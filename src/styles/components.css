@@ -1051,6 +1051,14 @@ body.pg-mode {
   padding-bottom: 72px;
 }
 
+/* Lift the theme toggle above the pagination bar (64px tall + 16px clearance) */
+body.pg-mode .hn-panel-toggle {
+  bottom: 84px;
+}
+body.pg-mode .hn-panel {
+  bottom: 136px;
+}
+
 /* ─────────────────────────────────────────
    Responsive
    ───────────────────────────────────────── */
