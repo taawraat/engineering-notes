@@ -1,0 +1,175 @@
+---
+// PaginationController
+// Finds all .page cards inside .content-wrap and paginates them.
+// The .cover (title page) always stays visible.
+// Drop this component anywhere inside a note page layout.
+---
+
+<!-- Progress bar (fixed, just below site nav) -->
+<div class="pg-progress-wrap" id="pg-progress-wrap">
+  <div class="pg-progress-bar" id="pg-progress-bar"></div>
+</div>
+
+<!-- Fixed bottom navigation bar -->
+<div class="pg-bar" id="pg-bar" role="navigation" aria-label="Note page navigation">
+  <button class="pg-bar-btn" id="pg-prev" aria-label="Previous page" disabled>←</button>
+
+  <div class="pg-bar-center">
+    <div class="pg-bar-info">
+      <span class="pg-counter" id="pg-counter">pg 01 / 10</span>
+      <span class="pg-bar-sep">·</span>
+      <span class="pg-title" id="pg-title"></span>
+    </div>
+    <div class="pg-dots" id="pg-dots" role="tablist" aria-label="Pages"></div>
+  </div>
+
+  <button class="pg-bar-btn" id="pg-next" aria-label="Next page">→</button>
+</div>
+
+<script>
+  (function () {
+    // ── Collect pages ────────────────────────────────────────────────
+    const wrap  = document.querySelector('.content-wrap');
+    const pages = wrap ? Array.from(wrap.querySelectorAll(':scope > .page')) : [];
+    if (pages.length === 0) return;
+
+    const total = pages.length;
+    let current = 0;
+
+    // Restore page from URL hash (#page-3 → index 2)
+    const hashMatch = window.location.hash.match(/#page-(\d+)/);
+    if (hashMatch) {
+      const idx = parseInt(hashMatch[1], 10) - 1;
+      if (idx >= 0 && idx < total) current = idx;
+    }
+
+    // ── Extract titles ───────────────────────────────────────────────
+    const titles = pages.map(p => {
+      const el = p.querySelector('.section-title');
+      return el ? el.textContent.trim() : '';
+    });
+
+    // ── Init: hide all pages except current ─────────────────────────
+    pages.forEach((p, i) => { p.style.display = i === current ? 'block' : 'none'; });
+    document.body.classList.add('pg-mode');
+
+    // ── Show UI ──────────────────────────────────────────────────────
+    const bar         = document.getElementById('pg-bar');
+    const progressWrap = document.getElementById('pg-progress-wrap');
+    bar.classList.add('pg-visible');
+    progressWrap.classList.add('pg-visible');
+
+    // ── Build dots ───────────────────────────────────────────────────
+    const dotsContainer = document.getElementById('pg-dots');
+    pages.forEach((_, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'pg-dot';
+      btn.setAttribute('role', 'tab');
+      btn.setAttribute('aria-label', 'Page ' + (i + 1));
+      btn.addEventListener('click', () => { if (i !== current) navigate(i - current); });
+      dotsContainer.appendChild(btn);
+    });
+
+    // ── Update UI state ──────────────────────────────────────────────
+    function updateUI() {
+      const num  = String(current + 1).padStart(2, '0');
+      const tot  = String(total).padStart(2, '0');
+      document.getElementById('pg-counter').textContent = 'pg ' + num + ' / ' + tot;
+      document.getElementById('pg-title').textContent   = titles[current];
+      document.getElementById('pg-prev').disabled       = current === 0;
+      document.getElementById('pg-next').disabled       = current === total - 1;
+
+      dotsContainer.querySelectorAll('.pg-dot').forEach((d, i) => {
+        d.classList.toggle('pg-dot--active', i === current);
+        d.setAttribute('aria-selected', String(i === current));
+      });
+
+      document.getElementById('pg-progress-bar').style.width =
+        ((current + 1) / total * 100) + '%';
+
+      // Update URL hash without pushing to history
+      try { history.replaceState(null, '', '#page-' + (current + 1)); } catch (_) {}
+    }
+
+    // ── Animation ────────────────────────────────────────────────────
+    const prefersReduced =
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function navigate(direction) {
+      const newIndex = current + direction;
+      if (newIndex < 0 || newIndex >= total) return;
+
+      const oldPage = pages[current];
+      const newPage = pages[newIndex];
+
+      // Cancel any running animations on target page
+      if (newPage.getAnimations) newPage.getAnimations().forEach(a => a.cancel());
+
+      if (prefersReduced) {
+        oldPage.style.display = 'none';
+        newPage.style.display = 'block';
+        current = newIndex;
+        updateUI();
+        window.scrollTo({ top: 0 });
+        return;
+      }
+
+      // Exit: old page slides out
+      const exitX   = direction > 0 ? '-20px' : '20px';
+      const enterX  = direction > 0 ?  '36px' : '-36px';
+      const exitAnim = oldPage.animate(
+        [{ opacity: 1, transform: 'none' },
+         { opacity: 0, transform: `translateX(${exitX}) translateY(-6px)` }],
+        { duration: 200, easing: 'ease-in', fill: 'forwards' }
+      );
+
+      exitAnim.finished.then(() => {
+        oldPage.style.display = 'none';
+        oldPage.getAnimations().forEach(a => a.cancel());
+
+        // Enter: new page slides in
+        newPage.style.display = 'block';
+        newPage.animate(
+          [{ opacity: 0, transform: `translateX(${enterX}) translateY(8px)` },
+           { opacity: 1, transform: 'none' }],
+          { duration: 380, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', fill: 'forwards' }
+        ).finished.then(() => {
+          newPage.getAnimations().forEach(a => a.cancel());
+        });
+
+        current = newIndex;
+        updateUI();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
+
+    // ── Button events ─────────────────────────────────────────────────
+    document.getElementById('pg-prev').addEventListener('click', () => navigate(-1));
+    document.getElementById('pg-next').addEventListener('click', () => navigate(1));
+
+    // ── Keyboard navigation ───────────────────────────────────────────
+    document.addEventListener('keydown', (e) => {
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return;
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') navigate(1);
+      if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   navigate(-1);
+    });
+
+    // ── Touch / swipe ─────────────────────────────────────────────────
+    let touchStartX = 0, touchStartY = 0;
+    document.addEventListener('touchstart', (e) => {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+    document.addEventListener('touchend', (e) => {
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      const dy = e.changedTouches[0].clientY - touchStartY;
+      // Only horizontal swipes (not vertical scrolling)
+      if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+        navigate(dx < 0 ? 1 : -1);
+      }
+    }, { passive: true });
+
+    // ── Initial render ────────────────────────────────────────────────
+    updateUI();
+  })();
+</script>

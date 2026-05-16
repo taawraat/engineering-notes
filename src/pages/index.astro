@@ -1,0 +1,46 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const notes = [
+  {
+    href:   '/notes/spring-boot-ioc/',
+    series: 'Spring Boot · Deep Dive Series',
+    title:  'IoC Container, @Bean & Dep. Injection',
+    desc:   'How Spring actually works under the hood — BeanDefinition, CGLIB proxies, DI types, scopes, lifecycle, and circular dependency resolution.',
+    tags:   [
+      { label: '🫘 Beans',            cls: 'tag-g' },
+      { label: '📦 ApplicationContext', cls: 'tag-b' },
+      { label: '🔄 Lifecycle',        cls: 'tag-o' },
+      { label: '🔗 DI Internals',     cls: 'tag-g' },
+    ],
+    doodle: '☕',
+    pages:  10,
+  },
+];
+---
+
+<BaseLayout
+  title="Hand Notes — Engineering Deep Dives"
+  description="Hand-written style engineering notes on Spring Boot, Java, and backend systems."
+>
+  <div class="notes-header">
+    <h1>Engineering Notes</h1>
+    <p>Deep dives, hand-written style. Pick a topic and start reading.</p>
+  </div>
+
+  <div class="notes-grid">
+    {notes.map((note) => (
+      <a href={note.href} class="note-card">
+        <div class="note-card-series">{note.series}</div>
+        <div class="note-card-title">{note.title}</div>
+        <div class="note-card-desc">{note.desc}</div>
+        <div class="note-card-tags">
+          {note.tags.map((t) => (
+            <span class={`tag ${t.cls}`}>{t.label}</span>
+          ))}
+        </div>
+        <div class="note-card-doodle">{note.doodle}</div>
+      </a>
+    ))}
+  </div>
+</BaseLayout>

@@ -1,0 +1,76 @@
+/* ─────────────────────────────────────────
+   Design Tokens — Warm Paper (default theme)
+   ───────────────────────────────────────── */
+:root {
+  /* ── Fonts ── */
+  --font-body: 'Klee One', cursive;
+  --font-hand: 'Gochi Hand', cursive;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* ── Paper & Ink ── */
+  --paper:    #fdf8f0;
+  --paper2:   #fef9f2;
+  --ink:      #2d2318;
+  --ink2:     #4a3728;
+  --ink3:     #6b5040;
+  --body-bg:  #e8e0d0;
+
+  /* ── Rule & Grid ── */
+  --rule-line: #e8dcc8;
+  --grid:      #f0e8d8;
+  --body-rule: #d8cfc0;
+
+  /* ── Shadows ── */
+  --shadow:  rgba(80, 50, 20, 0.10);
+  --shadow2: rgba(80, 50, 20, 0.18);
+
+  /* ── Accent: Green ── */
+  --green:       #3a7d4a;
+  --green-bg:    #e8f5ec;
+  --green-light: #c8e6cf;
+
+  /* ── Accent: Blue ── */
+  --blue:       #2a5fa5;
+  --blue-bg:    #e6eef8;
+  --blue-light: #b8d0f0;
+
+  /* ── Accent: Orange ── */
+  --orange:       #c45e1a;
+  --orange-bg:    #fdf0e4;
+  --orange-light: #f5cfaa;
+
+  /* ── Accent: Red ── */
+  --red:    #b53030;
+  --red-bg: #fdeaea;
+
+  /* ── Accent: Purple ── */
+  --purple:    #6a3d9a;
+  --purple-bg: #f3eefb;
+
+  /* ── Highlights ── */
+  --yellow-hl:     #fff3a3;
+  --yellow-sticky: #fff176;
+
+  /* ── Spine colors (used for page left border) ── */
+  --spine-green:  var(--green);
+  --spine-blue:   var(--blue);
+  --spine-orange: var(--orange);
+  --spine-purple: var(--purple);
+  --spine-red:    var(--red);
+
+  /* ── Spacing rhythm ── */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+
+  /* ── Border radius ── */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
+  /* ── Max content width ── */
+  --content-width: 920px;
+}

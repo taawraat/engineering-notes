@@ -1,0 +1,631 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PaginationController from '../../components/PaginationController.astro';
+---
+
+<BaseLayout
+  title="Spring Boot — IoC, @Bean & DI · Hand Notes"
+  description="Deep dive into Spring Boot's IoC container, @Bean internals, CGLIB proxies, DI types, bean scopes, and the complete bean lifecycle."
+>
+
+<!-- ═══ COVER ═══ -->
+<div class="cover">
+  <div class="cover-subject">Spring Boot · Deep Dive Series</div>
+  <h1>IoC Container,<br /><span>@Bean</span> &amp;<br />Dep. Injection</h1>
+  <div class="cover-sub">How Spring actually works under the hood</div>
+  <div class="cover-tags">
+    <span class="tag tag-g">🫘 Beans</span>
+    <span class="tag tag-b">📦 ApplicationContext</span>
+    <span class="tag tag-o">🔄 Lifecycle</span>
+    <span class="tag tag-p">🏗️ BeanDefinition</span>
+    <span class="tag tag-g">🔗 DI Internals</span>
+    <span class="tag tag-b">🛡️ CGLIB Proxy</span>
+  </div>
+  <div class="cover-doodle">☕</div>
+</div>
+
+
+<!-- ═══ PAGE 1: IoC ═══ -->
+<div class="page green-spine">
+  <div class="page-num">pg 01</div>
+  <div class="section-header">
+    <span class="section-icon">💡</span>
+    <span class="section-title">1. Inversion of Control (IoC)</span>
+    <span class="section-num">01</span>
+  </div>
+
+  <div class="body-text">
+    <p>In <span class="hl">traditional code</span>, YOU create all objects manually. You're the boss of object creation.</p>
+    <p>In <span class="wu">IoC</span>, the <span class="hl-green">framework</span> creates and manages objects. You just <em>declare</em> what you need — Spring does the rest.</p>
+  </div>
+
+  <div class="code-compare">
+    <div class="code-compare-panel">
+      <div class="code-compare-label r">❌ Traditional Way</div>
+      <pre class="code-block orange-left"><span class="kw">public class</span> <span class="cl">OrderService</span> &#123;
+  <span class="cm">// YOU create everything manually</span>
+  <span class="kw">private</span> PaymentService pay = <span class="kw">new</span> <span class="cl">PaymentService</span>();
+  <span class="kw">private</span> EmailService email  = <span class="kw">new</span> <span class="cl">EmailService</span>();
+&#125;</pre>
+      <div class="code-compare-note">Tightly coupled. Hard to test. Nightmare to refactor.</div>
+    </div>
+    <div class="code-compare-sep">— vs —</div>
+    <div class="code-compare-panel">
+      <div class="code-compare-label g">✓ IoC Way</div>
+      <pre class="code-block green-left"><span class="an">@Service</span>
+<span class="kw">public class</span> <span class="cl">OrderService</span> &#123;
+  <span class="kw">private final</span> PaymentService pay;
+
+  <span class="cm">// Spring injects it — you never call new ↓</span>
+  <span class="kw">public</span> OrderService(<span class="cl">PaymentService</span> pay) &#123;
+    <span class="kw">this</span>.pay = pay;
+  &#125;
+&#125;</pre>
+      <div class="code-compare-note">Loosely coupled. Testable. Spring owns creation.</div>
+    </div>
+  </div>
+
+  <div class="sticky">
+    <div class="sticky-label">🍽️ Mental Model</div>
+    <p>Think of IoC like a <strong>restaurant</strong>. Traditional code = you go to the kitchen and cook. IoC = you sit at the table, tell the waiter what you want, the kitchen delivers it. <strong>Control is inverted.</strong></p>
+  </div>
+
+  <h2 class="sub">IoC vs DI — Not the same thing!</h2>
+  <table class="note-table">
+    <thead>
+      <tr><th>Concept</th><th>What it is</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><span class="hl-green">IoC</span></td><td>The <em>principle</em> — framework controls object creation &amp; wiring</td></tr>
+      <tr><td><span class="hl-blue">DI</span></td><td>The <em>implementation</em> of IoC — dependencies are "injected" into objects</td></tr>
+    </tbody>
+  </table>
+  <div class="body-text"><p>DI is <span class="wu">how</span> IoC is achieved in Spring. IoC is the concept, DI is the mechanism.</p></div>
+</div>
+
+
+<!-- ═══ PAGE 2: ApplicationContext ═══ -->
+<div class="page blue-spine">
+  <div class="page-num">pg 02</div>
+  <div class="section-header">
+    <span class="section-icon">📦</span>
+    <span class="section-title">2. The IoC Container</span>
+    <span class="section-num">02</span>
+  </div>
+
+  <div class="body-text">
+    <p>The IoC container is a <span class="hl">Java object</span> that reads your config, creates beans, wires them, and manages their entire lifecycle. In Spring Boot it's the <code>ApplicationContext</code>.</p>
+  </div>
+
+  <h2 class="sub">Interface Hierarchy</h2>
+  <div class="diag-wrap">
+    <div class="flow-row">
+      <div class="flow-box fb-gray">BeanFactory<br /><span style="font-size:11px;opacity:0.7">lazy, basic</span></div>
+      <div class="flow-arr">→</div>
+      <div class="flow-box fb-blue">ApplicationContext<br /><span style="font-size:11px;opacity:0.7">eager + AOP + events</span></div>
+      <div class="flow-arr">→</div>
+      <div class="flow-box fb-purple">AnnotationConfig<br />ApplicationContext<br /><span style="font-size:11px;opacity:0.7">Spring Boot uses this</span></div>
+    </div>
+  </div>
+
+  <ul class="note-list">
+    <li><span class="hl-green">BeanFactory</span> — bare minimum. Lazy: creates beans only when asked.</li>
+    <li><span class="hl-blue">ApplicationContext</span> — extends BeanFactory. Eager: creates singletons at startup.</li>
+    <li class="sq">Also adds: AOP support, Event publishing, i18n (<code>MessageSource</code>), <code>Environment</code> properties</li>
+    <li class="sq">In Spring Boot — <code>SpringApplication.run()</code> bootstraps it automatically. You never create it manually.</li>
+  </ul>
+
+  <h2 class="sub">Container Startup Flow</h2>
+  <div class="diag-wrap">
+    <div class="phase-flow">
+      <div class="phase-box ph-orange">
+        <div class="ph-num">Step 1</div>
+        <div class="ph-title">main() → SpringApplication.run()</div>
+        <div class="ph-sub">Entry point, bootstraps the context</div>
+      </div>
+      <div class="phase-arrow">↓</div>
+      <div class="phase-box ph-blue">
+        <div class="ph-num">Step 2</div>
+        <div class="ph-title">ApplicationContext Created</div>
+        <div class="ph-sub">Container object instantiated</div>
+      </div>
+      <div class="phase-arrow">↓</div>
+      <div class="phase-box ph-green">
+        <div class="ph-num">Step 3</div>
+        <div class="ph-title">Component Scanning</div>
+        <div class="ph-sub">Finds @Component, @Service, @Bean…</div>
+      </div>
+      <div class="phase-arrow">↓</div>
+      <div class="phase-box ph-blue">
+        <div class="ph-num">Step 4</div>
+        <div class="ph-title">BeanDefinitions Created</div>
+        <div class="ph-sub">Blueprints registered — no objects yet</div>
+      </div>
+      <div class="phase-arrow">↓</div>
+      <div class="phase-box ph-purple">
+        <div class="ph-num">Step 5</div>
+        <div class="ph-title">Beans Instantiated</div>
+        <div class="ph-sub">Via Reflection — objects created</div>
+      </div>
+      <div class="phase-arrow">↓</div>
+      <div class="phase-box ph-orange">
+        <div class="ph-num">Step 6</div>
+        <div class="ph-title">Dependencies Injected</div>
+        <div class="ph-sub">@Autowired resolved</div>
+      </div>
+      <div class="phase-arrow">↓</div>
+      <div class="phase-box ph-green">
+        <div class="ph-num">Step 7</div>
+        <div class="ph-title">@PostConstruct called → App READY ✓</div>
+        <div class="ph-sub">Application is now serving requests</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ PAGE 3: What is a Bean ═══ -->
+<div class="page orange-spine">
+  <div class="page-num">pg 03</div>
+  <div class="section-header">
+    <span class="section-icon">🫘</span>
+    <span class="section-title">3. What is a Bean?</span>
+    <span class="section-num">03</span>
+  </div>
+
+  <div class="sticky">
+    <div class="sticky-label">⭐ Core Definition</div>
+    <p>A <strong>bean</strong> = any Java object that Spring creates, configures, and manages. Nothing magic about the class itself — it becomes a bean because Spring knows about it.</p>
+  </div>
+
+  <h2 class="sub">Way 1 — @Component &amp; its friends</h2>
+  <pre class="code-block"><span class="an">@Component</span>     <span class="cm">// generic bean</span>
+<span class="an">@Service</span>       <span class="cm">// same as @Component — semantic for service layer</span>
+<span class="an">@Repository</span>    <span class="cm">// same + adds exception translation</span>
+<span class="an">@Controller</span>    <span class="cm">// same + enables Spring MVC request handling</span>
+<span class="an">@RestController</span> <span class="cm">// @Controller + @ResponseBody</span>
+<span class="kw">public class</span> <span class="cl">UserService</span> &#123; &#125;</pre>
+  <div class="body-text"><p>All picked up by <span class="hl-green">component scanning</span>. Spring scans your packages at startup and registers them automatically.</p></div>
+
+  <h2 class="sub">Way 2 — @Bean inside @Configuration</h2>
+  <pre class="code-block"><span class="an">@Configuration</span>  <span class="cm">// this class provides bean definitions</span>
+<span class="kw">public class</span> <span class="cl">AppConfig</span> &#123;
+
+  <span class="an">@Bean</span>  <span class="cm">// return value becomes a bean</span>
+  <span class="kw">public</span> <span class="cl">PasswordEncoder</span> passwordEncoder() &#123;
+    <span class="kw">return new</span> <span class="cl">BCryptPasswordEncoder</span>();
+  &#125;
+
+  <span class="an">@Bean</span>
+  <span class="kw">public</span> <span class="cl">UserService</span> userService(<span class="cl">PasswordEncoder</span> encoder) &#123;
+    <span class="cm">// Spring sees param → injects the bean above ↑</span>
+    <span class="kw">return new</span> <span class="cl">UserService</span>(encoder);
+  &#125;
+&#125;</pre>
+
+  <div class="insight green-ins">
+    <div class="insight-label">💡 Key Insight</div>
+    <p>The <code>@Bean</code> method body runs <strong>only ONCE</strong> for singletons. Spring intercepts calls using CGLIB proxying. Read page 4 to understand this deeply!</p>
+  </div>
+</div>
+
+
+<!-- ═══ PAGE 4: @Bean Internals ═══ -->
+<div class="page purple-spine">
+  <div class="page-num">pg 04</div>
+  <div class="section-header">
+    <span class="section-icon">🔬</span>
+    <span class="section-title">4. @Bean Internals — Deep Dive</span>
+    <span class="section-num">04</span>
+  </div>
+
+  <h2 class="sub">Step 1 — BeanDefinition (the Blueprint)</h2>
+  <div class="body-text"><p>Before any object is created, Spring creates a <span class="hl-blue">BeanDefinition</span> — an internal metadata object describing the bean. Think of it as a recipe card.</p></div>
+  <pre class="code-block purple-left"><span class="cl">BeanDefinition</span> &#123;
+  beanClass         <span class="ar">→</span> com.example.<span class="cl">UserService</span>
+  scope             <span class="ar">→</span> <span class="st">"singleton"</span>
+  lazyInit          <span class="ar">→</span> <span class="kw">false</span>
+  initMethodName    <span class="ar">→</span> <span class="st">"postConstruct"</span>
+  destroyMethodName <span class="ar">→</span> <span class="st">"preDestroy"</span>
+  constructorArgs   <span class="ar">→</span> [<span class="cl">PasswordEncoder</span>]
+&#125;
+<span class="cm">// Blueprint only — no object exists yet!</span></pre>
+
+  <h2 class="sub">Step 2 — CGLIB Proxy on @Configuration</h2>
+  <div class="body-text"><p><span class="wu-o">This is what almost nobody knows.</span> Consider this:</p></div>
+  <pre class="code-block"><span class="an">@Configuration</span>
+<span class="kw">public class</span> <span class="cl">AppConfig</span> &#123;
+  <span class="an">@Bean</span> <span class="kw">public</span> <span class="cl">ServiceA</span> serviceA() &#123;
+    <span class="kw">return new</span> <span class="cl">ServiceA</span>(<span class="wu-b">serviceB()</span>); <span class="cm">// calls serviceB()!!</span>
+  &#125;
+  <span class="an">@Bean</span> <span class="kw">public</span> <span class="cl">ServiceB</span> serviceB() &#123;
+    <span class="kw">return new</span> <span class="cl">ServiceB</span>();
+  &#125;
+&#125;</pre>
+
+  <div class="body-text"><p>In plain Java, calling <code>serviceB()</code> would create a <span class="hl">new object every time</span>. But Spring prevents this with <span class="hl-orange">CGLIB subclassing</span>:</p></div>
+  <div class="diag-wrap">
+    <div class="phase-flow">
+      <div class="phase-box ph-gray">
+        <div class="ph-num">Your class</div>
+        <div class="ph-title">AppConfig</div>
+        <div class="ph-sub">Your original @Configuration class</div>
+      </div>
+      <div class="phase-arrow">↓ Spring subclasses it at runtime</div>
+      <div class="phase-box ph-purple">
+        <div class="ph-num">Spring-generated subclass</div>
+        <div class="ph-title">AppConfig$$EnhancerBySpringCGLIB</div>
+        <div class="ph-sub">Intercepts all @Bean method calls → checks container cache first → only creates if absent</div>
+      </div>
+    </div>
+  </div>
+  <div class="insight orange-ins">
+    <div class="insight-label">⚡ Pro Tip</div>
+    <p>Use <code>@Configuration(proxyBeanMethods = false)</code> to skip CGLIB (faster startup) — but only when <code>@Bean</code> methods don't call each other.</p>
+  </div>
+
+  <h2 class="sub">Step 3 — Instantiation via Reflection</h2>
+  <pre class="code-block"><span class="cm">// Spring does this internally:</span>
+<span class="cl">Class</span>&lt;?&gt; cls = beanDef.getBeanClass();
+<span class="cl">Constructor</span>&lt;?&gt; ctor = cls.<span class="wu-b">getDeclaredConstructor</span>(paramTypes);
+ctor.<span class="wu-b">setAccessible</span>(<span class="kw">true</span>); <span class="cm">// even private constructors!</span>
+<span class="cl">Object</span> instance = ctor.newInstance(args);</pre>
+  <div class="body-text"><p>Reflection bypasses Java access modifiers. This is why Spring can inject into <code>private</code> constructors and fields.</p></div>
+</div>
+
+
+<!-- ═══ PAGE 5: DI Types ═══ -->
+<div class="page green-spine">
+  <div class="page-num">pg 05</div>
+  <div class="section-header">
+    <span class="section-icon">💉</span>
+    <span class="section-title">5. The 3 DI Types</span>
+    <span class="section-num">05</span>
+  </div>
+
+  <h2 class="sub">① Constructor Injection ← USE THIS</h2>
+  <pre class="code-block green-left"><span class="an">@Service</span>
+<span class="kw">public class</span> <span class="cl">OrderService</span> &#123;
+  <span class="kw">private final</span> <span class="cl">PaymentService</span> pay; <span class="cm">// final!</span>
+
+  <span class="cm">// No @Autowired needed if there's only ONE constructor (Spring 4.3+)</span>
+  <span class="kw">public</span> OrderService(<span class="cl">PaymentService</span> pay) &#123;
+    <span class="kw">this</span>.pay = pay;
+  &#125;
+&#125;</pre>
+  <div class="body-text"><p><strong>Internally:</strong> Spring resolves params by <span class="hl-green">type first</span>, then by <span class="hl">name</span> if multiple candidates exist.</p></div>
+  <ul class="note-list">
+    <li class="ck">Dependencies are <code>final</code> — immutable</li>
+    <li class="ck">Object always in valid state after construction</li>
+    <li class="ck">Easy to unit test — just pass a mock via constructor</li>
+    <li class="ck">Circular deps caught at startup (not runtime)</li>
+  </ul>
+
+  <h2 class="sub">② Field Injection (avoid in prod)</h2>
+  <pre class="code-block orange-left"><span class="an">@Autowired</span>
+<span class="kw">private</span> <span class="cl">PaymentService</span> pay;
+<span class="cm">// Spring does: field.setAccessible(true); field.set(instance, resolvedBean)</span></pre>
+  <ul class="note-list">
+    <li class="cr">Can't make field <code>final</code></li>
+    <li class="cr">Hard to test without Spring context</li>
+    <li class="cr">Hides dependencies (hard to see what a class needs)</li>
+  </ul>
+
+  <h2 class="sub">③ Setter Injection (optional deps)</h2>
+  <pre class="code-block"><span class="an">@Autowired</span>
+<span class="kw">public void</span> setPaymentService(<span class="cl">PaymentService</span> svc) &#123;
+  <span class="kw">this</span>.pay = svc;
+&#125;</pre>
+  <div class="body-text"><p>Good for optional dependencies. Can be re-injected after construction (rare use case).</p></div>
+
+  <div class="sticky">
+    <div class="sticky-label">📌 Remember</div>
+    <p>Constructor injection = <strong>mandatory deps</strong>. Setter injection = <strong>optional deps</strong>. Field injection = <strong>avoid</strong> (convenient but problematic).</p>
+  </div>
+</div>
+
+
+<!-- ═══ PAGE 6: Scopes ═══ -->
+<div class="page orange-spine">
+  <div class="page-num">pg 06</div>
+  <div class="section-header">
+    <span class="section-icon">🔄</span>
+    <span class="section-title">6. Bean Scopes</span>
+    <span class="section-num">06</span>
+  </div>
+
+  <div class="sticky" style="transform:rotate(0.3deg)">
+    <div class="sticky-label">❓ Does Spring create new objects every injection?</div>
+    <p><strong>NO — by default!</strong> Spring creates ONE object per bean and reuses it forever. This is <strong>Singleton scope</strong>.</p>
+  </div>
+
+  <div class="scope-diagram">
+    <div class="scope-side">
+      <div class="scope-label" style="color:var(--green)">Singleton (default)</div>
+      <div class="scope-bean" style="color:var(--green);border-color:var(--green)">UserService @0xAB12</div>
+      <div style="font-family:var(--font-hand);font-size:13px;color:var(--ink3);margin:4px 0">↑ same reference every time</div>
+      <div class="scope-callers">
+        <div class="scope-caller">Controller A</div>
+        <div class="scope-caller">Controller B</div>
+        <div class="scope-caller">Controller C</div>
+      </div>
+      <div class="scope-note" style="color:var(--green)">All get the SAME object</div>
+    </div>
+    <div class="scope-side">
+      <div class="scope-label" style="color:var(--red)">Prototype</div>
+      <div class="scope-callers" style="flex-direction:column;align-items:center">
+        <div style="display:flex;align-items:center;gap:8px;width:100%">
+          <div class="scope-caller">Controller A</div>
+          <span style="color:var(--red);font-family:var(--font-hand)">→</span>
+          <div class="scope-bean" style="color:var(--red);border-color:var(--red);margin:0;font-size:11px">@0xAB12</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;width:100%;margin-top:6px">
+          <div class="scope-caller">Controller B</div>
+          <span style="color:var(--red);font-family:var(--font-hand)">→</span>
+          <div class="scope-bean" style="color:var(--red);border-color:var(--red);margin:0;font-size:11px">@0xCD34</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;width:100%;margin-top:6px">
+          <div class="scope-caller">Controller C</div>
+          <span style="color:var(--red);font-family:var(--font-hand)">→</span>
+          <div class="scope-bean" style="color:var(--red);border-color:var(--red);margin:0;font-size:11px">@0xEF56</div>
+        </div>
+      </div>
+      <div class="scope-note" style="color:var(--red)">NEW object every injection</div>
+    </div>
+  </div>
+
+  <div class="insight">
+    <div class="insight-label">🧠 Singleton cache internally</div>
+    <p><code>ConcurrentHashMap&lt;String, Object&gt;</code> inside the container stores all singleton beans. Every injection returns the same reference from this map.</p>
+  </div>
+
+  <h2 class="sub">All Scopes</h2>
+  <table class="note-table">
+    <thead><tr><th>Scope</th><th>One instance per…</th></tr></thead>
+    <tbody>
+      <tr><td><code>singleton</code> ⭐</td><td>Entire application (default)</td></tr>
+      <tr><td><code>prototype</code></td><td>Each injection / getBean() call</td></tr>
+      <tr><td><code>request</code></td><td>Each HTTP request</td></tr>
+      <tr><td><code>session</code></td><td>Each HTTP session</td></tr>
+      <tr><td><code>application</code></td><td>ServletContext lifecycle</td></tr>
+    </tbody>
+  </table>
+  <div class="body-text"><p>⚠️ <code>@PreDestroy</code> is <span class="hl">NOT called</span> for prototype beans — Spring doesn't track them after creation!</p></div>
+</div>
+
+
+<!-- ═══ PAGE 7: Bean Lifecycle ═══ -->
+<div class="page purple-spine">
+  <div class="page-num">pg 07</div>
+  <div class="section-header">
+    <span class="section-icon">🏗️</span>
+    <span class="section-title">7. Complete Bean Lifecycle</span>
+    <span class="section-num">07</span>
+  </div>
+
+  <div class="phase-flow">
+    <div class="phase-box ph-gray">
+      <div class="ph-num">Phase 1</div>
+      <div class="ph-title">📋 Definition</div>
+      <div class="ph-sub">@Component / @Bean found → BeanDefinition registered</div>
+    </div>
+    <div class="phase-arrow">↓</div>
+    <div class="phase-box ph-blue">
+      <div class="ph-num">Phase 2</div>
+      <div class="ph-title">🔨 Instantiation</div>
+      <div class="ph-sub">Constructor called via Reflection — raw object, no deps yet</div>
+    </div>
+    <div class="phase-arrow">↓</div>
+    <div class="phase-box ph-green">
+      <div class="ph-num">Phase 3</div>
+      <div class="ph-title">💉 Dependency Injection</div>
+      <div class="ph-sub">@Autowired fields/setters resolved → BeanPostProcessor.before()</div>
+    </div>
+    <div class="phase-arrow">↓</div>
+    <div class="phase-box ph-orange">
+      <div class="ph-num">Phase 4</div>
+      <div class="ph-title">⚙️ Initialization</div>
+      <div class="ph-sub">@PostConstruct → afterPropertiesSet() → BeanPostProcessor.after()<br />← @Transactional / @Async proxies created HERE</div>
+    </div>
+    <div class="phase-arrow">↓</div>
+    <div class="phase-box ph-purple">
+      <div class="ph-num">Phase 5</div>
+      <div class="ph-title">✅ Ready — In Use</div>
+      <div class="ph-sub">Lives in singleton cache. Serves all requests.</div>
+    </div>
+    <div class="phase-arrow">↓</div>
+    <div class="phase-box ph-red">
+      <div class="ph-num">Phase 6</div>
+      <div class="ph-title">💀 Destruction</div>
+      <div class="ph-sub">@PreDestroy → DisposableBean.destroy()</div>
+    </div>
+  </div>
+
+  <div class="insight orange-ins" style="margin-top:20px">
+    <div class="insight-label">🔥 BeanPostProcessor — The Magic Hook</div>
+    <p>Called after EVERY bean initialization. Spring's AOP uses this to wrap beans with CGLIB/JDK proxies. This is exactly how <code>@Transactional</code>, <code>@Async</code>, and <code>@Cacheable</code> work — they replace your bean with a proxy at this phase!</p>
+  </div>
+</div>
+
+
+<!-- ═══ PAGE 8: Circular Deps ═══ -->
+<div class="page red-spine">
+  <div class="page-num">pg 08</div>
+  <div class="section-header">
+    <span class="section-icon">🔁</span>
+    <span class="section-title">8. Circular Dependencies</span>
+    <span class="section-num">08</span>
+  </div>
+
+  <pre class="code-block orange-left"><span class="an">@Service</span> <span class="kw">public class</span> <span class="cl">A</span> &#123;
+  <span class="an">@Autowired</span> <span class="cl">B</span> b; <span class="cm">// A needs B</span>
+&#125;
+<span class="an">@Service</span> <span class="kw">public class</span> <span class="cl">B</span> &#123;
+  <span class="an">@Autowired</span> <span class="cl">A</span> a; <span class="cm">// B needs A</span>
+&#125;</pre>
+
+  <h2 class="sub">With Field/Setter Injection → Spring solves it using 3 caches</h2>
+  <div class="diag-wrap">
+    <div class="body-text" style="font-size:15px">
+      <p><span class="hl-orange">Level 1</span> — <code>singletonObjects</code> → fully initialized beans ✅</p>
+      <p><span class="hl-blue">Level 2</span> — <code>earlySingletonObjects</code> → half-init (no deps yet) 🔄</p>
+      <p><span class="hl-green">Level 3</span> — <code>singletonFactories</code> → factory lambdas to create early refs 🏭</p>
+    </div>
+    <div style="margin-top:12px;font-family:var(--font-body);font-size:14px;color:var(--ink3);border-top:1px dashed var(--rule-line);padding-top:12px">
+      Spring creates A (incomplete) → puts factory in L3 → starts creating B<br />
+      B needs A → finds L3 factory → creates early ref of A → finishes B → finishes A ✓
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="col-card">
+      <div class="col-card-title r">Constructor Injection</div>
+      <div class="body-text" style="font-size:14px;margin:0">
+        <p>Spring <span class="hl">FAILS at startup</span> with <code>BeanCurrentlyInCreationException</code>.</p>
+        <p>This is <span class="hl-green">GOOD</span> — forces you to fix a design problem early!</p>
+      </div>
+    </div>
+    <div class="col-card">
+      <div class="col-card-title b">Field/Setter Injection</div>
+      <div class="body-text" style="font-size:14px;margin:0">
+        <p>Spring solves it with the 3-level cache. Works but feels fragile.</p>
+        <p>Circular deps usually indicate a <span class="wu-o">design problem</span>.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ PAGE 9: @Autowired Resolution ═══ -->
+<div class="page green-spine">
+  <div class="page-num">pg 09</div>
+  <div class="section-header">
+    <span class="section-icon">🎯</span>
+    <span class="section-title">9. @Autowired Resolution</span>
+    <span class="section-num">09</span>
+  </div>
+
+  <div class="body-text"><p>When Spring sees <code>@Autowired PaymentService pay</code>, it follows this decision tree:</p></div>
+
+  <div class="diag-wrap">
+    <div class="phase-flow">
+      <div class="phase-box ph-blue">
+        <div class="ph-num">Step 1</div>
+        <div class="ph-title">Find all beans of type PaymentService</div>
+      </div>
+      <div class="phase-arrow">↓</div>
+      <div class="phase-box ph-green">
+        <div class="ph-num">Exactly one found</div>
+        <div class="ph-title">✅ Inject it</div>
+      </div>
+      <div class="phase-arrow" style="opacity:0.3">— or —</div>
+      <div class="phase-box ph-red">
+        <div class="ph-num">Zero found</div>
+        <div class="ph-title">💥 NoSuchBeanDefinitionException</div>
+        <div class="ph-sub">Unless @Autowired(required=false)</div>
+      </div>
+      <div class="phase-arrow" style="opacity:0.3">— or —</div>
+      <div class="phase-box ph-orange">
+        <div class="ph-num">Multiple found</div>
+        <div class="ph-title">💥 NoUniqueBeanDefinitionException</div>
+        <div class="ph-sub">→ Needs disambiguation (see below)</div>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="sub">Disambiguation Strategies</h2>
+  <pre class="code-block green-left"><span class="cm">// Option 1: @Qualifier — pick by name</span>
+<span class="an">@Autowired</span>
+<span class="an">@Qualifier</span>(<span class="st">"stripePaymentService"</span>)
+<span class="kw">private</span> <span class="cl">PaymentService</span> pay;
+
+<span class="cm">// Option 2: @Primary — mark one as default winner</span>
+<span class="an">@Service</span> <span class="an">@Primary</span>
+<span class="kw">public class</span> <span class="cl">StripePaymentService</span> <span class="kw">implements</span> <span class="cl">PaymentService</span> &#123;&#125;
+
+<span class="cm">// Option 3: Variable name matches bean name (last resort)</span>
+<span class="an">@Autowired</span>
+<span class="kw">private</span> <span class="cl">PaymentService</span> stripePaymentService; <span class="cm">// name = bean name</span></pre>
+
+  <div class="insight">
+    <div class="insight-label">🔍 Resolution Order</div>
+    <p>Spring tries: <strong>1)</strong> by type → <strong>2)</strong> @Primary if multiple → <strong>3)</strong> @Qualifier → <strong>4)</strong> field/parameter name match. It only fails if none of these resolve to exactly one bean.</p>
+  </div>
+</div>
+
+
+<!-- ═══ PAGE 10: Cheat Sheet ═══ -->
+<div class="page orange-spine">
+  <div class="page-num">pg 10</div>
+  <div class="section-header">
+    <span class="section-icon">📝</span>
+    <span class="section-title">10. Quick Reference Cheatsheet</span>
+    <span class="section-num">10</span>
+  </div>
+
+  <div class="cheat-grid">
+    <div class="cheat-card" style="color:var(--green);border-top-color:var(--green)">
+      <div class="cheat-card-title">🫘 Declare Beans</div>
+      <pre class="code-block" style="margin:0;font-size:12px;border-left-color:var(--green)"><span class="an">@Component</span>
+<span class="an">@Service</span>
+<span class="an">@Repository</span>
+<span class="an">@Controller</span>
+<span class="an">@Bean</span> <span class="cm">// in @Configuration</span></pre>
+    </div>
+    <div class="cheat-card" style="color:var(--blue);border-top-color:var(--blue)">
+      <div class="cheat-card-title">💉 Inject Beans</div>
+      <pre class="code-block" style="margin:0;font-size:12px;border-left-color:var(--blue)"><span class="an">@Autowired</span> <span class="cm">// field/ctor/setter</span>
+<span class="cm">// ctor: no @Autowired needed</span>
+<span class="cm">// if single constructor</span></pre>
+    </div>
+    <div class="cheat-card" style="color:var(--orange);border-top-color:var(--orange)">
+      <div class="cheat-card-title">🔄 Scopes</div>
+      <pre class="code-block" style="margin:0;font-size:12px;border-left-color:var(--orange)"><span class="an">@Scope</span>(<span class="st">"singleton"</span>) <span class="cm">// default</span>
+<span class="an">@Scope</span>(<span class="st">"prototype"</span>) <span class="cm">// new each time</span>
+<span class="an">@Scope</span>(<span class="st">"request"</span>)
+<span class="an">@Scope</span>(<span class="st">"session"</span>)</pre>
+    </div>
+    <div class="cheat-card" style="color:var(--purple);border-top-color:var(--purple)">
+      <div class="cheat-card-title">⚙️ Lifecycle</div>
+      <pre class="code-block" style="margin:0;font-size:12px;border-left-color:var(--purple)"><span class="an">@PostConstruct</span> <span class="cm">// after DI</span>
+<span class="an">@PreDestroy</span>    <span class="cm">// before destroy</span></pre>
+    </div>
+    <div class="cheat-card" style="color:var(--red);border-top-color:var(--red)">
+      <div class="cheat-card-title">🎯 Disambiguation</div>
+      <pre class="code-block" style="margin:0;font-size:12px;border-left-color:var(--red)"><span class="an">@Primary</span>    <span class="cm">// default winner</span>
+<span class="an">@Qualifier</span>(<span class="st">"name"</span>) <span class="cm">// by name</span></pre>
+    </div>
+    <div class="cheat-card" style="color:var(--green);border-top-color:var(--green)">
+      <div class="cheat-card-title">🛡️ Conditional</div>
+      <pre class="code-block" style="margin:0;font-size:12px;border-left-color:var(--green)"><span class="an">@ConditionalOnProperty</span>(
+  name=<span class="st">"feat.enabled"</span>,
+  havingValue=<span class="st">"true"</span>)
+<span class="an">@ConditionalOnMissingBean</span></pre>
+    </div>
+  </div>
+
+  <h2 class="sub">Master Summary Table</h2>
+  <table class="note-table">
+    <thead><tr><th>Concept</th><th>What it is</th><th>In code</th></tr></thead>
+    <tbody>
+      <tr><td><span class="hl-green">IoC</span></td><td>Framework controls object creation</td><td>Principle</td></tr>
+      <tr><td><span class="hl-blue">DI</span></td><td>Deps passed in, not created inside</td><td><code>@Autowired</code>, ctor</td></tr>
+      <tr><td><span class="hl-orange">Bean</span></td><td>Any Spring-managed object</td><td><code>@Component</code>, <code>@Bean</code></td></tr>
+      <tr><td><span class="hl-purple">BeanDefinition</span></td><td>Internal blueprint for a bean</td><td>Created at startup</td></tr>
+      <tr><td>ApplicationContext</td><td>The container itself</td><td><code>SpringApplication.run()</code></td></tr>
+      <tr><td>Singleton</td><td>One instance, always reused</td><td>Default scope</td></tr>
+      <tr><td>Prototype</td><td>New instance every time</td><td><code>@Scope("prototype")</code></td></tr>
+      <tr><td>BeanPostProcessor</td><td>Hook after every bean init</td><td>How AOP proxies are created</td></tr>
+      <tr><td>CGLIB proxy</td><td>Intercepts <code>@Bean</code> method calls</td><td><code>@Configuration</code> classes</td></tr>
+      <tr><td>3-level cache</td><td>Solves circular deps</td><td>Internal Spring mechanism</td></tr>
+    </tbody>
+  </table>
+
+  <div class="sticky" style="transform:rotate(-0.5deg);margin-top:24px">
+    <div class="sticky-label">🎓 Next to Study</div>
+    <p>How <code>@Transactional</code> proxy works internally · Spring AOP (JDK vs CGLIB proxies) · Auto-configuration internals · <code>@SpringBootApplication</code> deep dive</p>
+  </div>
+</div>
+
+<PaginationController />
+</BaseLayout>

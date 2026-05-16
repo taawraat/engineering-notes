@@ -1,0 +1,96 @@
+/* ─────────────────────────────────────────
+   Theme Overrides
+   ───────────────────────────────────────── */
+
+/* ── Cool Paper ── */
+[data-theme="cool"] {
+  --paper:    #f5f8fc;
+  --paper2:   #f8fafd;
+  --ink:      #1a2030;
+  --ink2:     #2d3a52;
+  --ink3:     #4a5570;
+  --body-bg:  #dce4f0;
+  --rule-line: #cdd8ea;
+  --grid:      #dce8f4;
+  --body-rule: #c4d0e4;
+  --shadow:   rgba(20, 40, 80, 0.10);
+  --shadow2:  rgba(20, 40, 80, 0.18);
+  --yellow-hl:     #dff0ff;
+  --yellow-sticky: #cfe8ff;
+
+  /* Accent tweaks for cool tone */
+  --green:       #2e7057;
+  --green-bg:    #e4f4ee;
+  --green-light: #b8dece;
+
+  --orange:       #b05a30;
+  --orange-bg:    #faeee4;
+  --orange-light: #e8c4a0;
+
+  --purple:    #5a3890;
+  --purple-bg: #eee8f8;
+}
+
+/* ── Dark Ink ── */
+[data-theme="dark"] {
+  --paper:    #1e1a14;
+  --paper2:   #231f18;
+  --ink:      #f0e8d8;
+  --ink2:     #d4c8b4;
+  --ink3:     #a89880;
+  --body-bg:  #0f0d0a;
+  --rule-line: #2e2820;
+  --grid:      #262018;
+  --body-rule: #1e1a12;
+  --shadow:   rgba(0, 0, 0, 0.40);
+  --shadow2:  rgba(0, 0, 0, 0.60);
+  --yellow-hl:     rgba(255, 243, 163, 0.15);
+  --yellow-sticky: #3a3000;
+
+  /* Accent adjustments for dark bg */
+  --green:       #5ab87a;
+  --green-bg:    rgba(90, 184, 122, 0.12);
+  --green-light: rgba(90, 184, 122, 0.25);
+
+  --blue:       #6ea8e8;
+  --blue-bg:    rgba(110, 168, 232, 0.12);
+  --blue-light: rgba(110, 168, 232, 0.25);
+
+  --orange:       #e88040;
+  --orange-bg:    rgba(232, 128, 64, 0.12);
+  --orange-light: rgba(232, 128, 64, 0.25);
+
+  --red:    #e06060;
+  --red-bg: rgba(224, 96, 96, 0.12);
+
+  --purple:    #a878e8;
+  --purple-bg: rgba(168, 120, 232, 0.12);
+}
+
+/* ─────────────────────────────────────────
+   Font Overrides
+   ───────────────────────────────────────── */
+
+/* Caveat — casual, friendly scrawl */
+[data-font="caveat"] {
+  --font-body: 'Caveat', cursive;
+  --font-hand: 'Caveat', cursive;
+}
+
+/* Patrick Hand — neat, clean classroom */
+[data-font="patrick"] {
+  --font-body: 'Patrick Hand', cursive;
+  --font-hand: 'Patrick Hand', cursive;
+}
+
+/* Kalam — warm, rounded notebook */
+[data-font="kalam"] {
+  --font-body: 'Kalam', cursive;
+  --font-hand: 'Kalam', cursive;
+}
+
+/* Klee One — default, no override needed */
+[data-font="klee"] {
+  --font-body: 'Klee One', cursive;
+  --font-hand: 'Gochi Hand', cursive;
+}

@@ -1,0 +1,89 @@
+<!-- Floating theme + font switcher panel -->
+<button
+  class="hn-panel-toggle"
+  id="hn-toggle"
+  aria-label="Open theme and font settings"
+  aria-expanded="false"
+  aria-controls="hn-panel"
+>
+  🎨
+</button>
+
+<div class="hn-panel" id="hn-panel" role="dialog" aria-label="Theme and font settings">
+  <div>
+    <div class="hn-panel-section-label">Theme</div>
+    <div class="hn-panel-row">
+      <button class="hn-btn" data-hn-theme="warm"  aria-label="Warm Paper theme">☀️ Warm</button>
+      <button class="hn-btn" data-hn-theme="cool"  aria-label="Cool Paper theme">❄️ Cool</button>
+      <button class="hn-btn" data-hn-theme="dark"  aria-label="Dark Ink theme">🌙 Dark</button>
+    </div>
+  </div>
+  <div>
+    <div class="hn-panel-section-label">Handwriting</div>
+    <div class="hn-panel-row">
+      <button class="hn-btn" data-hn-font="klee"    aria-label="Klee One font" style="font-family:'Klee One',cursive">Klee</button>
+      <button class="hn-btn" data-hn-font="caveat"  aria-label="Caveat font"   style="font-family:'Caveat',cursive">Caveat</button>
+      <button class="hn-btn" data-hn-font="patrick" aria-label="Patrick Hand font" style="font-family:'Patrick Hand',cursive">Patrick</button>
+      <button class="hn-btn" data-hn-font="kalam"   aria-label="Kalam font"    style="font-family:'Kalam',cursive">Kalam</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var toggle = document.getElementById('hn-toggle');
+    var panel  = document.getElementById('hn-panel');
+
+    // Reflect saved state on buttons
+    function syncButtons() {
+      var theme = document.documentElement.dataset.theme || 'warm';
+      var font  = document.documentElement.dataset.font  || 'klee';
+
+      document.querySelectorAll('[data-hn-theme]').forEach(function (btn) {
+        btn.classList.toggle('active', btn.dataset.hnTheme === theme);
+      });
+      document.querySelectorAll('[data-hn-font]').forEach(function (btn) {
+        btn.classList.toggle('active', btn.dataset.hnFont === font);
+      });
+    }
+
+    // Toggle panel open / closed
+    if (toggle && panel) {
+      toggle.addEventListener('click', function () {
+        var isOpen = panel.classList.toggle('open');
+        toggle.setAttribute('aria-expanded', String(isOpen));
+        toggle.textContent = isOpen ? '✕' : '🎨';
+        if (isOpen) syncButtons();
+      });
+
+      // Close when clicking outside
+      document.addEventListener('click', function (e) {
+        if (!panel.contains(e.target) && e.target !== toggle) {
+          panel.classList.remove('open');
+          toggle.setAttribute('aria-expanded', 'false');
+          toggle.textContent = '🎨';
+        }
+      });
+    }
+
+    // Theme buttons
+    document.querySelectorAll('[data-hn-theme]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var value = btn.dataset.hnTheme;
+        document.documentElement.dataset.theme = value;
+        localStorage.setItem('hn-theme', value);
+        syncButtons();
+      });
+    });
+
+    // Font buttons
+    document.querySelectorAll('[data-hn-font]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var value = btn.dataset.hnFont;
+        document.documentElement.dataset.font = value;
+        localStorage.setItem('hn-font', value);
+        syncButtons();
+      });
+    });
+  })();
+</script>

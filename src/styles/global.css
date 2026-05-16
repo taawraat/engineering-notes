@@ -1,0 +1,60 @@
+/* ─────────────────────────────────────────
+   Imports
+   ───────────────────────────────────────── */
+@import './tokens.css';
+@import './themes.css';
+@import './components.css';
+
+/* ─────────────────────────────────────────
+   Reset
+   ───────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ─────────────────────────────────────────
+   Base body — lined paper background
+   ───────────────────────────────────────── */
+body {
+  background-color: var(--body-bg);
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 39px,
+    var(--body-rule) 39px,
+    var(--body-rule) 40px
+  );
+  font-family: var(--font-body);
+  color: var(--ink);
+  min-height: 100vh;
+}
+
+/* Content area below the nav */
+.content-wrap {
+  padding: 40px 20px 80px;
+}
+
+/* ─────────────────────────────────────────
+   Base typography
+   ───────────────────────────────────────── */
+a {
+  color: inherit;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ─────────────────────────────────────────
+   Reduce motion
+   ───────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

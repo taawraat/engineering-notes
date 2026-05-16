@@ -1,0 +1,65 @@
+---
+import SiteNav from '../components/SiteNav.astro';
+import ThemeFontPanel from '../components/ThemeFontPanel.astro';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  ogImage?: string;
+}
+
+const {
+  title,
+  description = 'Hand-written style engineering notes',
+  ogImage,
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="article" />
+    {ogImage && <meta property="og:image" content={ogImage} />}
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Google Fonts — all options preloaded so font switching has no network delay -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Gochi+Hand&family=JetBrains+Mono:wght@400;500&family=Kalam:wght@300;400;700&family=Klee+One:wght@400;600&family=Patrick+Hand&display=swap"
+      rel="stylesheet"
+    />
+
+    <title>{title}</title>
+
+    <!-- FOUC prevention: apply saved theme/font before first paint -->
+    <script is:inline>
+      (function () {
+        var t = localStorage.getItem('hn-theme') || 'warm';
+        var f = localStorage.getItem('hn-font') || 'klee';
+        document.documentElement.dataset.theme = t;
+        document.documentElement.dataset.font = f;
+      })();
+    </script>
+  </head>
+  <body>
+    <SiteNav />
+    <div class="content-wrap">
+      <slot />
+    </div>
+    <ThemeFontPanel />
+  </body>
+</html>
