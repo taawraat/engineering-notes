@@ -34,6 +34,7 @@ body {
 /* Content area below the nav */
 .content-wrap {
   padding: 40px 20px 80px;
+  /* horizontal padding tightens via responsive breakpoints in components.css */
 }
 
 /* ─────────────────────────────────────────

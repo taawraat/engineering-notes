@@ -374,4 +374,98 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   </div>
 </div>
 
+<!-- ── Mobile & Responsive ── -->
+<div class="sg-section">
+  <div class="page green-spine">
+    <div class="section-header">
+      <span class="section-icon">📱</span>
+      <span class="section-title">Mobile &amp; Responsive</span>
+    </div>
+
+    <div class="body-text">
+      <p>All responsive rules live in the <span class="hl-green">Responsive</span> section at the bottom of <code>components.css</code>. Three breakpoints cover tablet, phone, and small phone.</p>
+    </div>
+
+    <h2 class="sub">Breakpoints</h2>
+    <table class="note-table">
+      <thead><tr><th>Breakpoint</th><th>Target</th><th>Key changes</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>≤ 768px</code></td>
+          <td>Tablet</td>
+          <td>Tighter card padding, smaller cover h1 (28px), decorative section-num shrinks</td>
+        </tr>
+        <tr>
+          <td><code>≤ 640px</code></td>
+          <td>Phone</td>
+          <td>Single-column grids, font sizes reduced, <code>.page-num</code> hidden, cover compact, sticky rotation off</td>
+        </tr>
+        <tr>
+          <td><code>≤ 480px</code></td>
+          <td>Small phone</td>
+          <td>Further size reduction, cover-subject hidden, pagination title hidden, nav tightened</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2 class="sub">Rules for new components</h2>
+    <ul class="note-list">
+      <li>Never use hard pixel widths on layout containers — use <code>max-width</code> + <code>width: 100%</code></li>
+      <li class="sq">New <span class="hl-blue">multi-column grids</span> must be added to the <code>≤ 640px</code> block with <code>grid-template-columns: 1fr</code></li>
+      <li class="sq">New <span class="hl-blue">tables</span> must get <code>display: block; overflow-x: auto</code> at <code>≤ 640px</code> — the <code>.note-table</code> rule is the reference</li>
+      <li class="sq">New <span class="hl-blue">code blocks</span> scroll horizontally automatically — <code>overflow-x: auto</code> + <code>white-space: pre</code> handle it</li>
+      <li class="sq">New <span class="hl-orange">decorative-only elements</span> (doodles, background numbers, hints) must be hidden at <code>≤ 640px</code> or <code>≤ 480px</code></li>
+      <li class="sq">New <span class="hl-orange">fixed elements</span> must check positioning under <code>body.pg-mode</code> (pagination bar active)</li>
+    </ul>
+
+    <h2 class="sub">Known mobile fixes (do not remove)</h2>
+
+    <div class="insight orange-ins">
+      <div class="insight-label">⚠️ .page-num hidden at ≤ 640px</div>
+      <p>The "pg 01" badge is <code>position: absolute; top: 16px; right: 24px</code>. At reduced page padding it overlaps the section header. The pagination bar already shows the current page — hiding the badge on mobile removes the overlap without losing information.</p>
+    </div>
+
+    <div class="insight green-ins">
+      <div class="insight-label">✅ .section-title has flex: 1; min-width: 0</div>
+      <p>This is a global rule (not mobile-only). It allows long section titles to wrap inside the flex row instead of overflowing. Any new flex-row text element needs the same treatment.</p>
+    </div>
+
+    <div class="insight">
+      <div class="insight-label">💡 .sticky transform: none at ≤ 640px</div>
+      <p>The <code>rotate(-0.4deg)</code> decoration clips against card edges on narrow screens. Mobile sticky notes are flat — the warmth comes from the yellow background alone.</p>
+    </div>
+
+    <h2 class="sub">What scales automatically (no extra work needed)</h2>
+    <div class="two-col">
+      <div class="col-card">
+        <div class="col-card-title g">✓ Handled by CSS</div>
+        <ul class="note-list" style="margin:0">
+          <li class="ck">Code blocks scroll horizontally</li>
+          <li class="ck">Diagram wrappers scroll horizontally</li>
+          <li class="ck"><code>.two-col</code> stacks to 1 column</li>
+          <li class="ck"><code>.cheat-grid</code> stacks to 1 column</li>
+          <li class="ck">Flow diagrams go vertical</li>
+          <li class="ck">Tags wrap to new lines</li>
+          <li class="ck">Cover shrinks compactly</li>
+        </ul>
+      </div>
+      <div class="col-card">
+        <div class="col-card-title r">✗ You must handle manually</div>
+        <ul class="note-list" style="margin:0">
+          <li class="cr">New 2-col grids (add 1fr override)</li>
+          <li class="cr">New tables (add overflow-x rule)</li>
+          <li class="cr">New fixed elements (check pg-mode offset)</li>
+          <li class="cr">Hard-coded pixel widths</li>
+          <li class="cr">Decorative-only elements (hide them)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="sticky" style="margin-top:20px">
+      <div class="sticky-label">📐 Test on real devices</div>
+      <p>Always resize the browser to <strong>360px</strong> (common Android), <strong>390px</strong> (iPhone 14), and <strong>768px</strong> (iPad) when building new pages. The responsive rules were tuned for these widths.</p>
+    </div>
+  </div>
+</div>
+
 </BaseLayout>

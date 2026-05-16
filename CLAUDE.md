@@ -91,6 +91,31 @@ Inline highlight  .hl .hl-green .hl-blue .hl-orange .hl-purple
 Wavy underline    .wu .wu-o .wu-b
 ```
 
+### Rule 6 — Mobile-first thinking for every component
+
+The site is read heavily on phones. Follow these rules for every new component or content block:
+
+**Breakpoints** (all in `components.css` responsive section):
+- `≤ 768px` — tablet: tighten padding
+- `≤ 640px` — mobile: major changes (single-column, smaller text, compact UI)
+- `≤ 480px` — small phones: fine-tuning (hide decorative elements, shrink further)
+
+**Component rules:**
+- Never use hard pixel widths on layout elements — use `max-width` + `width: 100%`.
+- New multi-column grids **must** be added to the `≤ 640px` block with `grid-template-columns: 1fr`.
+- New tables **must** get `display: block; overflow-x: auto; -webkit-overflow-scrolling: touch` at `≤ 640px`.
+- Code blocks already handle themselves — `overflow-x: auto` + `white-space: pre` scroll natively.
+- Decorative-only elements (`.cover-doodle`, `.section-num`, `.pg-hint`, `.cover-subject`) are hidden at small breakpoints. New decorative elements must follow this pattern.
+- The pagination bar is 54px on mobile and 64px on desktop. Fixed elements must use `body.pg-mode` to adjust their `bottom` above the bar.
+
+**Two known mobile-specific fixes baked into the CSS:**
+
+1. **`.page-num` is hidden at `≤ 640px`** — the badge (`position: absolute; top: 16px; right: 24px`) overlaps the section header when page top-padding is reduced. The pagination bar already shows the page number, so hiding it is correct. Never remove this rule.
+
+2. **`.section-title` has `flex: 1; min-width: 0`** — this lets the title text wrap inside the flex row on narrow screens. Without it, long titles like "1. Inversion of Control (IoC)" overflow their column. Every flex-row text element needs this treatment.
+
+3. **`.sticky` has `transform: none` at `≤ 640px`** — the slight rotation is charming on desktop but causes content to clip at screen edges on mobile.
+
 ### Cover writing rule
 
 The `h1` inside `.cover` must be a single flowing sentence — **no `<br />` tags**. The font is 34 px and will wrap naturally. Forced line breaks produce an oversized, theatrical heading that pushes reading content far down the page.

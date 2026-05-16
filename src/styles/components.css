@@ -121,13 +121,16 @@
 .section-icon {
   font-size: 28px;
   line-height: 1;
+  flex-shrink: 0; /* never squish the emoji */
 }
 .section-title {
   font-family: var(--font-hand);
   font-size: 33px;
   font-weight: 700;
   color: var(--ink);
-  line-height: 1;
+  line-height: 1.15;
+  flex: 1;       /* fill remaining flex space so text wraps inside the row */
+  min-width: 0;  /* allow shrinking below content size */
 }
 .section-num {
   font-family: var(--font-hand);
@@ -1060,18 +1063,183 @@ body.pg-mode .hn-panel {
 }
 
 /* ─────────────────────────────────────────
-   Responsive
+   Responsive — Tablet  ≤ 768 px
+   ───────────────────────────────────────── */
+@media (max-width: 768px) {
+  .page  { padding: 36px 36px 30px; }
+  .cover { padding: 22px 32px 18px; }
+
+  .cover h1        { font-size: 28px; }
+  .cover-doodle    { font-size: 40px; bottom: 14px; right: 28px; }
+  .section-num     { font-size: 44px; }
+  .notes-header h1 { font-size: 34px; }
+}
+
+/* ─────────────────────────────────────────
+   Responsive — Mobile  ≤ 640 px
    ───────────────────────────────────────── */
 @media (max-width: 640px) {
-  .page, .cover          { padding: 28px 24px 24px; }
+
+  /* ── Layout ── */
+  .content-wrap { padding: 16px 10px 80px; }
+
+  /* ── Page card ──
+     Extra top padding (44px) keeps the section-header clear of the
+     absolutely-positioned .page-num badge (top: 16px) on desktop.
+     On mobile we hide .page-num entirely, so 20px top padding is safe. */
+  .page  {
+    padding: 20px 16px 20px;
+    margin-bottom: 18px;
+  }
+
+  /* ── Page number badge ──
+     Hidden on mobile: the pagination bar already shows "pg 01 / 10".
+     This also eliminates the overlap with the section header title. */
+  .page-num { display: none; }
+
+  /* ── Cover card — compact title card, not a hero banner ── */
+  .cover {
+    padding: 14px 16px 14px;
+    margin-bottom: 16px;
+  }
+  .cover-subject { font-size: 10px; letter-spacing: 1px; margin-bottom: 4px; }
+  .cover h1      { font-size: 22px; line-height: 1.3; margin-bottom: 4px; }
+  .cover-sub     { font-size: 13px; margin-bottom: 10px; }
+  .cover-tags    { gap: 4px; }
+  .cover-doodle  { display: none; } /* decorative — reclaim space */
+
+  /* ── Section header ── */
+  .section-header { gap: 8px; margin-bottom: 14px; }
+  .section-icon   { font-size: 20px; }
+  .section-title  { font-size: 20px; line-height: 1.2; }
+  .section-num    { display: none; }
+
+  /* ── Sub-headings ── */
+  h2.sub { font-size: 19px; margin: 18px 0 8px; }
+  h3.sub { font-size: 16px; margin: 14px 0 6px; }
+
+  /* ── Body text ── */
+  .body-text   { font-size: 16px; line-height: 1.85; }
+  .body-text p { margin-bottom: 10px; }
+
+  /* ── Code blocks ── */
+  .code-block {
+    font-size: 12px;
+    line-height: 1.75;
+    padding: 12px 14px;
+    box-shadow: none;
+    border-left-width: 4px;
+  }
+  .col-card   .code-block { font-size: 11.5px; }
+  .cheat-card .code-block { font-size: 11.5px; }
+
+  /* ── Code comparison ── */
+  .code-compare        { gap: 6px; }
+  .code-compare-panel  { padding: 12px 14px; }
+  .code-compare-label  { font-size: 16px; margin-bottom: 8px; }
+  .code-compare-note   { font-size: 13px; margin-top: 8px; }
+  .code-compare-sep    { font-size: 16px; }
+
+  /* ── Callout boxes ── */
+  .sticky       { padding: 12px 14px; transform: none; } /* disable rotation on mobile */
+  .sticky p     { font-size: 15px; }
+  .sticky-label { font-size: 10px; }
+  .insight      { padding: 10px 14px; }
+  .insight p    { font-size: 14px; line-height: 1.55; }
+  .insight-label { font-size: 11px; }
+
+  /* ── Grids → single column ── */
   .two-col,
   .scope-diagram,
-  .cheat-grid            { grid-template-columns: 1fr; }
-  .cover h1              { font-size: 38px; }
-  .flow-row              { flex-direction: column; align-items: flex-start; }
-  .flow-arr              { transform: rotate(90deg); }
-  .notes-grid            { grid-template-columns: 1fr; }
-  .section-title         { font-size: 26px; }
-  .hn-panel              { right: 12px; min-width: 190px; }
-  .hn-panel-toggle       { right: 12px; }
+  .cheat-grid { grid-template-columns: 1fr; }
+
+  /* ── Horizontal flow → vertical ── */
+  .flow-row { flex-direction: column; align-items: flex-start; }
+  .flow-arr { transform: rotate(90deg); padding: 2px 0; }
+  .flow-box { font-size: 12px; padding: 6px 10px; white-space: normal; }
+
+  /* ── Phase (vertical lifecycle) flow ── */
+  .phase-box           { padding: 10px 14px; max-width: 100%; }
+  .phase-box .ph-title { font-size: 16px; }
+  .phase-box .ph-sub   { font-size: 12px; }
+  .phase-arrow         { font-size: 20px; }
+
+  /* ── Diagram wrapper ── */
+  .diag-wrap { padding: 12px; }
+
+  /* ── Note list ── */
+  .note-list li { font-size: 15px; line-height: 1.65; }
+
+  /* ── Tables — horizontal scroll ── */
+  .note-table {
+    font-size: 13px;
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* ── Tags ── */
+  .tag { font-size: 11px; padding: 3px 8px; }
+
+  /* ── Notes home page ── */
+  .notes-header    { margin: 20px auto 16px; }
+  .notes-header h1 { font-size: 26px; }
+  .notes-header p  { font-size: 15px; }
+  .notes-grid      { grid-template-columns: 1fr; padding: 0; margin-bottom: 60px; }
+  .note-card       { padding: 18px 20px; }
+  .note-card-title { font-size: 21px; }
+  .note-card-desc  { font-size: 13px; }
+
+  /* ── Theme / font panel ── */
+  .hn-panel        { right: 10px; min-width: 196px; }
+  .hn-panel-toggle { right: 10px; width: 38px; height: 38px; font-size: 18px; }
+
+  /* ── Pagination bar ── */
+  .pg-bar     { padding: 8px 10px; gap: 8px; min-height: 54px; }
+  .pg-bar-btn { width: 36px; height: 36px; font-size: 17px; }
+  .pg-counter { font-size: 13px; }
+  .pg-title   { font-size: 12px; }
+  .pg-dot     { width: 7px; height: 7px; }
+  .pg-hint    { display: none; }
+
+  /* ── pg-mode: lift theme toggle above mobile bar (54px tall) ── */
+  body.pg-mode .hn-panel-toggle { bottom: 70px; }
+  body.pg-mode .hn-panel        { bottom: 118px; }
+}
+
+/* ─────────────────────────────────────────
+   Responsive — Small phones  ≤ 480 px
+   ───────────────────────────────────────── */
+@media (max-width: 480px) {
+  .content-wrap { padding: 12px 8px 80px; }
+
+  .page  { padding: 16px 14px 18px; }
+  .cover { padding: 12px 14px 12px; }
+
+  .cover h1      { font-size: 19px; }
+  .cover-subject { display: none; } /* series label — not needed at very small size */
+  .cover-sub     { font-size: 12px; margin-bottom: 8px; }
+
+  .section-title { font-size: 18px; }
+
+  .body-text     { font-size: 15px; line-height: 1.8; }
+  .note-list li  { font-size: 15px; }
+
+  .code-block    { font-size: 11.5px; padding: 10px 12px; }
+
+  h2.sub { font-size: 17px; }
+
+  /* Pagination bar — hide section title, show only counter + dots */
+  .pg-title   { display: none; }
+  .pg-bar-sep { display: none; }
+  .pg-dots    { gap: 4px; }
+  .pg-dot     { width: 6px; height: 6px; }
+
+  /* Site nav — tighten for narrow screens */
+  .site-nav-inner   { padding: 0 10px; }
+  .site-nav-logo    { font-size: 18px; }
+  .site-nav-links a { font-size: 13px; padding: 4px 8px; }
+
+  .notes-header h1 { font-size: 22px; }
+  .note-card-title { font-size: 19px; }
 }

@@ -88,6 +88,27 @@ The `.cover` is intentionally compact — it frames the note without dominating 
 - `.cover-tags` — topic tags using `.tag.tag-g/b/o/p`
 - `.cover-doodle` — a single emoji, purely decorative
 
+### Mobile / responsive
+
+The site uses three CSS breakpoints, all in the `Responsive` section at the bottom of `components.css`:
+
+| Breakpoint | Target | Key changes |
+|---|---|---|
+| `≤ 768px` | Tablet | Tighter page padding, smaller section numbers |
+| `≤ 640px` | Mobile phones | Single-column grids, reduced font sizes, compact pagination bar, horizontal scroll on tables |
+| `≤ 480px` | Small phones | Further size reductions, hide pagination title text, compact site nav |
+
+**Rules to follow when building new components:**
+
+- Never use hard pixel widths on layout elements — use `max-width` + `width: 100%`.
+- Grids (`two-col`, `cheat-grid`, `scope-diagram`) already collapse to a single column at 640px via the shared breakpoint rule. New grids must be added to that rule.
+- Code blocks use `overflow-x: auto` and `white-space: pre` — they scroll horizontally on narrow screens. No extra work needed.
+- Tables must be wrapped with `display: block; overflow-x: auto` at 640px — the `.note-table` breakpoint rule already covers this. New table classes need the same treatment.
+- The pagination bar height is `54px` at mobile and `64px` at desktop — the theme toggle's `bottom` offset accounts for both.
+- `.page-num` (the "pg 01" badge) is **hidden at `≤ 640px`** because it overlaps the section header at reduced page padding. The pagination bar is the source of truth for page number on mobile.
+- `.section-title` has `flex: 1; min-width: 0` globally — this allows long titles to wrap inside the flex row. Any new flex-row text element needs the same treatment.
+- `.sticky` rotation is disabled at `≤ 640px` — the `rotate(-0.4deg)` clips off-screen on narrow viewports.
+
 ### CSS Grid overflow — required fix
 
 Every direct child of a CSS Grid container must have `min-width: 0` or it can burst outside its column. `.col-card`, `.cheat-card`, and `.scope-side` already include this. If you add a bare `<div>` as a grid child, add `style="min-width:0"` or give it a class that sets it.
