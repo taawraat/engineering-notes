@@ -3,6 +3,20 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
 const notes = [
   {
+    href:   '/notes/spring-transactional/',
+    series: 'Spring Boot · Deep Dive Series',
+    title:  '@Transactional — Complete Deep Dive',
+    desc:   'Everything about @Transactional: AOP proxy internals, propagation types, isolation levels, rollback rules, common pitfalls, and real-world patterns.',
+    tags:   [
+      { label: '🔄 Propagation',   cls: 'tag-g' },
+      { label: '🔒 Isolation',     cls: 'tag-b' },
+      { label: '🛡️ AOP Proxy',    cls: 'tag-o' },
+      { label: '⚡ Rollback',      cls: 'tag-p' },
+    ],
+    doodle: '🔁',
+    pages:  12,
+  },
+  {
     href:   '/notes/database-acid/',
     series: 'Database Fundamentals · Deep Dive Series',
     title:  'ACID Properties & Transaction Guarantees',
