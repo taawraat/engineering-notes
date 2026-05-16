@@ -150,8 +150,8 @@
     // ── Keyboard navigation ───────────────────────────────────────────
     document.addEventListener('keydown', (e) => {
       if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return;
-      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') navigate(1);
-      if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   navigate(-1);
+      if (e.key === 'ArrowRight') navigate(1);
+      if (e.key === 'ArrowLeft')  navigate(-1);
     });
 
     // ── Touch / swipe ─────────────────────────────────────────────────
