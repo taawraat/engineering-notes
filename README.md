@@ -68,6 +68,7 @@ Open `/style-guide` in the browser before writing new content. Every component c
 
 | Need | Use |
 |------|-----|
+| Note cover card | `.cover` with `.cover-subject`, `h1`, `.cover-sub`, `.cover-tags`, `.cover-doodle` |
 | Two text/info columns | `.two-col` + `.col-card` |
 | Two code comparisons | `.code-compare` + `.code-compare-panel` |
 | Cheat-sheet grid | `.cheat-grid` + `.cheat-card` |
@@ -77,6 +78,15 @@ Open `/style-guide` in the browser before writing new content. Every component c
 | Tip / insight | `.insight` (`.green-ins`, `.orange-ins`) |
 | Inline emphasis | `.hl`, `.hl-green`, `.hl-blue`, `.hl-orange`, `.hl-purple` |
 | Wavy underline | `.wu`, `.wu-o`, `.wu-b` |
+
+### Cover card guidelines
+
+The `.cover` is intentionally compact — it frames the note without dominating it:
+- Write `h1` as a single sentence, no forced `<br />` line breaks. Let the text wrap naturally.
+- `.cover-subject` — series label in small caps (e.g. `Spring Boot · Deep Dive Series`)
+- `.cover-sub` — one short subtitle sentence
+- `.cover-tags` — topic tags using `.tag.tag-g/b/o/p`
+- `.cover-doodle` — a single emoji, purely decorative
 
 ### CSS Grid overflow — required fix
 

@@ -70,6 +70,12 @@ CSS Grid items default to `min-width: auto`, which lets them overflow their colu
 ## Component cheat sheet
 
 ```
+Cover card        .cover
+                    .cover-subject  ← series label, small caps
+                    h1              ← single sentence, NO <br /> tags
+                    .cover-sub      ← one subtitle line
+                    .cover-tags     ← .tag.tag-g/b/o/p chips
+                    .cover-doodle   ← decorative emoji
 Prose             .body-text
 Code block        <pre class="code-block [green|orange|purple|red]-left">
 Code comparison   .code-compare > .code-compare-panel
@@ -84,6 +90,10 @@ Table             .note-table
 Inline highlight  .hl .hl-green .hl-blue .hl-orange .hl-purple
 Wavy underline    .wu .wu-o .wu-b
 ```
+
+### Cover writing rule
+
+The `h1` inside `.cover` must be a single flowing sentence — **no `<br />` tags**. The font is 34 px and will wrap naturally. Forced line breaks produce an oversized, theatrical heading that pushes reading content far down the page.
 
 ---
 
