@@ -3,6 +3,20 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
 const notes = [
   {
+    href:   '/notes/database-acid/',
+    series: 'Database Fundamentals · Deep Dive Series',
+    title:  'ACID Properties & Transaction Guarantees',
+    desc:   'Complete deep dive into ACID — Atomicity, Consistency, Isolation, Durability. Covers MySQL internals, isolation levels, MVCC, anomalies, and interview prep.',
+    tags:   [
+      { label: '⚛️ Atomicity',     cls: 'tag-g' },
+      { label: '🔒 Isolation',     cls: 'tag-o' },
+      { label: '🔄 MVCC',          cls: 'tag-b' },
+      { label: '📝 Undo/Redo',     cls: 'tag-p' },
+    ],
+    doodle: '🗄️',
+    pages:  10,
+  },
+  {
     href:   '/notes/spring-boot-ioc/',
     series: 'Spring Boot · Deep Dive Series',
     title:  'IoC Container, @Bean & Dep. Injection',
