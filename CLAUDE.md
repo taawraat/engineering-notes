@@ -116,6 +116,8 @@ The site is read heavily on phones. Follow these rules for every new component o
 
 3. **`.sticky` has `transform: none` at `≤ 640px`** — the slight rotation is charming on desktop but causes content to clip at screen edges on mobile.
 
+4. **Swipe-nav vs. horizontal scroll conflict** — `PaginationController` guards against this. On every `touchstart` it records the target element; on `touchend` it walks the DOM to check for any ancestor with `overflow-x: auto|scroll` AND `scrollWidth > clientWidth`. If found, the swipe is for scrolling and page navigation is skipped. **Never remove the `isInsideHScrollable` guard.** Any new element with `overflow-x: auto` is protected automatically — no extra code needed.
+
 ### Cover writing rule
 
 The `h1` inside `.cover` must be a single flowing sentence — **no `<br />` tags**. The font is 34 px and will wrap naturally. Forced line breaks produce an oversized, theatrical heading that pushes reading content far down the page.

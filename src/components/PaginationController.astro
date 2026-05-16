@@ -155,14 +155,37 @@
     });
 
     // ── Touch / swipe ─────────────────────────────────────────────────
-    let touchStartX = 0, touchStartY = 0;
+    //
+    // Problem: code blocks and diagram wrappers have overflow-x: auto.
+    // If the user swipes inside one of them to scroll the content, the
+    // gesture bubbles to document and triggers page navigation instead.
+    //
+    // Fix: record the touch-start target and walk up the DOM. If any
+    // ancestor is horizontally scrollable AND has overflowing content
+    // (scrollWidth > clientWidth), the swipe is for scrolling — skip nav.
+
+    function isInsideHScrollable(el) {
+      while (el && el !== document.body) {
+        if (el.scrollWidth > el.clientWidth + 1) {
+          const ox = window.getComputedStyle(el).overflowX;
+          if (ox === 'auto' || ox === 'scroll') return true;
+        }
+        el = el.parentElement;
+      }
+      return false;
+    }
+
+    let touchStartX = 0, touchStartY = 0, touchStartTarget = null;
     document.addEventListener('touchstart', (e) => {
-      touchStartX = e.touches[0].clientX;
-      touchStartY = e.touches[0].clientY;
+      touchStartX      = e.touches[0].clientX;
+      touchStartY      = e.touches[0].clientY;
+      touchStartTarget = e.target;
     }, { passive: true });
     document.addEventListener('touchend', (e) => {
       const dx = e.changedTouches[0].clientX - touchStartX;
       const dy = e.changedTouches[0].clientY - touchStartY;
+      // Skip if swipe started inside a horizontally scrollable element
+      if (isInsideHScrollable(touchStartTarget)) return;
       // Only horizontal swipes (not vertical scrolling)
       if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {
         navigate(dx < 0 ? 1 : -1);

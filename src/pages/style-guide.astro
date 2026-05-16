@@ -461,6 +461,26 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       </div>
     </div>
 
+    <h2 class="sub">Swipe navigation &amp; scrollable elements</h2>
+    <div class="body-text">
+      <p>The <code>PaginationController</code> listens for horizontal swipe gestures on the whole page to navigate between note pages. This conflicts with <span class="hl-orange">horizontally scrollable elements</span> such as code blocks and diagram wrappers — a user trying to scroll code would accidentally navigate to the next page instead.</p>
+    </div>
+    <div class="insight orange-ins">
+      <div class="insight-label">⚠️ Swipe conflict — already fixed, keep this pattern</div>
+      <p>On every <code>touchstart</code>, the controller records the target element. On <code>touchend</code>, it walks up the DOM tree checking for any ancestor with <code>overflow-x: auto | scroll</code> <em>and</em> <code>scrollWidth &gt; clientWidth</code> (meaning the element actually has overflowing content). If one is found, the swipe is treated as a scroll gesture and page navigation is skipped entirely.</p>
+    </div>
+    <div class="insight green-ins">
+      <div class="insight-label">✅ Rule — any new scrollable element gets this for free</div>
+      <p>The check is DOM-walk based, not class-based. Any element you add with <code>overflow-x: auto</code> or <code>overflow-x: scroll</code> that has wider content than its container will automatically be protected from swipe-nav conflict. No extra code needed.</p>
+    </div>
+    <ul class="note-list">
+      <li class="ck">Code blocks (<code>.code-block</code>) — protected automatically</li>
+      <li class="ck">Diagram wrappers (<code>.diag-wrap</code>) — protected automatically</li>
+      <li class="ck">Tables on mobile (<code>.note-table</code> with <code>overflow-x: auto</code>) — protected automatically</li>
+      <li class="cr">Never add swipe navigation outside <code>PaginationController</code> — duplicate listeners cause double-navigate bugs</li>
+      <li class="cr">Never remove the <code>isInsideHScrollable</code> guard from <code>PaginationController.astro</code></li>
+    </ul>
+
     <div class="sticky" style="margin-top:20px">
       <div class="sticky-label">📐 Test on real devices</div>
       <p>Always resize the browser to <strong>360px</strong> (common Android), <strong>390px</strong> (iPhone 14), and <strong>768px</strong> (iPad) when building new pages. The responsive rules were tuned for these widths.</p>

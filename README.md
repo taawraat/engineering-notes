@@ -108,6 +108,7 @@ The site uses three CSS breakpoints, all in the `Responsive` section at the bott
 - `.page-num` (the "pg 01" badge) is **hidden at `≤ 640px`** because it overlaps the section header at reduced page padding. The pagination bar is the source of truth for page number on mobile.
 - `.section-title` has `flex: 1; min-width: 0` globally — this allows long titles to wrap inside the flex row. Any new flex-row text element needs the same treatment.
 - `.sticky` rotation is disabled at `≤ 640px` — the `rotate(-0.4deg)` clips off-screen on narrow viewports.
+- **Swipe-nav conflict guard** — `PaginationController` records the touch target on `touchstart` and walks the DOM on `touchend`. If the swipe started inside any element with `overflow-x: auto|scroll` that has overflowing content, page navigation is skipped so the user can scroll code blocks and diagrams freely. Do not remove this guard.
 
 ### CSS Grid overflow — required fix
 
