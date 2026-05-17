@@ -1,13 +1,18 @@
 # Hand Notes — Full Agent Handoff Context
 
-## Project
+> Updated handoff after the **design polish session** (2026-05-17). Read this end-to-end before touching any file.
 
-**Path:** `/home/tawraat/engineering-notes`
-**Framework:** Astro v5 (static output)
-**Deploy target:** Netlify — https://hand-notes.netlify.app
-**Status:** Git repo, working local development
+---
+
+## 1. Project Identity
+
+- **Name:** Hand Notes — a static Astro v5 site for engineering notes
+- **Repo:** `/home/tawrat/engineering-notes` (branch `main`, clean working tree)
+- **Live:** https://hand-notes.netlify.app
+- **Aesthetic:** warm paper notebook — graph-paper code blocks, handwritten fonts, paginated page cards. **Readability is the top priority on every decision.**
 
 ### Commands
+
 ```bash
 npm install
 npm run dev      # http://localhost:4321
@@ -16,63 +21,174 @@ npm run build    # → dist/
 
 ---
 
-## File Tree
+## 2. File Tree & Routes
 
 ```
 /
-├── .gitignore
-├── README.md                 # developer guide
-├── CLAUDE.md                 # AI agent rules — READ THIS FIRST
-├── netlify.toml              # build: npm run build, publish: dist, NODE=20
-├── astro.config.mjs          # output:'static', site:'https://hand-notes.netlify.app'
-├── tsconfig.json
-├── package.json              # astro@^5.7.0
+├── .gitignore                   # ignores: .agents/, skills-lock.json, .astro/, dist/, node_modules/
+├── README.md                    # developer guide
+├── CLAUDE.md                    # AI agent rules — READ THIS FIRST
+├── AGENT-HANDOFF.md             # this file
+├── netlify.toml
+├── astro.config.mjs             # output:'static', site:'https://hand-notes.netlify.app'
+├── package.json                 # astro@^5.7.0
 ├── public/favicon.svg
 └── src/
     ├── styles/
-    │   ├── tokens.css        # all CSS custom properties
-    │   ├── themes.css        # [data-theme="cool/dark"] + [data-font="*"] overrides
-    │   ├── components.css    # every component class + all responsive rules
-    │   └── global.css        # resets, lined-paper body bg, @imports
+    │   ├── tokens.css           # all CSS custom properties
+    │   ├── themes.css           # [data-theme="cool/dark"] + [data-font="*"] overrides
+    │   ├── components.css       # every component class + responsive rules
+    │   └── global.css           # resets, lined-paper body bg, @imports
     ├── layouts/
-    │   └── BaseLayout.astro  # HTML shell, Google Fonts, FOUC script, viewport meta
+    │   └── BaseLayout.astro     # HTML shell, Google Fonts, FOUC script
     ├── components/
     │   ├── SiteNav.astro
     │   ├── ThemeFontPanel.astro
-    │   └── PaginationController.astro  # handles all note pagination
+    │   └── PaginationController.astro
     └── pages/
-        ├── index.astro               # notes listing (hardcoded array)
-        ├── style-guide.astro         # design system showcase + dev rules
+        ├── index.astro                  # notes listing (hardcoded array)
+        ├── style-guide.astro            # design system showcase
         └── notes/
-            ├── spring-boot-ioc.astro       # 10-page note
-            ├── database-acid.astro         # 10-page note (created this session)
-            └── spring-transactional.astro  # 12-page note (created this session)
+            ├── spring-boot-ioc.astro       # 10 pages
+            ├── database-acid.astro         # 10 pages — heavily polished this session
+            └── spring-transactional.astro  # 12 pages
 ```
 
----
-
-## Routes
-
-| Route | File | Notes |
-|---|---|---|
-| `/` | `index.astro` | Notes listing, hardcoded array |
-| `/notes/spring-boot-ioc/` | `notes/spring-boot-ioc.astro` | 10 pages, paginated |
-| `/notes/database-acid/` | `notes/database-acid.astro` | 10 pages, paginated |
-| `/notes/spring-transactional/` | `notes/spring-transactional.astro` | 12 pages, paginated |
-| `/style-guide/` | `style-guide.astro` | Design system + mobile rules |
+| Route | File |
+|---|---|
+| `/` | `index.astro` |
+| `/notes/spring-boot-ioc/` | `notes/spring-boot-ioc.astro` |
+| `/notes/database-acid/` | `notes/database-acid.astro` |
+| `/notes/spring-transactional/` | `notes/spring-transactional.astro` |
+| `/style-guide/` | `style-guide.astro` |
 
 ---
 
-## CSS Architecture
+## 3. Recent Session Changes (commit `4c6bbb2 — feat: design fixed`)
+
+This session focused on **enforcing Rule #6** (no ASCII art in code blocks) across `database-acid.astro` and on **upgrading the `.note-table` design system** to a self-contained paper card.
+
+### A. `src/pages/notes/database-acid.astro` content conversions
+
+| Page | Section | Before | After |
+|------|---------|--------|-------|
+| 2 | Without/With Atomicity (bank transfer) | ASCII prose-in-`<pre>` | **KEPT AS-IS** — user explicitly reverted conversion attempts. Do **not** touch. |
+| 3 | What "Valid State" Means | ASCII tree (`├── └──`) of constraints inside `<pre>` | `.note-table` (Constraint → Rule it enforces) |
+| 4 | Anomaly 1: Dirty Read | ASCII timeline `│ ─ ┼` inside `<pre>` | 3-column `.note-table` (Time × Tx A × Tx B) |
+| 4 | Anomaly 2: Non-Repeatable Read | same | same |
+| 4 | Anomaly 3: Phantom Read | same | same |
+| 5 | Anomaly 4: Lost Update | same + dangling `<span class="cm">Expected/Actual...</span>` lines | `.note-table` + `.insight orange-ins` for the "Expected vs Actual" punchline |
+| 6 | Hidden Row Metadata | ASCII box (`┌─┬┐`) showing one InnoDB row | `.note-table` (4 cols, 🔒 emoji on hidden columns) + `.two-col` `.col-card`s explaining `DB_TRX_ID` and `DB_ROLL_PTR` |
+| 6 | Read View — Snapshot Isolation | prose narrative inside `<pre>` + redundant `.phase-flow` repeating the same flow | body-text intro + `.sticky` ("📜 The Read View Rule") + enriched `.phase-flow` with concrete TXN numbers (`TXN_100`, `TXN_101`, `DB_TRX_ID < 100` rule) |
+| 7 | Without/With Durability | two `.code-compare` panels with prose-in-`<pre>` | single 3-column `.note-table` (Step × Without × With). Steps 1–3 are *identical*; only step 4 diverges with `.hl-orange` / `.hl-green` highlights. Subtitle below table makes the lesson explicit. |
+| 7 | Redo Log & WAL | ASCII box-flow inside `<pre>` | body-text intro + `.sticky` ("📜 The WAL Golden Rule") + `.phase-flow` 3-step sequence (📞 commit → 📝 Redo Log → 💾 fsync) with **"Step 3 · Durable! ✅"** marker on the final box + `.insight` callout explaining why data pages don't block COMMIT |
+
+### Anomaly table convention (Pages 4–5) — copy this pattern
+
+```html
+<table class="note-table">
+  <thead>
+    <tr><th style="width:60px">Time</th><th>Transaction A (Reader)</th><th>Transaction B (Writer)</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>T1</strong></td><td><code>BEGIN</code></td><td></td></tr>
+    <tr><td><strong>T2</strong></td><td></td><td><code>UPDATE</code> balance = 500</td></tr>
+    <!-- ... -->
+  </tbody>
+</table>
+```
+
+- Narrow `width:60px` Time column anchors each row.
+- Empty `<td>` cells read as "transaction is idle".
+- `<code>` for SQL keywords (`BEGIN`, `UPDATE`, `SELECT`, `COMMIT`, `ROLLBACK`).
+- `.hl-green` for correct values, `.hl-orange` for anomalous values.
+- Italic `<em>` for side-notes like `(not yet committed)`.
+
+### B. `src/styles/components.css` — `.note-table` redesign
+
+**The big design upgrade of this session.** Tables are now a self-contained "paper card" so the page's lined-paper texture stops at the table boundary.
+
+```css
+.note-table {
+  position: relative; z-index: 1;
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+  font-family: var(--font-body);
+  font-size: 15px;
+  background: var(--paper);                                      /* opaque base */
+  border-radius: var(--radius-md);
+  overflow: hidden;                                              /* clip rounded corners */
+  box-shadow: 0 0 0 1px var(--rule-line), 0 1px 3px var(--shadow); /* outer ring + soft shadow */
+}
+.note-table th  { background: var(--green-bg); color: var(--green); ... padding: 10px 14px; border-bottom: 2px solid var(--green-light); }
+.note-table td  { padding: 10px 14px; border-bottom: 1px solid var(--rule-line); ... background: var(--paper); }
+.note-table tr:last-child td       { border-bottom: none; }
+.note-table tr:nth-child(even) td  { background: var(--paper2); }
+.note-table th + th,
+.note-table td + td               { border-left: 1px solid var(--rule-line); }
+```
+
+**Key design decisions (do not undo without reading this):**
+
+1. **Opaque cell backgrounds** (`--paper` odd, `--paper2` even). The body has a `repeating-linear-gradient` lined-paper texture. Without opaque cells, those horizontal lines bleed through and visually mix with the column dividers — looks like cross-hatched chaos.
+2. **`box-shadow: 0 0 0 1px ...` + `border-radius` + `overflow: hidden`** — uses a hairline shadow ring as the outer frame instead of a `border` property. Why? `border-collapse: collapse` fights with element borders + `border-radius`; box-shadow rings work cleanly.
+3. **Theme-safe via `--paper` / `--paper2` tokens** — both variables are defined in all three themes (warm/cool/dark) in `tokens.css` and `themes.css`. The old `[data-theme="dark"]` rgba override was removed because the token-based approach handles it inherently.
+4. **`th + th, td + td { border-left }`** — adjacent-sibling selector adds left borders only to cells *after* the first, giving internal column dividers without an outer frame.
+
+### C. Documentation updates
+
+| File | Change |
+|------|--------|
+| `CLAUDE.md` | **Added Rule #6 — "Use real components instead of ASCII art"** with full pattern→component lookup table (flow-row, phase-flow, two-col, code-compare, note-table for timelines/lookups). Renumbered the existing mobile rule from `Rule 6` to `Rule 7`. Updated cheat sheet table line. |
+| `README.md` | Added `.note-table` (paper card; for reference data + timelines) and `.note-list` rows to the "Consistent styling rules" table. |
+| `src/pages/style-guide.astro` | Added body-text describing the new paper-card design, a second `.note-table` example showing the concurrency timeline pattern, and an `.insight orange-ins` warning callout that explicitly forbids ASCII tables. |
+
+### D. Tooling
+
+| File | Change |
+|------|--------|
+| `.gitignore` | Added `.agents/` and `skills-lock.json` (AI agent tooling artifacts). `.astro/` was already ignored. |
+
+---
+
+## 4. Non-Negotiable Rules (from `CLAUDE.md`)
+
+1. **Read-friendly design always wins** — body 18px line-height 2.0, code 13.5px line-height 1.9, content width 920px, prefer one column.
+2. **Always use `<pre>` for code blocks** — Astro's HTML minifier collapses newlines inside `<div>` siblings. `<pre>` is HTML-spec protected.
+3. **Escape `{` → `&#123;` and `}` → `&#125;`** in `.astro` template sections (after second `---`). Frontmatter JS is unaffected.
+4. **Check the style guide first** at `/style-guide` — every component is demonstrated there. Don't invent one-off styles.
+5. **CSS Grid children need `min-width: 0`** — direct `<div>` grid children must have it set.
+6. **🆕 Use real components instead of ASCII art** — never draw with `│ ─ ┼ ┌ └ ▶` inside `<pre class="code-block">`. The page's lined-paper texture turns ASCII grids into visual noise.
+
+   | Pattern | Use |
+   |---|---|
+   | Horizontal step flow | `.flow-row` + `.flow-box.fb-*` + `.flow-arr` |
+   | Vertical step flow / lifecycle | `.phase-flow` + `.phase-box.ph-*` + `.phase-arrow` |
+   | Side-by-side text comparison | `.two-col` + `.col-card` |
+   | Side-by-side code comparison | `.code-compare` + `.code-compare-panel` |
+   | Time-series / concurrency timeline | `<table class="note-table">` (narrow Time column + per-actor columns) |
+   | Reference data / lookup | `<table class="note-table">` |
+
+7. **Mobile-first** — three breakpoints in `components.css`:
+   - `≤ 768px` tablet — tighten padding
+   - `≤ 640px` mobile — single-column, smaller text, hide `.page-num`, disable `.sticky` rotation, tables become `display: block; overflow-x: auto`
+   - `≤ 480px` small phones — hide pagination title, compact nav
+
+8. **Cover `h1` is one sentence, no `<br />`** — 34px font wraps naturally.
+
+---
+
+## 5. CSS Architecture
 
 ```
 global.css
-  @import tokens.css       ← :root variables
-  @import themes.css       ← theme/font overrides
-  @import components.css   ← all components + responsive
+  @import tokens.css        ← :root variables (paper, ink, accents, shadows)
+  @import themes.css        ← [data-theme="cool|dark"] + [data-font="*"] overrides
+  @import components.css    ← all components + responsive
 ```
 
-### Key CSS Variables (`tokens.css`)
+### Token reference (`tokens.css`)
 
 ```css
 :root {
@@ -82,7 +198,7 @@ global.css
 
   --paper: #fdf8f0;   --paper2: #fef9f2;
   --ink: #2d2318;     --ink2: #4a3728;    --ink3: #6b5040;
-  --body-bg: #e8e0d0; --rule-line: #e8dcc8; --grid: #f0e8d8;
+  --body-bg: #e8e0d0; --rule-line: #e8dcc8; --grid: #f0e8d8; --body-rule: #d8cfc0;
 
   --green: #3a7d4a;   --green-bg: #e8f5ec;  --green-light: #c8e6cf;
   --blue: #2a5fa5;    --blue-bg: #e6eef8;   --blue-light: #b8d0f0;
@@ -97,114 +213,17 @@ global.css
 }
 ```
 
----
-
-## Theme & Font Switching
+### Themes & fonts
 
 - **Themes:** `warm` (default) · `cool` · `dark` — via `data-theme` on `<html>`
 - **Fonts:** `klee` (default) · `caveat` · `patrick` · `kalam` — via `data-font` on `<html>`
-- Persisted in `localStorage` (`hn-theme`, `hn-font`)
-- FOUC prevented by inline `<script>` in `<head>` of `BaseLayout.astro`
-- All 5 font families preloaded in one Google Fonts `<link>`
-- Theme panel: floating 🎨 button fixed bottom-right → `ThemeFontPanel.astro`
-- When pagination is active (`body.pg-mode`), the panel lifts above the pagination bar
+- Persisted in `localStorage` (`hn-theme`, `hn-font`).
+- FOUC prevented by inline `<script>` in `<head>` of `BaseLayout.astro` — do not remove.
+- Theme panel: floating 🎨 button bottom-right → `ThemeFontPanel.astro`.
 
 ---
 
-## Non-Negotiable Development Rules
-
-### 1. Use `<pre>` for ALL code blocks — never `<div>`
-
-```html
-<pre class="code-block [green|orange|purple|red]-left">
-  <span class="kw">public class</span> <span class="cl">Foo</span> &#123; &#125;
-</pre>
-```
-
-**Why:** Astro's HTML minifier collapses newlines between `<span>` elements inside `<div>`, rendering all code on one line. `<pre>` is protected by the HTML spec — minifiers cannot touch its whitespace.
-
-### 2. Escape braces in `.astro` HTML template sections
-
-Every `{` → `&#123;` and `}` → `&#125;` in the HTML template (everything after the second `---`). The frontmatter JS block is unaffected.
-
-This prevents Astro from parsing them as JSX expressions (causes build errors).
-
-### 3. Cover `h1` — no `<br />` tags
-
-Write as a single sentence. The font is 34px and wraps naturally. Forced line breaks create an oversized theatrical heading.
-
-### 4. Check the style guide before adding any new styles
-
-`/style-guide` demonstrates every component. Do not invent one-off inline styles.
-
-### 5. CSS Grid children need `min-width: 0`
-
-Grid items default to `min-width: auto`, which lets them overflow. Any bare `<div>` as a direct grid child needs `min-width: 0`. Classes that already handle this: `.col-card`, `.cheat-card`, `.scope-side`, `.two-col > *`.
-
-### 6. Mobile-first thinking for every new component
-
-Three breakpoints in `components.css` responsive section:
-
-| Breakpoint | Target | Key changes |
-|---|---|---|
-| `≤ 768px` | Tablet | Tighter padding, smaller cover h1 |
-| `≤ 640px` | Phone | 1-col grids, page-num hidden, cover compact, sticky rotation off |
-| `≤ 480px` | Small phone | Further reduction, pagination title hidden, nav compact |
-
-### 7. Convert ASCII diagrams to visual components
-
-Never use ASCII art inside code blocks for diagrams. Always use proper visual components:
-- `.flow-row` + `.flow-box` for horizontal flows
-- `.phase-flow` + `.phase-box` for vertical step flows
-- `.two-col` + `.col-card` for side-by-side comparisons
-- `.diag-wrap` wrapper for graph-paper background
-
----
-
-## Pagination System (`PaginationController.astro`)
-
-- Finds all `.page` elements inside `.content-wrap` (`.cover` is untouched)
-- Hides all except the current page (`display: none`)
-- Adds `body.pg-mode` → `padding-bottom: 72px` for bar clearance
-- Fixed bottom bar: ← / → circular buttons, page counter "pg 03 / 10", section title, dot indicators
-- Green progress bar fixed at `top: 52px` (below sticky nav)
-- Navigation: buttons, dots, keyboard (`←` = prev, `→` = next), horizontal swipe ≥ 60px
-- **Keyboard:** Only left/right arrows change pages. Up/down arrows scroll normally (fixed this session)
-- Swipe guard: skips navigation if swipe started inside horizontally scrollable element
-- Animations: Web Animations API, slide left/right, respects `prefers-reduced-motion`
-- URL hash: `#page-3` via `history.replaceState` — restored on page load
-
-### Adding pagination to a new note
-
-```astro
----
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import PaginationController from '../../components/PaginationController.astro';
----
-
-<BaseLayout title="..." description="...">
-  <div class="cover">...</div>
-  <div class="page green-spine">...</div>
-  <!-- more .page divs -->
-  <PaginationController />
-</BaseLayout>
-```
-
----
-
-## Adding a New Note Page (Checklist)
-
-1. Copy `src/pages/notes/spring-boot-ioc.astro` as template
-2. Replace ALL `{` with `&#123;` and `}` with `&#125;` in the HTML section (after second `---`)
-3. Use `<pre class="code-block">` for every code block (never `<div>`)
-4. Write cover `h1` as a single sentence with no `<br />` tags
-5. Add `<PaginationController />` before `</BaseLayout>`
-6. Register the note in the `notes` array in `src/pages/index.astro`
-7. Convert any ASCII diagrams to proper visual components (flow-row, phase-flow, two-col, etc.)
-
----
-
-## Component Classes Reference
+## 6. Component Reference
 
 ```
 Cover card        .cover
@@ -221,7 +240,7 @@ Subsection hdgs   h2.sub · h3.sub
 
 Prose             .body-text (18px / line-height 2.0)
 Inline code       <code>
-Code block        <pre class="code-block [color]-left">
+Code block        <pre class="code-block [color]-left">     ← ONLY for actual code
                     Syntax: .kw .an .cl .st .cm .ar
 Code comparison   .code-compare > .code-compare-panel
                     .code-compare-label [.g|.r|.b]
@@ -231,7 +250,6 @@ Code comparison   .code-compare > .code-compare-panel
 Two-col text      .two-col > .col-card
                     .col-card-title [.g|.r|.b|.o]
 Cheat grid        .cheat-grid > .cheat-card
-Scope diagram     .scope-diagram > .scope-side
 Flow diagram      .flow-row > .flow-box.fb-[gray|blue|green|purple|orange] + .flow-arr
 Lifecycle flow    .phase-flow > .phase-box.ph-[gray|blue|green|orange|purple|red] + .phase-arrow
 Diagram wrap      .diag-wrap (graph paper bg, overflow-x: auto)
@@ -240,7 +258,8 @@ Sticky callout    .sticky (.sticky-label + <p>)
 Insight box       .insight [.green-ins|.orange-ins]
 
 Bullet list       .note-list > li [.sq|.ck|.cr|.st]
-Table             .note-table
+Table             <table class="note-table">  ← paper card; reference data + timelines
+                    (auto: opaque cells, outer ring, soft shadow, mobile auto-scroll)
 Tags              .tag [.tag-g|.tag-b|.tag-o|.tag-p]
 
 Inline highlight  .hl .hl-green .hl-blue .hl-orange .hl-purple
@@ -248,100 +267,97 @@ Wavy underline    .wu (green) .wu-o (orange) .wu-b (blue)
 Margin note       .margin-note
 ```
 
----
-
-## Code Block Syntax Highlighting Classes
+### Code-block syntax classes (only valid inside `.code-block`)
 
 ```
-.kw  → keyword (public, class, if, return, etc.)
-.an  → annotation (@Service, @Transactional, etc.)
-.cl  → class name (BankService, String, etc.)
+.kw  → keyword (public, class, BEGIN, SELECT, ...)
+.an  → annotation (@Service, @Transactional, ...)
+.cl  → class name (BankService, String, ...)
 .st  → string literal ("hello", numbers)
 .cm  → comment (// comment)
-.ar  → arrow/operator (→, =, etc.)
+.ar  → arrow/operator (→, =, ...)
 ```
+
+These classes do **not** style outside a code block — for tables/cards use `<code>` for monospace + `.hl-*` for highlights.
 
 ---
 
-## Current Notes in index.astro
+## 7. Pagination System (`PaginationController.astro`)
+
+- Finds all `.page` elements inside `.content-wrap` (`.cover` is untouched).
+- Hides all except the current page.
+- Adds `body.pg-mode` → `padding-bottom: 72px` for bar clearance.
+- Fixed bottom bar: ← / → buttons, page counter "pg 03 / 10", section title, dot indicators.
+- Green progress bar fixed at `top: 52px`.
+- Navigation: buttons, dots, keyboard (`←` / `→` only — up/down scroll normally), horizontal swipe ≥ 60px.
+- **Swipe guard** — `isInsideHScrollable` walks the DOM on `touchend`; if any ancestor has `overflow-x: auto|scroll` AND `scrollWidth > clientWidth`, swipe is treated as scroll (skips page nav). Code blocks, diagram wrappers, and mobile tables are protected automatically. **Never remove this guard.**
+- URL hash: `#page-3` via `history.replaceState`, restored on load.
+
+---
+
+## 8. Adding a New Note (Checklist)
+
+1. Copy `src/pages/notes/spring-boot-ioc.astro` as template.
+2. Replace **all** `{` → `&#123;` and `}` → `&#125;` in the HTML section (after second `---`).
+3. Use `<pre class="code-block">` for every actual code block (never `<div>`).
+4. **For tables, timelines, comparisons** — use the proper component (Rule #6). Never draw with ASCII characters.
+5. Cover `h1` = single sentence, no `<br />`.
+6. Add `<PaginationController />` before `</BaseLayout>`.
+7. Register the note in the `notes` array in `src/pages/index.astro`.
+
+---
+
+## 9. Current Notes in `src/pages/index.astro`
 
 ```javascript
 const notes = [
-  {
-    href:   '/notes/spring-transactional/',
-    series: 'Spring Boot · Deep Dive Series',
-    title:  '@Transactional — Complete Deep Dive',
-    desc:   'Everything about @Transactional: AOP proxy internals, propagation types, isolation levels, rollback rules, common pitfalls, and real-world patterns.',
-    tags:   [
-      { label: '🔄 Propagation',   cls: 'tag-g' },
-      { label: '🔒 Isolation',     cls: 'tag-b' },
-      { label: '🛡️ AOP Proxy',    cls: 'tag-o' },
-      { label: '⚡ Rollback',      cls: 'tag-p' },
-    ],
-    doodle: '🔁',
-    pages:  12,
-  },
-  {
-    href:   '/notes/database-acid/',
-    series: 'Database Fundamentals · Deep Dive Series',
-    title:  'ACID Properties & Transaction Guarantees',
-    desc:   'Complete deep dive into ACID — Atomicity, Consistency, Isolation, Durability. Covers MySQL internals, isolation levels, MVCC, anomalies, and interview prep.',
-    tags:   [
-      { label: '⚛️ Atomicity',     cls: 'tag-g' },
-      { label: '🔒 Isolation',     cls: 'tag-o' },
-      { label: '🔄 MVCC',          cls: 'tag-b' },
-      { label: '📝 Undo/Redo',     cls: 'tag-p' },
-    ],
-    doodle: '🗄️',
-    pages:  10,
-  },
-  {
-    href:   '/notes/spring-boot-ioc/',
-    series: 'Spring Boot · Deep Dive Series',
-    title:  'IoC Container, @Bean & Dep. Injection',
-    desc:   'How Spring actually works under the hood — BeanDefinition, CGLIB proxies, DI types, scopes, lifecycle, and circular dependency resolution.',
-    tags:   [
-      { label: '🫘 Beans',            cls: 'tag-g' },
-      { label: '📦 ApplicationContext', cls: 'tag-b' },
-      { label: '🔄 Lifecycle',        cls: 'tag-o' },
-      { label: '🔗 DI Internals',     cls: 'tag-g' },
-    ],
-    doodle: '☕',
-    pages:  10,
-  },
+  { href: '/notes/spring-transactional/',  pages: 12, ... },  // @Transactional deep dive
+  { href: '/notes/database-acid/',         pages: 10, ... },  // ACID — heavily polished this session
+  { href: '/notes/spring-boot-ioc/',       pages: 10, ... },  // IoC, beans, DI
 ];
 ```
 
 ---
 
-## Changes Made This Session
+## 10. User Preferences (Observed)
 
-1. **Created `database-acid.astro`** — 10-page note covering ACID properties, MySQL internals, isolation levels, MVCC, anomalies, ACID vs BASE, interview Q&A
-
-2. **Created `spring-transactional.astro`** — 12-page note covering @Transactional AOP proxy internals, propagation types, isolation levels, rollback rules, timeout, event listeners, common pitfalls, decision guide, interview Q&A
-
-3. **Fixed PaginationController keyboard navigation** — Removed up/down arrow page navigation so they scroll normally. Only left/right arrows now change pages.
-
-4. **Updated index.astro** — Added both new notes to the notes array
-
-5. **Converted ASCII diagrams to visual components** — Replaced ASCII art in code blocks with proper `.flow-row`, `.phase-flow`, `.two-col` components in spring-transactional.astro (Page 2 proxy diagram, Page 11 propagation decision guide)
+- **Compact, read-friendly** trumps decorative — when phase-flow felt "too big" for the bank transfer, user preferred the original ASCII prose. The decision turns on content density per pixel.
+- **Industrial-standard solutions with minimal changes** — explicit user rule. Don't refactor adjacent code unprompted.
+- **Commit messages:** short, lowercase, imperative. Examples: `feat: design fixed`, `add spring-aop note`, `fix code block overflow`.
+- **Tables must have visible internal grid lines** — column dividers are non-negotiable for readability. The current `.note-table` paper-card design satisfies this.
+- **One job per component** — user pushed back when the same flow was repeated in both prose and `.phase-flow`. Each visual element should do exactly one thing the others don't.
+- **The Atomicity bank transfer (Page 2 of database-acid)** must remain in its original ASCII prose-in-code form. User reverted conversion attempts twice. **Do not touch.**
 
 ---
 
-## Possible Next Steps
+## 11. Possible Next Steps
 
-- Add more note pages (use the checklist above)
-- Move `notes` array in `index.astro` to Astro content collection as count grows
-- Add RSS feed + sitemap (`@astrojs/sitemap`)
-- Make commits for the work done
-- Consider adding search functionality as notes grow
+- Apply Rule #6 audit to `spring-boot-ioc.astro` and `spring-transactional.astro` — there may be more ASCII timelines/diagrams that predate Rule #6.
+- Move the `notes` array in `index.astro` to an Astro content collection as the count grows.
+- Add `@astrojs/sitemap` + RSS feed (`@astrojs/rss`).
+- Add search functionality as notes grow.
+- Audit existing `<pre class="code-block">` blocks across all notes for any remaining ASCII art (`│ ─ ┼ ┌ └ ▶`).
 
 ---
 
-## Key Files to Read First
+## 12. Files to Read First (in order)
 
-1. `CLAUDE.md` — AI agent rules (non-negotiable)
-2. `src/pages/notes/spring-boot-ioc.astro` — Template for new notes
-3. `src/pages/style-guide.astro` — All available components
-4. `src/styles/components.css` — Component CSS definitions
-5. `src/components/PaginationController.astro` — Pagination logic
+1. **`CLAUDE.md`** — non-negotiable rules, including the new Rule #6.
+2. **`/style-guide` route** (`src/pages/style-guide.astro`) — visual demo of every component, including the new `.note-table` paper card and the warning against ASCII tables.
+3. **`README.md`** — developer guide + the styling rules table that includes `.note-table` for timelines/lookups.
+4. **`src/styles/components.css`** — single source of truth for all component CSS. The `.note-table` block (around line 580) is the model for future "paper card" components.
+5. **`src/pages/notes/database-acid.astro`** — reference for the new patterns: `.note-table` timelines (Pages 4–5), `.note-table` row metadata (Page 6), `.sticky` + `.phase-flow` rhythm (Pages 6–7).
+
+---
+
+## 13. Quick "Don't Break These" List
+
+- ❌ Don't draw tables with `│ ─ ┼ ┌ └ ▶` inside `<pre>` — use `<table class="note-table">` (Rule #6).
+- ❌ Don't use `.kw / .cm / .st` syntax classes outside `.code-block` — they're scoped to that selector.
+- ❌ Don't add `border` (instead of `box-shadow`) to `.note-table` — it fights with `border-collapse: collapse` + `border-radius`.
+- ❌ Don't make table cells transparent — page lines bleed through.
+- ❌ Don't touch the Atomicity bank-transfer comparison on Page 2 of `database-acid.astro` — user wants the ASCII version.
+- ❌ Don't remove the `isInsideHScrollable` guard in `PaginationController.astro`.
+- ❌ Don't use bare `<div>` as a CSS Grid child without `min-width: 0`.
+- ❌ Don't put `<br />` tags in cover `h1`.
+- ❌ Don't forget to escape `{` and `}` in `.astro` templates.
