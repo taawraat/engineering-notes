@@ -22,3 +22,7 @@ Thumbs.db
 
 # Logs
 npm-debug.log*
+
+# AI agent tooling
+.agents/
+skills-lock.json

@@ -74,6 +74,8 @@ Open `/style-guide` in the browser before writing new content. Every component c
 | Cheat-sheet grid | `.cheat-grid` + `.cheat-card` |
 | Horizontal flow diagram | `.flow-row` + `.flow-box.fb-*` + `.flow-arr` |
 | Vertical lifecycle diagram | `.phase-flow` + `.phase-box.ph-*` + `.phase-arrow` |
+| Reference data / timelines | `<table class="note-table">` (paper card; never ASCII `│ ─ ┼` inside `<pre>`) |
+| Bullet list | `.note-list` + `li.sq` / `.ck` / `.cr` / `.st` |
 | Key callout | `.sticky` |
 | Tip / insight | `.insight` (`.green-ins`, `.orange-ins`) |
 | Inline emphasis | `.hl`, `.hl-green`, `.hl-blue`, `.hl-orange`, `.hl-purple` |
@@ -132,5 +134,5 @@ Push to the `main` branch. Netlify picks up `netlify.toml` automatically:
   publish   = "dist"
 
 [build.environment]
-  NODE_VERSION = "20"
+  NODE_VERSION = "22"
 ```

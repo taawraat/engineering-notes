@@ -42,6 +42,21 @@ The `/style-guide` route demonstrates every available component. Use the existin
 
 CSS Grid items default to `min-width: auto`, which lets them overflow their column. Any bare `<div>` used as a direct grid child **must** have `min-width: 0` set (either via a class or inline style). Classes that already handle this: `.col-card`, `.cheat-card`, `.scope-side`.
 
+### 6. Use real components instead of ASCII art
+
+Never draw diagrams or tables with ASCII characters (`│ ─ ┼ ┌ └ ▶ →`) inside `<pre class="code-block">`. The page has a lined-paper texture that leaks through code blocks and turns ASCII grids into visual noise. Always use the proper component:
+
+| Pattern | Use |
+|---|---|
+| Horizontal step flow | `.flow-row` + `.flow-box.fb-*` + `.flow-arr` |
+| Vertical step flow / lifecycle | `.phase-flow` + `.phase-box.ph-*` + `.phase-arrow` |
+| Side-by-side text comparison | `.two-col` + `.col-card` |
+| Side-by-side code comparison | `.code-compare` + `.code-compare-panel` |
+| Time-series / concurrency timeline | `<table class="note-table">` (narrow Time column + per-actor columns) |
+| Reference data / lookup | `<table class="note-table">` |
+
+`.code-block` is for actual code only — never prose, never tables, never timelines.
+
 ---
 
 ## File map (quick reference)
@@ -86,12 +101,12 @@ Lifecycle diagram .phase-flow > .phase-box.ph-* + .phase-arrow
 Sticky callout    .sticky
 Insight box       .insight [.green-ins|.orange-ins]
 Bullet list       .note-list > li[.sq|.ck|.cr|.st]
-Table             .note-table
+Table             <table class="note-table">  ← paper card; for reference data + timelines
 Inline highlight  .hl .hl-green .hl-blue .hl-orange .hl-purple
 Wavy underline    .wu .wu-o .wu-b
 ```
 
-### Rule 6 — Mobile-first thinking for every component
+### Rule 7 — Mobile-first thinking for every component
 
 The site is read heavily on phones. Follow these rules for every new component or content block:
 

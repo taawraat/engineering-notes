@@ -41,7 +41,7 @@ import PaginationController from '../../components/PaginationController.astro';
 
   <div class="sticky">
     <div class="sticky-label">🏦 Real-World Analogy</div>
-    <p>Transferring ₹5000 from your Savings Account to your Friend's Account involves TWO operations: <strong>Debit yours</strong> → <strong>Credit theirs</strong>. If the system crashes between steps, your money is gone and friend got nothing. A <strong>transaction</strong> says: "Either BOTH happen, or NEITHER happens."</p>
+    <p>Transferring $5000 from your Savings Account to your Friend's Account involves TWO operations: <strong>Debit yours</strong> → <strong>Credit theirs</strong>. If the system crashes between steps, your money is gone and friend got nothing. A <strong>transaction</strong> says: "Either BOTH happen, or NEITHER happens."</p>
   </div>
 
   <h2 class="sub">SQL Transaction Syntax</h2>
@@ -166,12 +166,18 @@ Result: Alice still has $1000.
 
   <h2 class="sub">What "Valid State" Means</h2>
   <div class="body-text"><p>A database defines rules about what data is acceptable:</p></div>
-  <pre class="code-block blue-left"><span class="cm">Rules / Constraints Examples:</span>
-├── CHECK constraint:      account balance &gt;= 0
-├── FOREIGN KEY:           order must reference a valid customer
-├── UNIQUE constraint:     email must be unique
-├── NOT NULL:              name cannot be null
-└── Custom triggers:       age must be &gt;= 18 for certain tables</pre>
+  <table class="note-table">
+    <thead>
+      <tr><th>Constraint</th><th>Rule it enforces</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>CHECK</code></td><td>account balance &gt;= 0</td></tr>
+      <tr><td><code>FOREIGN KEY</code></td><td>order must reference a valid customer</td></tr>
+      <tr><td><code>UNIQUE</code></td><td>email must be unique</td></tr>
+      <tr><td><code>NOT NULL</code></td><td>name cannot be null</td></tr>
+      <tr><td>Custom triggers</td><td>age must be &gt;= 18 for certain tables</td></tr>
+    </tbody>
+  </table>
 
   <div class="body-text"><p>Consistency says: <span class="wu">these rules must ALWAYS hold true</span>. No transaction can leave the database in a state that violates these rules.</p></div>
 
@@ -236,47 +242,56 @@ Result: Alice still has $1000.
 
   <h2 class="sub">Anomaly 1: Dirty Read</h2>
   <div class="body-text"><p>Reading data modified by another transaction that has <span class="hl-orange">NOT yet committed</span>.</p></div>
-  <pre class="code-block purple-left"><span class="cm">Time │ Transaction A (Writer)     │ Transaction B (Reader)</span>
-─────┼────────────────────────────┼────────────────────────
- T1  │ <span class="kw">BEGIN</span>                      │
- T2  │ <span class="kw">UPDATE</span> balance = <span class="st">500</span>       │
-     │ <span class="cm">(not yet committed)</span>       │
- T3  │                            │ <span class="kw">BEGIN</span>
- T4  │                            │ <span class="kw">SELECT</span> balance
-     │                            │ → Reads <span class="st">500</span> ❌ <span class="cm">(DIRTY!)</span>
- T5  │ <span class="kw">ROLLBACK</span> ← <span class="cm">(crashed)</span>       │
- T6  │ balance is back to <span class="st">1000</span>   │
- T7  │                            │ Uses $500 value
-     │                            │ → <span class="cm">WRONG DECISION! 💀</span></pre>
+  <table class="note-table">
+    <thead>
+      <tr><th style="width:60px">Time</th><th>Transaction A (Writer)</th><th>Transaction B (Reader)</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>T1</strong></td><td><code>BEGIN</code></td><td></td></tr>
+      <tr><td><strong>T2</strong></td><td><code>UPDATE</code> balance = 500 <em>(not yet committed)</em></td><td></td></tr>
+      <tr><td><strong>T3</strong></td><td></td><td><code>BEGIN</code></td></tr>
+      <tr><td><strong>T4</strong></td><td></td><td><code>SELECT</code> balance → reads <span class="hl-orange">500</span> ❌ <strong>DIRTY!</strong></td></tr>
+      <tr><td><strong>T5</strong></td><td><code>ROLLBACK</code> ← crashed</td><td></td></tr>
+      <tr><td><strong>T6</strong></td><td>balance reverts to <span class="hl-green">1000</span></td><td></td></tr>
+      <tr><td><strong>T7</strong></td><td></td><td>Uses $500 → <strong>WRONG DECISION 💀</strong></td></tr>
+    </tbody>
+  </table>
   <div class="body-text"><p style="font-size:14px;color:var(--ink2)">Transaction B read data that <strong>NEVER officially existed</strong>.</p></div>
 
   <h2 class="sub">Anomaly 2: Non-Repeatable Read</h2>
   <div class="body-text"><p>Within the same transaction, reading the <span class="hl-orange">same row twice</span> gives <span class="hl-orange">different results</span>.</p></div>
-  <pre class="code-block purple-left"><span class="cm">Time │ Transaction A (Reader)     │ Transaction B</span>
-─────┼────────────────────────────┼────────────────────────
- T1  │ <span class="kw">BEGIN</span>                      │
- T2  │ <span class="kw">SELECT</span> balance → <span class="st">1000</span> ✅   │
- T3  │                            │ <span class="kw">BEGIN</span>
- T4  │                            │ <span class="kw">UPDATE</span> balance = <span class="st">500</span>
- T5  │                            │ <span class="kw">COMMIT</span>
- T6  │ <span class="kw">SELECT</span> balance → <span class="st">500</span> ❌    │
-     │ <span class="cm">(Different result! Same TXN)</span> │
- T7  │ <span class="kw">COMMIT</span>                     │</pre>
+  <table class="note-table">
+    <thead>
+      <tr><th style="width:60px">Time</th><th>Transaction A (Reader)</th><th>Transaction B (Writer)</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>T1</strong></td><td><code>BEGIN</code></td><td></td></tr>
+      <tr><td><strong>T2</strong></td><td><code>SELECT</code> balance → <span class="hl-green">1000</span> ✅</td><td></td></tr>
+      <tr><td><strong>T3</strong></td><td></td><td><code>BEGIN</code></td></tr>
+      <tr><td><strong>T4</strong></td><td></td><td><code>UPDATE</code> balance = 500</td></tr>
+      <tr><td><strong>T5</strong></td><td></td><td><code>COMMIT</code></td></tr>
+      <tr><td><strong>T6</strong></td><td><code>SELECT</code> balance → <span class="hl-orange">500</span> ❌ <em>(different — same txn!)</em></td><td></td></tr>
+      <tr><td><strong>T7</strong></td><td><code>COMMIT</code></td><td></td></tr>
+    </tbody>
+  </table>
   <div class="body-text"><p style="font-size:14px;color:var(--ink2)">Transaction A saw <strong>TWO different values</strong> in the <strong>SAME transaction</strong>.</p></div>
 
   <h2 class="sub">Anomaly 3: Phantom Read</h2>
   <div class="body-text"><p>The <span class="hl-orange">same query returns different rows</span> because another transaction inserted/deleted rows.</p></div>
-  <pre class="code-block purple-left"><span class="cm">Time │ Transaction A (Reader)     │ Transaction B</span>
-─────┼────────────────────────────┼────────────────────────
- T1  │ <span class="kw">BEGIN</span>                      │
- T2  │ <span class="kw">SELECT COUNT</span>(*) <span class="kw">WHERE</span>      │
-     │ age &gt; <span class="st">18</span> → <span class="st">5 rows</span> ✅       │
- T3  │                            │ <span class="kw">BEGIN</span>
- T4  │                            │ <span class="kw">INSERT</span> new row age = <span class="st">25</span>
- T5  │                            │ <span class="kw">COMMIT</span>
- T6  │ <span class="kw">SELECT COUNT</span>(*) <span class="kw">WHERE</span>      │
-     │ age &gt; <span class="st">18</span> → <span class="st">6 rows</span> ❌       │
-     │ <span class="cm">(A new "phantom" appeared!)</span> │</pre>
+  <table class="note-table">
+    <thead>
+      <tr><th style="width:60px">Time</th><th>Transaction A (Reader)</th><th>Transaction B (Writer)</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>T1</strong></td><td><code>BEGIN</code></td><td></td></tr>
+      <tr><td><strong>T2</strong></td><td><code>SELECT COUNT(*) WHERE age &gt; 18</code> → <span class="hl-green">5 rows</span> ✅</td><td></td></tr>
+      <tr><td><strong>T3</strong></td><td></td><td><code>BEGIN</code></td></tr>
+      <tr><td><strong>T4</strong></td><td></td><td><code>INSERT</code> new row, age = 25</td></tr>
+      <tr><td><strong>T5</strong></td><td></td><td><code>COMMIT</code></td></tr>
+      <tr><td><strong>T6</strong></td><td><code>SELECT COUNT(*) WHERE age &gt; 18</code> → <span class="hl-orange">6 rows</span> ❌ <em>(phantom appeared!)</em></td><td></td></tr>
+    </tbody>
+  </table>
+  <div class="body-text"><p style="font-size:14px;color:var(--ink2)">Same query, <strong>different row count</strong> — a "phantom" row materialized mid-transaction.</p></div>
 </div>
 
 
@@ -291,17 +306,23 @@ Result: Alice still has $1000.
 
   <h2 class="sub">Anomaly 4: Lost Update</h2>
   <div class="body-text"><p>Two transactions read the same value, both modify it, and one update <span class="hl-orange">overwrites</span> the other.</p></div>
-  <pre class="code-block orange-left"><span class="cm">Time │ Transaction A              │ Transaction B</span>
-─────┼────────────────────────────┼────────────────────────
- T1  │ <span class="kw">READ</span> stock = <span class="st">10</span>            │
- T2  │                            │ <span class="kw">READ</span> stock = <span class="st">10</span>
- T3  │ stock = 10 - 1 = <span class="st">9</span>         │
- T4  │                            │ stock = 10 - 1 = <span class="st">9</span>
- T5  │ <span class="kw">WRITE</span> stock = <span class="st">9</span>            │
- T6  │                            │ <span class="kw">WRITE</span> stock = <span class="st">9</span>
-
-<span class="cm">Expected: stock = 8 (two items sold)</span>
-<span class="cm">Actual:   stock = 9 (one update was LOST) 💀</span></pre>
+  <table class="note-table">
+    <thead>
+      <tr><th style="width:60px">Time</th><th>Transaction A</th><th>Transaction B</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>T1</strong></td><td><code>READ</code> stock = <span class="hl-green">10</span></td><td></td></tr>
+      <tr><td><strong>T2</strong></td><td></td><td><code>READ</code> stock = <span class="hl-green">10</span></td></tr>
+      <tr><td><strong>T3</strong></td><td>stock = 10 − 1 = <strong>9</strong></td><td></td></tr>
+      <tr><td><strong>T4</strong></td><td></td><td>stock = 10 − 1 = <strong>9</strong></td></tr>
+      <tr><td><strong>T5</strong></td><td><code>WRITE</code> stock = 9</td><td></td></tr>
+      <tr><td><strong>T6</strong></td><td></td><td><code>WRITE</code> stock = 9</td></tr>
+    </tbody>
+  </table>
+  <div class="insight orange-ins" style="margin-top:12px">
+    <div class="insight-label">💀 Outcome</div>
+    <p><strong>Expected:</strong> stock = 8 (two items sold) · <strong>Actual:</strong> stock = <span class="hl-orange">9</span> — one update was silently lost.</p>
+  </div>
 
   <h2 class="sub">Isolation Levels</h2>
   <div class="body-text"><p>SQL defines four isolation levels — each trades off <span class="hl-green">performance</span> against <span class="hl-blue">protection from anomalies</span>:</p></div>
@@ -352,46 +373,61 @@ Result: Alice still has $1000.
   </div>
 
   <h2 class="sub">Hidden Row Metadata</h2>
-  <pre class="code-block green-left"><span class="cm">Every row in InnoDB has hidden columns:</span>
-┌──────────┬──────────┬────────────┬────────────────────────┐
-│  name    │  balance │  DB_TRX_ID │  DB_ROLL_PTR           │
-│  <span class="st">"Alice"</span> │  <span class="st">1000</span>    │   TXN_50   │ → Undo log pointer     │
-└──────────┴──────────┴────────────┴────────────────────────┘
-
-<span class="cl">DB_TRX_ID</span>   = Which transaction last modified this row
-<span class="cl">DB_ROLL_PTR</span> = Pointer to previous version in Undo Log</pre>
+  <div class="body-text"><p>Every row in InnoDB carries two <span class="hl-green">hidden columns</span> alongside your real data — they're what make MVCC possible:</p></div>
+  <table class="note-table">
+    <thead>
+      <tr>
+        <th>name</th>
+        <th>balance</th>
+        <th>DB_TRX_ID 🔒</th>
+        <th>DB_ROLL_PTR 🔒</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>"Alice"</code></td>
+        <td><code>1000</code></td>
+        <td><code>TXN_50</code></td>
+        <td>→ Undo log pointer</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="two-col">
+    <div class="col-card">
+      <div class="col-card-title b">🔒 DB_TRX_ID</div>
+      <div class="body-text" style="font-size:14px;margin:0">The transaction ID that last modified this row.</div>
+    </div>
+    <div class="col-card">
+      <div class="col-card-title b">🔒 DB_ROLL_PTR</div>
+      <div class="body-text" style="font-size:14px;margin:0">Pointer to the previous version of this row in the Undo Log.</div>
+    </div>
+  </div>
 
   <h2 class="sub">Read View — Snapshot Isolation</h2>
-  <div class="body-text"><p>When a transaction starts reading, it creates a <span class="hl-blue">Read View</span> — a snapshot that says:</p></div>
-  <pre class="code-block blue-left"><span class="cm">"I will only see rows committed BEFORE I started"</span>
+  <div class="body-text"><p>When a transaction starts reading, it builds a <span class="hl-blue">Read View</span> — a snapshot that locks in which row versions it is allowed to see.</p></div>
 
-Transaction B (TXN_100) starts reading...
-  Read View: <span class="st">"Only see rows where DB_TRX_ID &lt; 100"</span>
-
-Transaction A (TXN_101) updates the row:
-  → A new version is created with DB_TRX_ID = TXN_101
-  → Old version preserved in Undo Log
-
-Transaction B still reads the OLD version → Isolation achieved!
-<span class="cm">No locks needed for reads → High concurrency 🚀</span></pre>
+  <div class="sticky">
+    <div class="sticky-label">📜 The Read View Rule</div>
+    <p>"I will only see rows where <code>DB_TRX_ID</code> is <strong>older than my own transaction ID</strong>." Newer versions are filtered out, so the reader gets a stable, consistent snapshot.</p>
+  </div>
 
   <div class="phase-flow" style="margin-top:20px">
-    <div class="phase-box ph-gray">
-      <div class="ph-num">Writer</div>
-      <div class="ph-title">TXN_101 updates row</div>
-      <div class="ph-sub">Creates new version, old → Undo Log</div>
+    <div class="phase-box ph-blue">
+      <div class="ph-num">Step 1 · Reader</div>
+      <div class="ph-title">TXN_100 starts</div>
+      <div class="ph-sub">Read View: only see rows where <code>DB_TRX_ID &lt; 100</code></div>
     </div>
     <div class="phase-arrow">↓</div>
-    <div class="phase-box ph-blue">
-      <div class="ph-num">Reader</div>
-      <div class="ph-title">TXN_100 reads row</div>
-      <div class="ph-sub">Sees old version via Read View</div>
+    <div class="phase-box ph-orange">
+      <div class="ph-num">Step 2 · Writer</div>
+      <div class="ph-title">TXN_101 updates the row</div>
+      <div class="ph-sub">New version <code>DB_TRX_ID = 101</code> · old version preserved in Undo Log</div>
     </div>
     <div class="phase-arrow">↓</div>
     <div class="phase-box ph-green">
-      <div class="ph-num">Result</div>
-      <div class="ph-title">No blocking, no waiting</div>
-      <div class="ph-sub">Writers don't block readers ✅</div>
+      <div class="ph-num">Step 3 · Result</div>
+      <div class="ph-title">Reader still sees the old version</div>
+      <div class="ph-sub">No locks · no waiting · writers don't block readers 🚀</div>
     </div>
   </div>
 
@@ -416,43 +452,69 @@ Transaction B still reads the OLD version → Isolation achieved!
     <p>Durability guarantees that once a transaction is committed, it will remain committed <strong>permanently</strong> — even in the case of system failures like crashes, power outages, or errors. "Committed means committed." Forever.</p>
   </div>
 
-  <div class="code-compare">
-    <div class="code-compare-panel">
-      <div class="code-compare-label r">❌ Without Durability</div>
-      <pre class="code-block orange-left">1. You transfer $10,000
-2. Database says <span class="st">"COMMIT successful ✅"</span>
-3. Power goes out
-4. On restart: transfer never happened 😱</pre>
+  <div class="body-text"><p>Same scenario, two different worlds — see what happens after the crash:</p></div>
+  <table class="note-table">
+    <thead>
+      <tr><th style="width:60px">Step</th><th>❌ Without Durability</th><th>✓ With Durability</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>1</strong></td>
+        <td>You transfer $10,000</td>
+        <td>You transfer $10,000</td>
+      </tr>
+      <tr>
+        <td><strong>2</strong></td>
+        <td>Database says <code>"COMMIT successful ✅"</code></td>
+        <td>Database says <code>"COMMIT successful ✅"</code></td>
+      </tr>
+      <tr>
+        <td><strong>3</strong></td>
+        <td>⚡ Power goes out</td>
+        <td>⚡ Power goes out</td>
+      </tr>
+      <tr>
+        <td><strong>4</strong></td>
+        <td><span class="hl-orange"><strong>Transfer never happened 😱</strong></span></td>
+        <td><span class="hl-green"><strong>Transfer is still there ✅</strong></span></td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="body-text"><p style="font-size:14px;color:var(--ink3)">Steps 1 – 3 are identical. Durability is what makes step 4 turn out differently.</p></div>
+
+  <h2 class="sub">The Redo Log &amp; Write-Ahead Logging (WAL)</h2>
+  <div class="body-text"><p>MySQL guarantees durability through <span class="hl-purple">Write-Ahead Logging (WAL)</span> — every change is recorded in the Redo Log <em>before</em> it ever touches a data file.</p></div>
+
+  <div class="sticky">
+    <div class="sticky-label">📜 The WAL Golden Rule</div>
+    <p><strong>"WRITE to the log BEFORE writing to the actual data file."</strong> The Redo Log is the source of truth — if a crash happens, MySQL replays it on restart and reconstructs every committed change.</p>
+  </div>
+
+  <h3 class="sub">The Commit-Critical Path</h3>
+  <div class="phase-flow">
+    <div class="phase-box ph-orange">
+      <div class="ph-num">Step 1</div>
+      <div class="ph-title">📞 App calls commit()</div>
+      <div class="ph-sub">MySQL receives the COMMIT — change still only in memory buffers</div>
     </div>
-    <div class="code-compare-sep">— vs —</div>
-    <div class="code-compare-panel">
-      <div class="code-compare-label g">✓ With Durability</div>
-      <pre class="code-block green-left">1. You transfer $10,000
-2. Database says <span class="st">"COMMIT successful ✅"</span>
-3. Power goes out
-4. On restart: transfer is still there ✅</pre>
+    <div class="phase-arrow">↓</div>
+    <div class="phase-box ph-purple">
+      <div class="ph-num">Step 2</div>
+      <div class="ph-title">📝 Redo Log written</div>
+      <div class="ph-sub">Record appended to log buffer, then to the OS file</div>
+    </div>
+    <div class="phase-arrow">↓</div>
+    <div class="phase-box ph-green">
+      <div class="ph-num">Step 3 · Durable! ✅</div>
+      <div class="ph-title">💾 fsync() to disk platter</div>
+      <div class="ph-sub">Only now does the COMMIT return success to your application</div>
     </div>
   </div>
 
-  <h2 class="sub">The Redo Log &amp; Write-Ahead Logging (WAL)</h2>
-  <div class="body-text"><p>MySQL uses <span class="hl-purple">Write-Ahead Logging</span> — the Redo Log in InnoDB.</p></div>
-
-  <pre class="code-block purple-left"><span class="cm">The Golden Rule of WAL:</span>
-<span class="st">"WRITE to the log BEFORE writing to the actual data file."</span>
-
-Transaction Flow:
-  ┌──────────┐    ┌────────────────┐    ┌──────────────┐
-  │  COMMIT  │───▶│   Redo Log     │───▶│  Disk Flush  │
-  │  issued  │    │   (on disk)    │    │  (fsync)     │
-  └──────────┘    └────────────────┘    └──────────────┘
-                         │
-                         │  Only after log is safely on disk
-                         ▼
-                  ┌────────────────┐
-                  │  Data Pages    │
-                  │  (written      │
-                  │  lazily later) │
-                  └────────────────┘</pre>
+  <div class="insight" style="margin-top:12px">
+    <div class="insight-label">💡 Why data pages don't block COMMIT</div>
+    <p>The actual <code>.ibd</code> data pages get rewritten <strong>lazily, in the background</strong> — they don't block the COMMIT. The Redo Log already has everything needed to reconstruct unwritten pages on restart, so MySQL can return success the moment the log is safely on disk.</p>
+  </div>
 
   <h2 class="sub">The innodb_flush_log_at_trx_commit Setting</h2>
   <table class="note-table">

@@ -319,6 +319,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     </ul>
 
     <h2 class="sub">Note Table</h2>
+    <div class="body-text">
+      <p>A self-contained <span class="hl-green">paper card</span> — opaque cells (no page-line bleed-through), subtle outer ring, soft drop shadow, alternating row tint, and clear column dividers. Theme-safe via <code>--paper</code> / <code>--paper2</code>. Scrolls horizontally on mobile automatically.</p>
+    </div>
     <table class="note-table">
       <thead><tr><th>Column A</th><th>Column B</th><th>Column C</th></tr></thead>
       <tbody>
@@ -327,6 +330,26 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <tr><td>Row 3 A</td><td>Row 3 B</td><td>Row 3 C</td></tr>
       </tbody>
     </table>
+
+    <h3 class="sub">Use case — concurrency timeline</h3>
+    <div class="body-text">
+      <p>For time-series or two-actor timelines, use a 3-column table with a narrow <code>Time</code> anchor column. Empty cells read as "idle"; <code>&lt;code&gt;</code> wraps SQL keywords; <code>.hl-green</code> / <code>.hl-orange</code> mark correct vs. anomalous values.</p>
+    </div>
+    <table class="note-table">
+      <thead>
+        <tr><th style="width:60px">Time</th><th>Transaction A</th><th>Transaction B</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>T1</strong></td><td><code>BEGIN</code></td><td></td></tr>
+        <tr><td><strong>T2</strong></td><td><code>UPDATE</code> balance = 500 <em>(uncommitted)</em></td><td></td></tr>
+        <tr><td><strong>T3</strong></td><td></td><td><code>SELECT</code> balance → <span class="hl-orange">500</span> ❌ <strong>dirty!</strong></td></tr>
+        <tr><td><strong>T4</strong></td><td><code>ROLLBACK</code></td><td></td></tr>
+      </tbody>
+    </table>
+    <div class="insight orange-ins">
+      <div class="insight-label">⚠️ Don't draw tables with ASCII art</div>
+      <p>Never use <code>│ ─ ┼ ┌ └</code> characters inside <code>&lt;pre class="code-block"&gt;</code> to draw a table. Use real <code>&lt;table class="note-table"&gt;</code> markup — the page's lined-paper texture leaks through code blocks and turns ASCII tables into visual noise.</p>
+    </div>
 
     <h2 class="sub">Two-Column Cards</h2>
     <div class="two-col">

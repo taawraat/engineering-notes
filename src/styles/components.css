@@ -584,6 +584,10 @@ h3.sub {
   margin: 16px 0;
   font-family: var(--font-body);
   font-size: 15px;
+  background: var(--paper);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: 0 0 0 1px var(--rule-line), 0 1px 3px var(--shadow);
 }
 .note-table th {
   background: var(--green-bg);
@@ -591,22 +595,21 @@ h3.sub {
   font-family: var(--font-hand);
   font-size: 18px;
   font-weight: 700;
-  padding: 8px 12px;
+  padding: 10px 14px;
   text-align: left;
   border-bottom: 2px solid var(--green-light);
 }
 .note-table td {
-  padding: 8px 12px;
+  padding: 10px 14px;
   border-bottom: 1px solid var(--rule-line);
   color: var(--ink2);
   vertical-align: top;
+  background: var(--paper);
 }
 .note-table tr:last-child td { border-bottom: none; }
-.note-table tr:nth-child(even) td { background: rgba(232,245,236,0.2); }
-
-[data-theme="dark"] .note-table tr:nth-child(even) td {
-  background: rgba(90,184,122,0.06);
-}
+.note-table tr:nth-child(even) td { background: var(--paper2); }
+.note-table th + th,
+.note-table td + td { border-left: 1px solid var(--rule-line); }
 
 /* ── Cheatsheet grid ── */
 .cheat-grid {
