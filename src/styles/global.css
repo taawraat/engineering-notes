@@ -23,9 +23,9 @@ body {
   background-image: repeating-linear-gradient(
     0deg,
     transparent,
-    transparent 39px,
-    color-mix(in srgb, var(--body-rule) calc(var(--hn-bg-opacity, 1) * 100%), transparent) 39px,
-    color-mix(in srgb, var(--body-rule) calc(var(--hn-bg-opacity, 1) * 100%), transparent) 40px
+    transparent calc(var(--rule-step) - 1px),
+    color-mix(in srgb, var(--body-rule) calc(var(--hn-bg-opacity, 1) * 100%), transparent) calc(var(--rule-step) - 1px),
+    color-mix(in srgb, var(--body-rule) calc(var(--hn-bg-opacity, 1) * 100%), transparent) var(--rule-step)
   );
   font-family: var(--font-body);
   color: var(--ink-display, var(--ink));

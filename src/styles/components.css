@@ -78,7 +78,8 @@
   background: var(--paper);
   border-radius: var(--radius-sm) var(--radius-lg) var(--radius-lg) var(--radius-sm);
   box-shadow: -6px 0 0 var(--blue), var(--card-shadow);
-  padding: 44px 52px 40px;
+  /* Top/bottom padding snap to the ruled-line grid (--rule-step) */
+  padding: var(--rule-step) 52px calc(var(--rule-step) * 1.25);
   position: relative;
 }
 
@@ -89,13 +90,15 @@
 .page.purple-spine { box-shadow: -6px 0 0 var(--purple), var(--card-shadow); }
 .page.red-spine    { box-shadow: -6px 0 0 var(--red),    var(--card-shadow); }
 
-/* Ruled lines overlay */
+/* Ruled lines overlay — 1px rule at the bottom of each --rule-step band */
 .page::after {
   content: '';
   position: absolute; top: 0; left: 0; right: 0; bottom: 0;
   background-image: repeating-linear-gradient(
-    transparent, transparent 31px,
-    var(--rule-line) 31px, var(--rule-line) 32px
+    transparent,
+    transparent calc(var(--rule-step) - 1px),
+    var(--rule-line) calc(var(--rule-step) - 1px),
+    var(--rule-line) var(--rule-step)
   );
   border-radius: inherit;
   pointer-events: none;
@@ -115,7 +118,8 @@
 /* ── Section header ── */
 .section-header {
   display: flex; align-items: center; gap: 12px;
-  margin-bottom: 24px;
+  min-height: calc(var(--rule-step) * 2);
+  margin-bottom: var(--rule-step);
   position: relative; z-index: 1;
 }
 .section-icon {
@@ -141,16 +145,22 @@
   line-height: 1;
 }
 
-/* ── Body text ── */
+/* ── Body text — one line box per ruled row ── */
 .body-text {
   font-family: var(--font-body);
   font-size: var(--text-body);
   line-height: var(--text-body-leading);
   color: var(--ink2);
   position: relative; z-index: 1;
-  margin-bottom: 16px;
+  margin-bottom: var(--rule-step);
 }
-.body-text p { margin-bottom: 12px; }
+.body-text p {
+  margin: 0;
+  min-height: var(--rule-step);
+}
+.body-text p + p {
+  margin-top: var(--rule-step);
+}
 
 /* ── Inline highlights ── */
 .hl        { background: var(--yellow-hl);   padding: 0 3px; border-radius: 2px; }
@@ -275,9 +285,9 @@ code {
 }
 .insight p {
   font-family: var(--font-body);
-  font-size: 15px;
+  font-size: max(15px, calc(var(--text-body) * 0.85));
   color: var(--ink2);
-  line-height: 1.6;
+  line-height: var(--rule-step);
 }
 .insight.green-ins  { background: var(--green-bg);  border-left-color: var(--green); }
 .insight.orange-ins { background: var(--orange-bg); border-left-color: var(--orange); }
@@ -302,7 +312,7 @@ h2.sub {
   font-size: 26px;
   font-weight: 700;
   color: var(--ink);
-  margin: 28px 0 10px;
+  margin: var(--rule-step) 0 calc(var(--rule-step) * 0.5);
   padding-bottom: 4px;
   border-bottom: 2px dashed var(--rule-line);
 }
@@ -312,23 +322,24 @@ h3.sub {
   font-size: 21px;
   font-weight: 600;
   color: var(--ink2);
-  margin: 20px 0 8px;
+  margin: calc(var(--rule-step) * 0.75) 0 calc(var(--rule-step) * 0.25);
 }
 
 /* ── Note list ── */
 .note-list {
   position: relative; z-index: 1;
   list-style: none;
-  margin: 10px 0 16px 4px;
+  margin: calc(var(--rule-step) * 0.5) 0 var(--rule-step) 4px;
 }
 .note-list li {
   font-family: var(--font-body);
-  font-size: 18px;
+  font-size: var(--text-body);
   color: var(--ink2);
-  line-height: 1.7;
+  line-height: var(--rule-step);
   padding-left: 24px;
   position: relative;
-  margin-bottom: 4px;
+  margin-bottom: 0;
+  min-height: var(--rule-step);
 }
 .note-list li::before {
   content: '→';
@@ -1216,7 +1227,7 @@ body.pg-mode .hn-panel {
    Responsive — Tablet  ≤ 768 px
    ───────────────────────────────────────── */
 @media (max-width: 768px) {
-  .page  { padding: 36px 36px 30px; }
+  .page  { padding: var(--rule-step) 36px calc(var(--rule-step) * 1); }
   .cover { padding: 22px 32px 18px; }
 
   .cover h1        { font-size: 28px; }
@@ -1238,7 +1249,7 @@ body.pg-mode .hn-panel {
      absolutely-positioned .page-num badge (top: 16px) on desktop.
      On mobile we hide .page-num entirely, so 20px top padding is safe. */
   .page  {
-    padding: 20px 16px 20px;
+    padding: var(--rule-step) 16px var(--rule-step);
     margin-bottom: 18px;
   }
 
@@ -1259,18 +1270,17 @@ body.pg-mode .hn-panel {
   .cover-doodle  { display: none; } /* decorative — reclaim space */
 
   /* ── Section header ── */
-  .section-header { gap: 8px; margin-bottom: 14px; }
+  .section-header { gap: 8px; min-height: calc(var(--rule-step) * 2); margin-bottom: var(--rule-step); }
   .section-icon   { font-size: 20px; }
   .section-title  { font-size: 20px; line-height: 1.2; }
   .section-num    { display: none; }
 
   /* ── Sub-headings ── */
-  h2.sub { font-size: 19px; margin: 18px 0 8px; }
-  h3.sub { font-size: 16px; margin: 14px 0 6px; }
+  h2.sub { font-size: 19px; }
+  h3.sub { font-size: 16px; }
 
-  /* ── Body text ── */
-  .body-text   { font-size: max(15px, calc(var(--text-body) * 0.89)); line-height: calc(var(--text-body-leading) * 0.93); }
-  .body-text p { margin-bottom: 10px; }
+  /* ── Body text — keep rule-step line height for ruled alignment ── */
+  .body-text { font-size: max(15px, calc(var(--text-body) * 0.89)); }
 
   /* ── Code blocks ── */
   .code-block {
@@ -1295,7 +1305,7 @@ body.pg-mode .hn-panel {
   .sticky p     { font-size: 15px; }
   .sticky-label { font-size: 10px; }
   .insight      { padding: 10px 14px; }
-  .insight p    { font-size: 14px; line-height: 1.55; }
+  .insight p    { font-size: 14px; line-height: var(--rule-step); }
   .insight-label { font-size: 11px; }
 
   /* ── Grids → single column ── */
@@ -1318,7 +1328,7 @@ body.pg-mode .hn-panel {
   .diag-wrap { padding: 12px; }
 
   /* ── Note list ── */
-  .note-list li { font-size: 15px; line-height: 1.65; }
+  .note-list li { font-size: max(15px, calc(var(--text-body) * 0.89)); }
 
   /* ── Tables — horizontal scroll ── */
   .note-table {
@@ -1363,7 +1373,7 @@ body.pg-mode .hn-panel {
 @media (max-width: 480px) {
   .content-wrap { padding: 12px 8px 80px; }
 
-  .page  { padding: 16px 14px 18px; }
+  .page  { padding: var(--rule-step) 14px var(--rule-step); }
   .cover { padding: 12px 14px 12px; }
 
   .cover h1      { font-size: 19px; }
@@ -1372,8 +1382,8 @@ body.pg-mode .hn-panel {
 
   .section-title { font-size: 18px; }
 
-  .body-text     { font-size: max(15px, calc(var(--text-body) * 0.83)); line-height: calc(var(--text-body-leading) * 0.9); }
-  .note-list li  { font-size: 15px; }
+  .body-text     { font-size: max(15px, calc(var(--text-body) * 0.83)); }
+  .note-list li  { font-size: max(15px, calc(var(--text-body) * 0.83)); }
 
   .code-block    { font-size: 11.5px; padding: 10px 12px; }
 

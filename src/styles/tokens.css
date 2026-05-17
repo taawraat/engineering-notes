@@ -69,9 +69,12 @@
   --hn-ink-mix:      0%;
   --hn-paper-mix:    0%;
 
+  /* ── Notebook rule rhythm (page ruled lines + prose share this step) ── */
+  --rule-step: calc(32px * var(--hn-line-scale));
+
   /* ── Readability scale (floors enforced in JS: body ≥15px, code ≥13.5px) ── */
   --text-body:         calc(18px * var(--hn-text-scale));
-  --text-body-leading: calc(2.0 * var(--hn-line-scale));
+  --text-body-leading: var(--rule-step);
   --text-code:         calc(13.5px * var(--hn-text-scale));
   --text-code-leading: calc(1.9 * var(--hn-line-scale));
 
