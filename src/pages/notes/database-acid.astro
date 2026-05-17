@@ -14,14 +14,14 @@ import PaginationController from '../../components/PaginationController.astro';
   <h1>ACID Properties and Transaction Guarantees</h1>
   <div class="cover-sub">From theory to MySQL internals — everything you need to know</div>
   <div class="cover-tags">
-    <span class="tag tag-g">⚛️ Atomicity</span>
-    <span class="tag tag-b">✓ Consistency</span>
-    <span class="tag tag-o">🔒 Isolation</span>
-    <span class="tag tag-p">💾 Durability</span>
-    <span class="tag tag-g">🔄 MVCC</span>
-    <span class="tag tag-b">📝 Undo/Redo Logs</span>
+    <span class="tag tag-g">Atomicity</span>
+    <span class="tag tag-b">Consistency</span>
+    <span class="tag tag-o">Isolation</span>
+    <span class="tag tag-p">Durability</span>
+    <span class="tag tag-g">MVCC</span>
+    <span class="tag tag-b">Undo/Redo Logs</span>
   </div>
-  <div class="cover-doodle">🗄️</div>
+  <div class="cover-doodle">◉</div>
 </div>
 
 
@@ -29,7 +29,7 @@ import PaginationController from '../../components/PaginationController.astro';
 <div class="page green-spine">
   <div class="page-num">pg 01</div>
   <div class="section-header">
-    <span class="section-icon">💡</span>
+    <span class="section-icon">★</span>
     <span class="section-title">1. What is a Transaction?</span>
     <span class="section-num">01</span>
   </div>
@@ -40,7 +40,7 @@ import PaginationController from '../../components/PaginationController.astro';
   </div>
 
   <div class="sticky">
-    <div class="sticky-label">🏦 Real-World Analogy</div>
+    <div class="sticky-label">★ Real-World Analogy</div>
     <p>Transferring $5000 from your Savings Account to your Friend's Account involves TWO operations: <strong>Debit yours</strong> → <strong>Credit theirs</strong>. If the system crashes between steps, your money is gone and friend got nothing. A <strong>transaction</strong> says: "Either BOTH happen, or NEITHER happens."</p>
   </div>
 
@@ -58,21 +58,21 @@ import PaginationController from '../../components/PaginationController.astro';
   <div class="body-text"><p>Databases face three major threats that ACID protects against:</p></div>
   <div class="cheat-grid">
     <div class="cheat-card" style="color:var(--red);border-top-color:var(--red)">
-      <div class="cheat-card-title">💥 System Crashes</div>
+      <div class="cheat-card-title">System Crashes</div>
       <div style="font-size:13px;color:var(--ink2)">Power failures, OS crashes, hardware faults</div>
     </div>
     <div class="cheat-card" style="color:var(--orange);border-top-color:var(--orange)">
-      <div class="cheat-card-title">👥 Concurrent Users</div>
+      <div class="cheat-card-title">Concurrent Users</div>
       <div style="font-size:13px;color:var(--ink2)">Race conditions, dirty reads, lost updates</div>
     </div>
     <div class="cheat-card" style="color:var(--purple);border-top-color:var(--purple)">
-      <div class="cheat-card-title">⚠️ Partial Failures</div>
+      <div class="cheat-card-title">Partial Failures</div>
       <div style="font-size:13px;color:var(--ink2)">Network errors, app bugs, disk errors</div>
     </div>
   </div>
 
   <div class="insight green-ins" style="margin-top:20px">
-    <div class="insight-label">📚 ACID = Four Guarantees</div>
+    <div class="insight-label">★ ACID = Four Guarantees</div>
     <p><span class="hl-green">A</span>tomicity → All or Nothing · <span class="hl-blue">C</span>onsistency → Rules are never broken · <span class="hl-orange">I</span>solation → Transactions don't interfere · <span class="hl-purple">D</span>urability → Committed data survives crashes</p>
   </div>
 </div>
@@ -82,13 +82,13 @@ import PaginationController from '../../components/PaginationController.astro';
 <div class="page orange-spine">
   <div class="page-num">pg 02</div>
   <div class="section-header">
-    <span class="section-icon">⚛️</span>
+    <span class="section-icon">◎</span>
     <span class="section-title">2. Atomicity — All or Nothing</span>
     <span class="section-num">02</span>
   </div>
 
   <div class="sticky">
-    <div class="sticky-label">📖 Definition</div>
+    <div class="sticky-label">★ Definition</div>
     <p>Atomicity guarantees that a transaction is treated as a <strong>single indivisible unit</strong> — either ALL operations succeed, or ALL are rolled back. There is no partial success.</p>
   </div>
 
@@ -144,7 +144,7 @@ Result: Alice still has $1000.
   </ul>
 
   <div class="insight orange-ins">
-    <div class="insight-label">💡 Key Points</div>
+    <div class="insight-label">★ Key Points</div>
     <p>Atomicity is about <strong>failure handling</strong>, not concurrency. It's enforced even on system crashes, not just explicit ROLLBACK. MySQL's <code>AUTOCOMMIT = 1</code> (default) means every single statement is its own transaction.</p>
   </div>
 </div>
@@ -160,7 +160,7 @@ Result: Alice still has $1000.
   </div>
 
   <div class="sticky">
-    <div class="sticky-label">📖 Definition</div>
+    <div class="sticky-label">★ Definition</div>
     <p>Consistency ensures that a transaction brings the database from one <strong>valid state</strong> to another valid state, never leaving it in an invalid intermediate state. All defined rules, constraints, and triggers must be satisfied.</p>
   </div>
 
@@ -218,7 +218,7 @@ Result: Alice still has $1000.
   </div>
 
   <div class="insight" style="margin-top:16px">
-    <div class="insight-label">⚠️ Important Note</div>
+    <div class="insight-label">! Important Note</div>
     <p>Consistency is the <strong>"C" that YOU define</strong>. The database upholds it only based on the constraints you've declared. If you don't define a constraint, the database doesn't know the rule.</p>
   </div>
 </div>
@@ -228,13 +228,13 @@ Result: Alice still has $1000.
 <div class="page purple-spine">
   <div class="page-num">pg 04</div>
   <div class="section-header">
-    <span class="section-icon">🔒</span>
+    <span class="section-icon">✗</span>
     <span class="section-title">4. Isolation — Concurrency Anomalies</span>
     <span class="section-num">04</span>
   </div>
 
   <div class="sticky">
-    <div class="sticky-label">📖 Definition</div>
+    <div class="sticky-label">★ Definition</div>
     <p>Isolation ensures that the intermediate state of a transaction is <strong>invisible to other concurrent transactions</strong>. Each transaction executes as if it is the only one running.</p>
   </div>
 
@@ -253,7 +253,7 @@ Result: Alice still has $1000.
       <tr><td><strong>T4</strong></td><td></td><td><code>SELECT</code> balance → reads <span class="hl-orange">500</span> ❌ <strong>DIRTY!</strong></td></tr>
       <tr><td><strong>T5</strong></td><td><code>ROLLBACK</code> ← crashed</td><td></td></tr>
       <tr><td><strong>T6</strong></td><td>balance reverts to <span class="hl-green">1000</span></td><td></td></tr>
-      <tr><td><strong>T7</strong></td><td></td><td>Uses $500 → <strong>WRONG DECISION 💀</strong></td></tr>
+      <tr><td><strong>T7</strong></td><td></td><td>Uses $500 → <strong>WRONG DECISION ✗</strong></td></tr>
     </tbody>
   </table>
   <div class="body-text"><p style="font-size:14px;color:var(--ink2)">Transaction B read data that <strong>NEVER officially existed</strong>.</p></div>
@@ -266,7 +266,7 @@ Result: Alice still has $1000.
     </thead>
     <tbody>
       <tr><td><strong>T1</strong></td><td><code>BEGIN</code></td><td></td></tr>
-      <tr><td><strong>T2</strong></td><td><code>SELECT</code> balance → <span class="hl-green">1000</span> ✅</td><td></td></tr>
+      <tr><td><strong>T2</strong></td><td><code>SELECT</code> balance → <span class="hl-green">1000</span> ✓</td><td></td></tr>
       <tr><td><strong>T3</strong></td><td></td><td><code>BEGIN</code></td></tr>
       <tr><td><strong>T4</strong></td><td></td><td><code>UPDATE</code> balance = 500</td></tr>
       <tr><td><strong>T5</strong></td><td></td><td><code>COMMIT</code></td></tr>
@@ -284,7 +284,7 @@ Result: Alice still has $1000.
     </thead>
     <tbody>
       <tr><td><strong>T1</strong></td><td><code>BEGIN</code></td><td></td></tr>
-      <tr><td><strong>T2</strong></td><td><code>SELECT COUNT(*) WHERE age &gt; 18</code> → <span class="hl-green">5 rows</span> ✅</td><td></td></tr>
+      <tr><td><strong>T2</strong></td><td><code>SELECT COUNT(*) WHERE age &gt; 18</code> → <span class="hl-green">5 rows</span> ✓</td><td></td></tr>
       <tr><td><strong>T3</strong></td><td></td><td><code>BEGIN</code></td></tr>
       <tr><td><strong>T4</strong></td><td></td><td><code>INSERT</code> new row, age = 25</td></tr>
       <tr><td><strong>T5</strong></td><td></td><td><code>COMMIT</code></td></tr>
@@ -299,7 +299,7 @@ Result: Alice still has $1000.
 <div class="page orange-spine">
   <div class="page-num">pg 05</div>
   <div class="section-header">
-    <span class="section-icon">📊</span>
+    <span class="section-icon">≡</span>
     <span class="section-title">5. Lost Update &amp; Isolation Levels</span>
     <span class="section-num">05</span>
   </div>
@@ -320,7 +320,7 @@ Result: Alice still has $1000.
     </tbody>
   </table>
   <div class="insight orange-ins" style="margin-top:12px">
-    <div class="insight-label">💀 Outcome</div>
+    <div class="insight-label">✗ Outcome</div>
     <p><strong>Expected:</strong> stock = 8 (two items sold) · <strong>Actual:</strong> stock = <span class="hl-orange">9</span> — one update was silently lost.</p>
   </div>
 
@@ -334,7 +334,7 @@ Result: Alice still has $1000.
     <tbody>
       <tr><td><code>READ UNCOMMITTED</code></td><td style="color:var(--red)">Possible</td><td style="color:var(--red)">Possible</td><td style="color:var(--red)">Possible</td></tr>
       <tr><td><code>READ COMMITTED</code></td><td style="color:var(--green)">Prevented</td><td style="color:var(--red)">Possible</td><td style="color:var(--red)">Possible</td></tr>
-      <tr><td><code>REPEATABLE READ</code> ⭐</td><td style="color:var(--green)">Prevented</td><td style="color:var(--green)">Prevented</td><td style="color:var(--orange)">Possible*</td></tr>
+      <tr><td><code>REPEATABLE READ</code> ★</td><td style="color:var(--green)">Prevented</td><td style="color:var(--green)">Prevented</td><td style="color:var(--orange)">Possible*</td></tr>
       <tr><td><code>SERIALIZABLE</code></td><td style="color:var(--green)">Prevented</td><td style="color:var(--green)">Prevented</td><td style="color:var(--green)">Prevented</td></tr>
     </tbody>
   </table>
@@ -346,14 +346,14 @@ Result: Alice still has $1000.
       <div class="flow-arr">→</div>
       <div class="flow-box fb-blue">READ<br />COMMITTED</div>
       <div class="flow-arr">→</div>
-      <div class="flow-box fb-orange">REPEATABLE<br />READ ⭐<br /><span style="font-size:11px;opacity:0.7">MySQL default</span></div>
+      <div class="flow-box fb-orange">REPEATABLE<br />READ ★<br /><span style="font-size:11px;opacity:0.7">MySQL default</span></div>
       <div class="flow-arr">→</div>
       <div class="flow-box fb-purple">SERIALIZABLE<br /><span style="font-size:11px;opacity:0.7">slowest / strongest</span></div>
     </div>
   </div>
 
   <div class="insight green-ins" style="margin-top:20px">
-    <div class="insight-label">⭐ MySQL Default</div>
+    <div class="insight-label">★ MySQL Default</div>
     <p><strong>REPEATABLE READ</strong> is MySQL's default isolation level. InnoDB additionally prevents phantom reads using <strong>Gap Locks</strong>, which is stricter than the SQL standard requires.</p>
   </div>
 </div>
@@ -363,7 +363,7 @@ Result: Alice still has $1000.
 <div class="page green-spine">
   <div class="page-num">pg 06</div>
   <div class="section-header">
-    <span class="section-icon">🔄</span>
+    <span class="section-icon">↺</span>
     <span class="section-title">6. How MySQL Implements Isolation — MVCC</span>
     <span class="section-num">06</span>
   </div>
@@ -379,8 +379,8 @@ Result: Alice still has $1000.
       <tr>
         <th>name</th>
         <th>balance</th>
-        <th>DB_TRX_ID 🔒</th>
-        <th>DB_ROLL_PTR 🔒</th>
+        <th>DB_TRX_ID</th>
+        <th>DB_ROLL_PTR</th>
       </tr>
     </thead>
     <tbody>
@@ -394,11 +394,11 @@ Result: Alice still has $1000.
   </table>
   <div class="two-col">
     <div class="col-card">
-      <div class="col-card-title b">🔒 DB_TRX_ID</div>
+      <div class="col-card-title b">DB_TRX_ID</div>
       <div class="body-text" style="font-size:14px;margin:0">The transaction ID that last modified this row.</div>
     </div>
     <div class="col-card">
-      <div class="col-card-title b">🔒 DB_ROLL_PTR</div>
+      <div class="col-card-title b">DB_ROLL_PTR</div>
       <div class="body-text" style="font-size:14px;margin:0">Pointer to the previous version of this row in the Undo Log.</div>
     </div>
   </div>
@@ -407,7 +407,7 @@ Result: Alice still has $1000.
   <div class="body-text"><p>When a transaction starts reading, it builds a <span class="hl-blue">Read View</span> — a snapshot that locks in which row versions it is allowed to see.</p></div>
 
   <div class="sticky">
-    <div class="sticky-label">📜 The Read View Rule</div>
+    <div class="sticky-label">★ The Read View Rule</div>
     <p>"I will only see rows where <code>DB_TRX_ID</code> is <strong>older than my own transaction ID</strong>." Newer versions are filtered out, so the reader gets a stable, consistent snapshot.</p>
   </div>
 
@@ -427,12 +427,12 @@ Result: Alice still has $1000.
     <div class="phase-box ph-green">
       <div class="ph-num">Step 3 · Result</div>
       <div class="ph-title">Reader still sees the old version</div>
-      <div class="ph-sub">No locks · no waiting · writers don't block readers 🚀</div>
+      <div class="ph-sub">No locks · no waiting · writers don't block readers</div>
     </div>
   </div>
 
   <div class="sticky" style="margin-top:20px">
-    <div class="sticky-label">🔑 MVCC Key Insight</div>
+    <div class="sticky-label">★ MVCC Key Insight</div>
     <p>MVCC allows <strong>readers and writers to work concurrently</strong> without locking each other. Readers see a consistent snapshot, writers create new versions. This is why InnoDB can handle high-concurrency workloads efficiently.</p>
   </div>
 </div>
@@ -442,20 +442,20 @@ Result: Alice still has $1000.
 <div class="page purple-spine">
   <div class="page-num">pg 07</div>
   <div class="section-header">
-    <span class="section-icon">💾</span>
+    <span class="section-icon">★</span>
     <span class="section-title">7. Durability — Committed Forever</span>
     <span class="section-num">07</span>
   </div>
 
   <div class="sticky">
-    <div class="sticky-label">📖 Definition</div>
+    <div class="sticky-label">★ Definition</div>
     <p>Durability guarantees that once a transaction is committed, it will remain committed <strong>permanently</strong> — even in the case of system failures like crashes, power outages, or errors. "Committed means committed." Forever.</p>
   </div>
 
   <div class="body-text"><p>Same scenario, two different worlds — see what happens after the crash:</p></div>
   <table class="note-table">
     <thead>
-      <tr><th style="width:60px">Step</th><th>❌ Without Durability</th><th>✓ With Durability</th></tr>
+      <tr><th style="width:60px">Step</th><th>✗ Without Durability</th><th>✓ With Durability</th></tr>
     </thead>
     <tbody>
       <tr>
@@ -465,8 +465,8 @@ Result: Alice still has $1000.
       </tr>
       <tr>
         <td><strong>2</strong></td>
-        <td>Database says <code>"COMMIT successful ✅"</code></td>
-        <td>Database says <code>"COMMIT successful ✅"</code></td>
+        <td>Database says <code>"COMMIT successful ✓"</code></td>
+        <td>Database says <code>"COMMIT successful ✓"</code></td>
       </tr>
       <tr>
         <td><strong>3</strong></td>
@@ -476,7 +476,7 @@ Result: Alice still has $1000.
       <tr>
         <td><strong>4</strong></td>
         <td><span class="hl-orange"><strong>Transfer never happened 😱</strong></span></td>
-        <td><span class="hl-green"><strong>Transfer is still there ✅</strong></span></td>
+        <td><span class="hl-green"><strong>Transfer is still there ✓</strong></span></td>
       </tr>
     </tbody>
   </table>
@@ -486,7 +486,7 @@ Result: Alice still has $1000.
   <div class="body-text"><p>MySQL guarantees durability through <span class="hl-purple">Write-Ahead Logging (WAL)</span> — every change is recorded in the Redo Log <em>before</em> it ever touches a data file.</p></div>
 
   <div class="sticky">
-    <div class="sticky-label">📜 The WAL Golden Rule</div>
+    <div class="sticky-label">★ The WAL Golden Rule</div>
     <p><strong>"WRITE to the log BEFORE writing to the actual data file."</strong> The Redo Log is the source of truth — if a crash happens, MySQL replays it on restart and reconstructs every committed change.</p>
   </div>
 
@@ -494,25 +494,25 @@ Result: Alice still has $1000.
   <div class="phase-flow">
     <div class="phase-box ph-orange">
       <div class="ph-num">Step 1</div>
-      <div class="ph-title">📞 App calls commit()</div>
+      <div class="ph-title">App calls commit()</div>
       <div class="ph-sub">MySQL receives the COMMIT — change still only in memory buffers</div>
     </div>
     <div class="phase-arrow">↓</div>
     <div class="phase-box ph-purple">
       <div class="ph-num">Step 2</div>
-      <div class="ph-title">📝 Redo Log written</div>
+      <div class="ph-title">Redo Log written</div>
       <div class="ph-sub">Record appended to log buffer, then to the OS file</div>
     </div>
     <div class="phase-arrow">↓</div>
     <div class="phase-box ph-green">
-      <div class="ph-num">Step 3 · Durable! ✅</div>
-      <div class="ph-title">💾 fsync() to disk platter</div>
+      <div class="ph-num">Step 3 · Durable! ✓</div>
+      <div class="ph-title">fsync() to disk platter</div>
       <div class="ph-sub">Only now does the COMMIT return success to your application</div>
     </div>
   </div>
 
   <div class="insight" style="margin-top:12px">
-    <div class="insight-label">💡 Why data pages don't block COMMIT</div>
+    <div class="insight-label">★ Why data pages don't block COMMIT</div>
     <p>The actual <code>.ibd</code> data pages get rewritten <strong>lazily, in the background</strong> — they don't block the COMMIT. The Redo Log already has everything needed to reconstruct unwritten pages on restart, so MySQL can return success the moment the log is safely on disk.</p>
   </div>
 
@@ -522,14 +522,14 @@ Result: Alice still has $1000.
       <tr><th>Value</th><th>Behavior</th><th>Risk / Performance</th></tr>
     </thead>
     <tbody>
-      <tr><td><code>0</code></td><td>Write + flush once per SECOND</td><td style="color:var(--red)">Up to 1s data loss · FASTEST 🚀</td></tr>
-      <tr><td><code>1</code> ⭐</td><td>Write + flush on EVERY commit</td><td style="color:var(--green)">Zero data loss · SLOWEST 🔒</td></tr>
-      <tr><td><code>2</code></td><td>Write to OS cache per commit, flush per second</td><td style="color:var(--orange)">Loss only if OS crashes · MIDDLE ⚖️</td></tr>
+      <tr><td><code>0</code></td><td>Write + flush once per SECOND</td><td style="color:var(--red)">Up to 1s data loss · fastest</td></tr>
+      <tr><td><code>1</code> ★</td><td>Write + flush on EVERY commit</td><td style="color:var(--green)">Zero data loss · slowest</td></tr>
+      <tr><td><code>2</code></td><td>Write to OS cache per commit, flush per second</td><td style="color:var(--orange)">Loss only if OS crashes · middle</td></tr>
     </tbody>
   </table>
 
   <div class="insight green-ins" style="margin-top:16px">
-    <div class="insight-label">🔒 Production Recommendation</div>
+    <div class="insight-label">★ Production Recommendation</div>
     <p>Keep <code>innodb_flush_log_at_trx_commit = 1</code> for true ACID compliance. Only change it if you understand the durability trade-offs and your workload can tolerate potential data loss.</p>
   </div>
 </div>
@@ -539,7 +539,7 @@ Result: Alice still has $1000.
 <div class="page blue-spine">
   <div class="page-num">pg 08</div>
   <div class="section-header">
-    <span class="section-icon">🏗️</span>
+    <span class="section-icon">≡</span>
     <span class="section-title">8. InnoDB's Complete ACID Stack</span>
     <span class="section-num">08</span>
   </div>
@@ -592,8 +592,8 @@ Result: Alice still has $1000.
   </table>
 
   <div class="sticky" style="margin-top:20px">
-    <div class="sticky-label">🔥 Crash Recovery Flow</div>
-    <p>On restart → MySQL reads Redo Log → Re-applies committed transactions that didn't make it to data files → Reads Undo Log → Rolls back incomplete transactions → Database is consistent again ✅</p>
+    <div class="sticky-label">⚡ Crash Recovery Flow</div>
+    <p>On restart → MySQL reads Redo Log → Re-applies committed transactions that didn't make it to data files → Reads Undo Log → Rolls back incomplete transactions → Database is consistent again ✓</p>
   </div>
 </div>
 
@@ -602,7 +602,7 @@ Result: Alice still has $1000.
 <div class="page red-spine">
   <div class="page-num">pg 09</div>
   <div class="section-header">
-    <span class="section-icon">⚠️</span>
+    <span class="section-icon">✗</span>
     <span class="section-title">9. ACID Violations &amp; ACID vs BASE</span>
     <span class="section-num">09</span>
   </div>
@@ -671,7 +671,7 @@ CAP Theorem: In a distributed system, you can only guarantee 2 of 3.
 <div class="page orange-spine">
   <div class="page-num">pg 10</div>
   <div class="section-header">
-    <span class="section-icon">📝</span>
+    <span class="section-icon">✎</span>
     <span class="section-title">10. Interview Questions &amp; Cheat Sheet</span>
     <span class="section-num">10</span>
   </div>
@@ -690,19 +690,19 @@ CAP Theorem: In a distributed system, you can only guarantee 2 of 3.
   <h2 class="sub">Quick Reference Cheat Sheet</h2>
   <div class="cheat-grid">
     <div class="cheat-card" style="color:var(--green);border-top-color:var(--green)">
-      <div class="cheat-card-title">⚛️ Atomicity</div>
+      <div class="cheat-card-title">Atomicity</div>
       <div style="font-size:12px;color:var(--ink2)">All or Nothing<br />Undo Log</div>
     </div>
     <div class="cheat-card" style="color:var(--blue);border-top-color:var(--blue)">
-      <div class="cheat-card-title">✓ Consistency</div>
+      <div class="cheat-card-title">Consistency</div>
       <div style="font-size:12px;color:var(--ink2)">Rules Never Broken<br />Constraints + App</div>
     </div>
     <div class="cheat-card" style="color:var(--orange);border-top-color:var(--orange)">
-      <div class="cheat-card-title">🔒 Isolation</div>
+      <div class="cheat-card-title">Isolation</div>
       <div style="font-size:12px;color:var(--ink2)">No Interference<br />MVCC + Locks</div>
     </div>
     <div class="cheat-card" style="color:var(--purple);border-top-color:var(--purple)">
-      <div class="cheat-card-title">💾 Durability</div>
+      <div class="cheat-card-title">Durability</div>
       <div style="font-size:12px;color:var(--ink2)">Survives Crashes<br />Redo Log + fsync</div>
     </div>
   </div>
@@ -721,7 +721,7 @@ CAP Theorem: In a distributed system, you can only guarantee 2 of 3.
   </table>
 
   <div class="sticky" style="transform:rotate(-0.5deg);margin-top:20px">
-    <div class="sticky-label">🎓 Next to Study</div>
+    <div class="sticky-label">✎ Next to Study</div>
     <p>Database Indexing internals · B+ Tree structure · Query Optimization · Distributed Transactions (2PC) · Replication &amp; Sharding strategies</p>
   </div>
 </div>

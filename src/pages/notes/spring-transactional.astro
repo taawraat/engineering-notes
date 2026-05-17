@@ -14,14 +14,14 @@ import PaginationController from '../../components/PaginationController.astro';
   <h1>@Transactional Annotation and Transaction Management</h1>
   <div class="cover-sub">From AOP proxies to propagation — everything you need to master transactions</div>
   <div class="cover-tags">
-    <span class="tag tag-g">🔄 Propagation</span>
-    <span class="tag tag-b">🔒 Isolation</span>
-    <span class="tag tag-o">🛡️ AOP Proxy</span>
-    <span class="tag tag-p">⚡ Rollback Rules</span>
-    <span class="tag tag-g">📖 readOnly</span>
-    <span class="tag tag-b">⏱️ Timeout</span>
+    <span class="tag tag-g">Propagation</span>
+    <span class="tag tag-b">Isolation</span>
+    <span class="tag tag-o">AOP Proxy</span>
+    <span class="tag tag-p">Rollback Rules</span>
+    <span class="tag tag-g">readOnly</span>
+    <span class="tag tag-b">Timeout</span>
   </div>
-  <div class="cover-doodle">🔁</div>
+  <div class="cover-doodle">↺</div>
 </div>
 
 
@@ -29,7 +29,7 @@ import PaginationController from '../../components/PaginationController.astro';
 <div class="page green-spine">
   <div class="page-num">pg 01</div>
   <div class="section-header">
-    <span class="section-icon">💡</span>
+    <span class="section-icon">★</span>
     <span class="section-title">1. The Problem @Transactional Solves</span>
     <span class="section-num">01</span>
   </div>
@@ -77,12 +77,12 @@ import PaginationController from '../../components/PaginationController.astro';
 &#125;</pre>
 
   <div class="sticky">
-    <div class="sticky-label">🎯 Key Insight</div>
+    <div class="sticky-label">★ Key Insight</div>
     <p>Spring wraps your method with an <strong>AOP proxy</strong>. YOU write business logic. Spring handles the transaction plumbing — begin, commit, rollback, and connection management.</p>
   </div>
 
   <div class="insight green-ins" style="margin-top:16px">
-    <div class="insight-label">✅ What @Transactional Gives You</div>
+    <div class="insight-label">✓ What @Transactional Gives You</div>
     <p>Declarative transaction management · Automatic rollback on exceptions · Configurable isolation levels · Propagation control for nested calls · Read-only optimization · Timeout protection</p>
   </div>
 </div>
@@ -92,13 +92,13 @@ import PaginationController from '../../components/PaginationController.astro';
 <div class="page orange-spine">
   <div class="page-num">pg 02</div>
   <div class="section-header">
-    <span class="section-icon">🔬</span>
+    <span class="section-icon">⚡</span>
     <span class="section-title">2. How @Transactional Works — AOP Proxy</span>
     <span class="section-num">02</span>
   </div>
 
   <div class="sticky">
-    <div class="sticky-label">⚠️ Most Important Concept</div>
+    <div class="sticky-label">! Most Important Concept</div>
     <p>When Spring sees <code>@Transactional</code>, it does NOT modify your class. Instead, it creates a <strong>proxy object</strong> that wraps your class. If you don't understand this, you WILL run into mysterious bugs.</p>
   </div>
 
@@ -110,7 +110,7 @@ import PaginationController from '../../components/PaginationController.astro';
       <div class="flow-box fb-orange">BankService<br /><span style="font-size:11px;opacity:0.7">Your class directly</span></div>
     </div>
   </div>
-  <div class="body-text"><p style="font-size:14px;color:var(--ink3);text-align:center;margin-top:8px">❌ Direct call to your class — <strong>WRONG assumption!</strong></p></div>
+  <div class="body-text"><p style="font-size:14px;color:var(--ink3);text-align:center;margin-top:8px">✗ Direct call to your class — <strong>WRONG assumption!</strong></p></div>
 
   <h2 class="sub">What ACTUALLY Happens</h2>
   <div class="diag-wrap">
@@ -146,7 +146,7 @@ import PaginationController from '../../components/PaginationController.astro';
       </div>
     </div>
   </div>
-  <div class="body-text"><p style="font-size:14px;color:var(--green);text-align:center;margin-top:8px">✅ Proxy wraps your class — handles transaction lifecycle automatically</p></div>
+  <div class="body-text"><p style="font-size:14px;color:var(--green);text-align:center;margin-top:8px">✓ Proxy wraps your class — handles transaction lifecycle automatically</p></div>
 
   <h2 class="sub">Key Internal Components</h2>
   <div class="diag-wrap">
@@ -160,7 +160,7 @@ import PaginationController from '../../components/PaginationController.astro';
   </div>
 
   <div class="insight orange-ins" style="margin-top:16px">
-    <div class="insight-label">🔑 Key Insight</div>
+    <div class="insight-label">★ Key Insight</div>
     <p>The proxy reads <code>@Transactional</code> attributes (isolation, propagation, timeout) and passes them to <code>PlatformTransactionManager</code>. Common implementations: <code>JpaTransactionManager</code>, <code>HibernateTransactionManager</code>, <code>DataSourceTransactionManager</code>.</p>
   </div>
 </div>
@@ -170,13 +170,13 @@ import PaginationController from '../../components/PaginationController.astro';
 <div class="page red-spine">
   <div class="page-num">pg 03</div>
   <div class="section-header">
-    <span class="section-icon">🐛</span>
+    <span class="section-icon">✗</span>
     <span class="section-title">3. The Self-Invocation Problem</span>
     <span class="section-num">03</span>
   </div>
 
   <div class="sticky">
-    <div class="sticky-label">💀 Critical Bug Pattern</div>
+    <div class="sticky-label">✗ Critical Bug Pattern</div>
     <p>Because Spring uses a PROXY, calling <code>@Transactional</code> methods from within the <strong>SAME class</strong> bypasses the proxy completely. The transaction is <strong>NEVER started</strong>.</p>
   </div>
 
@@ -235,7 +235,7 @@ OrderService$$Proxy
 &#125;</pre>
 
   <div class="insight orange-ins" style="margin-top:16px">
-    <div class="insight-label">💡 Alternative Fixes</div>
+    <div class="insight-label">★ Alternative Fixes</div>
     <p><strong>1)</strong> Move the <code>@Transactional</code> method to a separate service class · <strong>2)</strong> Use <code>ApplicationContext.getBean()</code> · <strong>3)</strong> Use AspectJ weaving instead of proxies (compile-time weaving)</p>
   </div>
 </div>
@@ -245,7 +245,7 @@ OrderService$$Proxy
 <div class="page blue-spine">
   <div class="page-num">pg 04</div>
   <div class="section-header">
-    <span class="section-icon">⚙️</span>
+    <span class="section-icon">≡</span>
     <span class="section-title">4. @Transactional Attributes Overview</span>
     <span class="section-num">04</span>
   </div>
@@ -278,19 +278,19 @@ OrderService$$Proxy
 
   <div class="cheat-grid" style="margin-top:20px">
     <div class="cheat-card" style="color:var(--green);border-top-color:var(--green)">
-      <div class="cheat-card-title">🔄 propagation</div>
+      <div class="cheat-card-title">propagation</div>
       <div style="font-size:12px;color:var(--ink2)">REQUIRED (default)<br />REQUIRES_NEW<br />NESTED · SUPPORTS<br />MANDATORY · NEVER</div>
     </div>
     <div class="cheat-card" style="color:var(--blue);border-top-color:var(--blue)">
-      <div class="cheat-card-title">🔒 isolation</div>
+      <div class="cheat-card-title">isolation</div>
       <div style="font-size:12px;color:var(--ink2)">DEFAULT<br />READ_UNCOMMITTED<br />READ_COMMITTED<br />REPEATABLE_READ<br />SERIALIZABLE</div>
     </div>
     <div class="cheat-card" style="color:var(--orange);border-top-color:var(--orange)">
-      <div class="cheat-card-title">⚡ rollbackFor</div>
+      <div class="cheat-card-title">rollbackFor</div>
       <div style="font-size:12px;color:var(--ink2)">RuntimeException → auto<br />Checked → NO rollback!<br />Use rollbackFor=Exception.class</div>
     </div>
     <div class="cheat-card" style="color:var(--purple);border-top-color:var(--purple)">
-      <div class="cheat-card-title">📖 readOnly</div>
+      <div class="cheat-card-title">readOnly</div>
       <div style="font-size:12px;color:var(--ink2)">Skip dirty checking<br />Can route to replica<br />Hibernate optimization</div>
     </div>
   </div>
@@ -301,7 +301,7 @@ OrderService$$Proxy
 <div class="page purple-spine">
   <div class="page-num">pg 05</div>
   <div class="section-header">
-    <span class="section-icon">🔒</span>
+    <span class="section-icon">◎</span>
     <span class="section-title">5. Isolation Levels — Database Meets Spring</span>
     <span class="section-num">05</span>
   </div>
@@ -337,7 +337,7 @@ OrderService$$Proxy
 <span class="kw">public void</span> auditFinancialReport(<span class="cl">Long</span> reportId) &#123; ... &#125;</pre>
 
   <div class="insight" style="margin-top:16px">
-    <div class="insight-label">🎯 Isolation Decision Guide</div>
+    <div class="insight-label">★ Isolation Decision Guide</div>
     <p><strong>Simple reads (dashboards):</strong> READ_COMMITTED · <strong>Read-then-write same row:</strong> REPEATABLE_READ · <strong>Aggregate queries driving decisions:</strong> SERIALIZABLE · <strong>High-throughput reads:</strong> READ_COMMITTED + optimistic locking</p>
   </div>
 </div>
@@ -347,7 +347,7 @@ OrderService$$Proxy
 <div class="page green-spine">
   <div class="page-num">pg 06</div>
   <div class="section-header">
-    <span class="section-icon">🔄</span>
+    <span class="section-icon">↺</span>
     <span class="section-title">6. Propagation — REQUIRED &amp; REQUIRES_NEW</span>
     <span class="section-num">06</span>
   </div>
@@ -356,7 +356,7 @@ OrderService$$Proxy
 
   <h2 class="sub">PROPAGATION.REQUIRED (Default)</h2>
   <div class="sticky">
-    <div class="sticky-label">📌 REQUIRED</div>
+    <div class="sticky-label">★ REQUIRED</div>
     <p>Join an existing transaction if one exists. If not, create a new one. This is the <strong>default</strong> and covers ~80% of use cases.</p>
   </div>
 
@@ -377,7 +377,7 @@ OrderService$$Proxy
 
   <h2 class="sub">PROPAGATION.REQUIRES_NEW</h2>
   <div class="sticky" style="transform:rotate(0.3deg)">
-    <div class="sticky-label">📌 REQUIRES_NEW</div>
+    <div class="sticky-label">★ REQUIRES_NEW</div>
     <p>Always create a BRAND NEW transaction. <strong>Suspend the current one</strong> if it exists. TXN-1 and TXN-2 are completely independent.</p>
   </div>
 
@@ -409,7 +409,7 @@ OrderService$$Proxy
 &#125;</pre>
 
   <div class="insight orange-ins" style="margin-top:12px">
-    <div class="insight-label">⚠️ Warning</div>
+    <div class="insight-label">! Warning</div>
     <p>REQUIRES_NEW uses a <strong>SEPARATE database connection</strong>. Under high load, this can exhaust your connection pool.</p>
   </div>
 </div>
@@ -419,7 +419,7 @@ OrderService$$Proxy
 <div class="page orange-spine">
   <div class="page-num">pg 07</div>
   <div class="section-header">
-    <span class="section-icon">🔄</span>
+    <span class="section-icon">↺</span>
     <span class="section-title">7. Propagation — NESTED &amp; Others</span>
     <span class="section-num">07</span>
   </div>
@@ -461,7 +461,7 @@ OrderService$$Proxy
       <tr><th>Propagation</th><th>Existing TXN</th><th>No Existing TXN</th></tr>
     </thead>
     <tbody>
-      <tr><td><code>REQUIRED</code> ⭐</td><td>Join it</td><td>Create new</td></tr>
+      <tr><td><code>REQUIRED</code> ★</td><td>Join it</td><td>Create new</td></tr>
       <tr><td><code>REQUIRES_NEW</code></td><td>Suspend, create new</td><td>Create new</td></tr>
       <tr><td><code>NESTED</code></td><td>Create savepoint inside</td><td>Create new</td></tr>
       <tr><td><code>SUPPORTS</code></td><td>Join it</td><td>Run without TX</td></tr>
@@ -477,7 +477,7 @@ OrderService$$Proxy
 <div class="page blue-spine">
   <div class="page-num">pg 08</div>
   <div class="section-header">
-    <span class="section-icon">📖</span>
+    <span class="section-icon">✎</span>
     <span class="section-title">8. readOnly &amp; Rollback Rules</span>
     <span class="section-num">08</span>
   </div>
@@ -509,7 +509,7 @@ OrderService$$Proxy
 
   <h2 class="sub">Default Rollback Behavior — KNOW THIS!</h2>
   <div class="sticky">
-    <div class="sticky-label">⚠️ Common Bug Source</div>
+    <div class="sticky-label">! Common Bug Source</div>
     <p><strong>RuntimeException</strong> → ROLLBACK (automatic) · <strong>Checked Exception</strong> → COMMIT (NOT rolled back!) · This surprises many developers!</p>
   </div>
 
@@ -534,7 +534,7 @@ OrderService$$Proxy
 <div class="page purple-spine">
   <div class="page-num">pg 09</div>
   <div class="section-header">
-    <span class="section-icon">⏱️</span>
+    <span class="section-icon">◷</span>
     <span class="section-title">9. Timeout &amp; Transaction Events</span>
     <span class="section-num">09</span>
   </div>
@@ -550,11 +550,11 @@ OrderService$$Proxy
   <div class="two-col">
     <div class="col-card">
       <div class="col-card-title r">Without Timeout</div>
-      <div style="font-size:13px;color:var(--ink2)">Transaction acquires locks → gets stuck → holds locks for minutes → other transactions queue up → system grinds to halt 🔥</div>
+      <div style="font-size:13px;color:var(--ink2)">Transaction acquires locks → gets stuck → holds locks for minutes → other transactions queue up → system grinds to halt</div>
     </div>
     <div class="col-card">
       <div class="col-card-title g">With Timeout</div>
-      <div style="font-size:13px;color:var(--ink2)">After 30s → TransactionTimedOutException → ROLLBACK → locks released → other transactions proceed ✅</div>
+      <div style="font-size:13px;color:var(--ink2)">After 30s → TransactionTimedOutException → ROLLBACK → locks released → other transactions proceed ✓</div>
     </div>
   </div>
 
@@ -589,7 +589,7 @@ OrderService$$Proxy
 
   <div class="insight" style="margin-top:12px">
     <div class="insight-label">TransactionPhase Options</div>
-    <p><code>BEFORE_COMMIT</code> → just before commit · <code>AFTER_COMMIT</code> → after success ✅ · <code>AFTER_ROLLBACK</code> → after rollback · <code>AFTER_COMPLETION</code> → after either</p>
+    <p><code>BEFORE_COMMIT</code> → just before commit · <code>AFTER_COMMIT</code> → after success ✓ · <code>AFTER_ROLLBACK</code> → after rollback · <code>AFTER_COMPLETION</code> → after either</p>
   </div>
 </div>
 
@@ -598,7 +598,7 @@ OrderService$$Proxy
 <div class="page red-spine">
   <div class="page-num">pg 10</div>
   <div class="section-header">
-    <span class="section-icon">⚠️</span>
+    <span class="section-icon">✗</span>
     <span class="section-title">10. Common Pitfalls &amp; Gotchas</span>
     <span class="section-num">10</span>
   </div>
@@ -644,7 +644,7 @@ OrderService$$Proxy
 order.getItems().size();  <span class="cm">// ❌ LazyInitializationException!</span></pre>
 
   <div class="insight orange-ins" style="margin-top:12px">
-    <div class="insight-label">💡 Lazy Loading Fixes</div>
+    <div class="insight-label">★ Lazy Loading Fixes</div>
     <p><strong>1)</strong> Use <code>JOIN FETCH</code> in query · <strong>2)</strong> Use DTO projection · <strong>3)</strong> Extend transaction boundary · <strong>4)</strong> Set <code>spring.jpa.open-in-view=false</code> and use DTOs</p>
   </div>
 </div>
@@ -654,7 +654,7 @@ order.getItems().size();  <span class="cm">// ❌ LazyInitializationException!</
 <div class="page green-spine">
   <div class="page-num">pg 11</div>
   <div class="section-header">
-    <span class="section-icon">🎯</span>
+    <span class="section-icon">◎</span>
     <span class="section-title">11. Decision Guide — When to Use What</span>
     <span class="section-num">11</span>
   </div>
@@ -663,7 +663,7 @@ order.getItems().size();  <span class="cm">// ❌ LazyInitializationException!</
   <div class="body-text"><p style="text-align:center;font-weight:600;color:var(--ink)">Is there a calling transaction?</p></div>
   <div class="two-col">
     <div class="col-card">
-      <div class="col-card-title g">✅ YES — Existing Transaction</div>
+      <div class="col-card-title g">✓ YES — Existing Transaction</div>
       <ul class="note-list" style="font-size:14px;margin:0">
         <li class="sq">Share it (default) → <span class="hl-green">REQUIRED</span></li>
         <li class="sq">Be independent (audit/log) → <span class="hl-orange">REQUIRES_NEW</span></li>
@@ -682,7 +682,7 @@ order.getItems().size();  <span class="cm">// ❌ LazyInitializationException!</
     </div>
   </div>
   <div class="insight green-ins" style="margin-top:16px">
-    <div class="insight-label">🎯 80% Rule</div>
+    <div class="insight-label">★ 80% Rule</div>
     <p><strong>REQUIRED</strong> (default) covers ~80% of use cases. Use <strong>REQUIRES_NEW</strong> for audit/logging. Use <strong>NESTED</strong> for partial failures you can recover from.</p>
   </div>
 
@@ -721,7 +721,7 @@ order.getItems().size();  <span class="cm">// ❌ LazyInitializationException!</
 <div class="page orange-spine">
   <div class="page-num">pg 12</div>
   <div class="section-header">
-    <span class="section-icon">📝</span>
+    <span class="section-icon">✎</span>
     <span class="section-title">12. Interview Questions &amp; Cheat Sheet</span>
     <span class="section-num">12</span>
   </div>
@@ -739,25 +739,25 @@ order.getItems().size();  <span class="cm">// ❌ LazyInitializationException!</
   <h2 class="sub">Master Cheat Sheet</h2>
   <div class="cheat-grid">
     <div class="cheat-card" style="color:var(--green);border-top-color:var(--green)">
-      <div class="cheat-card-title">🔄 Propagation</div>
+      <div class="cheat-card-title">Propagation</div>
       <div style="font-size:11px;color:var(--ink2)">REQUIRED = join/create<br />REQUIRES_NEW = always new<br />NESTED = savepoint</div>
     </div>
     <div class="cheat-card" style="color:var(--blue);border-top-color:var(--blue)">
-      <div class="cheat-card-title">🔒 Isolation</div>
-      <div style="font-size:11px;color:var(--ink2)">READ_UNCOMMITTED<br />READ_COMMITTED<br />REPEATABLE_READ ⭐<br />SERIALIZABLE</div>
+      <div class="cheat-card-title">Isolation</div>
+      <div style="font-size:11px;color:var(--ink2)">READ_UNCOMMITTED<br />READ_COMMITTED<br />REPEATABLE_READ ★<br />SERIALIZABLE</div>
     </div>
     <div class="cheat-card" style="color:var(--orange);border-top-color:var(--orange)">
-      <div class="cheat-card-title">⚡ Rollback</div>
+      <div class="cheat-card-title">Rollback</div>
       <div style="font-size:11px;color:var(--ink2)">RuntimeException → auto<br />Checked → NO!<br />rollbackFor=Exception.class</div>
     </div>
     <div class="cheat-card" style="color:var(--red);border-top-color:var(--red)">
-      <div class="cheat-card-title">🐛 Gotchas</div>
+      <div class="cheat-card-title">Gotchas</div>
       <div style="font-size:11px;color:var(--ink2)">Private methods ignored<br />Self-invocation bypasses<br />Swallowed exceptions</div>
     </div>
   </div>
 
   <div class="sticky" style="transform:rotate(-0.5deg);margin-top:20px">
-    <div class="sticky-label">🎓 Next to Study</div>
+    <div class="sticky-label">✎ Next to Study</div>
     <p>Spring AOP internals · JDK vs CGLIB proxies · Distributed transactions (XA/JTA) · Saga pattern for microservices · Optimistic vs Pessimistic locking</p>
   </div>
 </div>

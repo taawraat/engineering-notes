@@ -14,14 +14,14 @@ import PaginationController from '../../components/PaginationController.astro';
   <h1>IoC Container, <span>@Bean</span> &amp; Dependency Injection</h1>
   <div class="cover-sub">How Spring actually works under the hood</div>
   <div class="cover-tags">
-    <span class="tag tag-g">🫘 Beans</span>
-    <span class="tag tag-b">📦 ApplicationContext</span>
-    <span class="tag tag-o">🔄 Lifecycle</span>
-    <span class="tag tag-p">🏗️ BeanDefinition</span>
-    <span class="tag tag-g">🔗 DI Internals</span>
-    <span class="tag tag-b">🛡️ CGLIB Proxy</span>
+    <span class="tag tag-g">Beans</span>
+    <span class="tag tag-b">ApplicationContext</span>
+    <span class="tag tag-o">Lifecycle</span>
+    <span class="tag tag-p">BeanDefinition</span>
+    <span class="tag tag-g">DI Internals</span>
+    <span class="tag tag-b">CGLIB Proxy</span>
   </div>
-  <div class="cover-doodle">☕</div>
+  <div class="cover-doodle">✍</div>
 </div>
 
 
@@ -29,7 +29,7 @@ import PaginationController from '../../components/PaginationController.astro';
 <div class="page green-spine">
   <div class="page-num">pg 01</div>
   <div class="section-header">
-    <span class="section-icon">💡</span>
+    <span class="section-icon">★</span>
     <span class="section-title">1. Inversion of Control (IoC)</span>
     <span class="section-num">01</span>
   </div>
@@ -41,7 +41,7 @@ import PaginationController from '../../components/PaginationController.astro';
 
   <div class="code-compare">
     <div class="code-compare-panel">
-      <div class="code-compare-label r">❌ Traditional Way</div>
+      <div class="code-compare-label r">✗ Traditional Way</div>
       <pre class="code-block orange-left"><span class="kw">public class</span> <span class="cl">OrderService</span> &#123;
   <span class="cm">// YOU create everything manually</span>
   <span class="kw">private</span> PaymentService pay = <span class="kw">new</span> <span class="cl">PaymentService</span>();
@@ -66,7 +66,7 @@ import PaginationController from '../../components/PaginationController.astro';
   </div>
 
   <div class="sticky">
-    <div class="sticky-label">🍽️ Mental Model</div>
+    <div class="sticky-label">★ Mental Model</div>
     <p>Think of IoC like a <strong>restaurant</strong>. Traditional code = you go to the kitchen and cook. IoC = you sit at the table, tell the waiter what you want, the kitchen delivers it. <strong>Control is inverted.</strong></p>
   </div>
 
@@ -88,7 +88,7 @@ import PaginationController from '../../components/PaginationController.astro';
 <div class="page blue-spine">
   <div class="page-num">pg 02</div>
   <div class="section-header">
-    <span class="section-icon">📦</span>
+    <span class="section-icon">◎</span>
     <span class="section-title">2. The IoC Container</span>
     <span class="section-num">02</span>
   </div>
@@ -168,13 +168,13 @@ import PaginationController from '../../components/PaginationController.astro';
 <div class="page orange-spine">
   <div class="page-num">pg 03</div>
   <div class="section-header">
-    <span class="section-icon">🫘</span>
+    <span class="section-icon">★</span>
     <span class="section-title">3. What is a Bean?</span>
     <span class="section-num">03</span>
   </div>
 
   <div class="sticky">
-    <div class="sticky-label">⭐ Core Definition</div>
+    <div class="sticky-label">★ Core Definition</div>
     <p>A <strong>bean</strong> = any Java object that Spring creates, configures, and manages. Nothing magic about the class itself — it becomes a bean because Spring knows about it.</p>
   </div>
 
@@ -204,7 +204,7 @@ import PaginationController from '../../components/PaginationController.astro';
 &#125;</pre>
 
   <div class="insight green-ins">
-    <div class="insight-label">💡 Key Insight</div>
+    <div class="insight-label">★ Key Insight</div>
     <p>The <code>@Bean</code> method body runs <strong>only ONCE</strong> for singletons. Spring intercepts calls using CGLIB proxying. Read page 4 to understand this deeply!</p>
   </div>
 </div>
@@ -214,7 +214,7 @@ import PaginationController from '../../components/PaginationController.astro';
 <div class="page purple-spine">
   <div class="page-num">pg 04</div>
   <div class="section-header">
-    <span class="section-icon">🔬</span>
+    <span class="section-icon">⚡</span>
     <span class="section-title">4. @Bean Internals — Deep Dive</span>
     <span class="section-num">04</span>
   </div>
@@ -278,7 +278,7 @@ ctor.<span class="wu-b">setAccessible</span>(<span class="kw">true</span>); <spa
 <div class="page green-spine">
   <div class="page-num">pg 05</div>
   <div class="section-header">
-    <span class="section-icon">💉</span>
+    <span class="section-icon">→</span>
     <span class="section-title">5. The 3 DI Types</span>
     <span class="section-num">05</span>
   </div>
@@ -319,7 +319,7 @@ ctor.<span class="wu-b">setAccessible</span>(<span class="kw">true</span>); <spa
   <div class="body-text"><p>Good for optional dependencies. Can be re-injected after construction (rare use case).</p></div>
 
   <div class="sticky">
-    <div class="sticky-label">📌 Remember</div>
+    <div class="sticky-label">★ Remember</div>
     <p>Constructor injection = <strong>mandatory deps</strong>. Setter injection = <strong>optional deps</strong>. Field injection = <strong>avoid</strong> (convenient but problematic).</p>
   </div>
 </div>
@@ -329,13 +329,13 @@ ctor.<span class="wu-b">setAccessible</span>(<span class="kw">true</span>); <spa
 <div class="page orange-spine">
   <div class="page-num">pg 06</div>
   <div class="section-header">
-    <span class="section-icon">🔄</span>
+    <span class="section-icon">↺</span>
     <span class="section-title">6. Bean Scopes</span>
     <span class="section-num">06</span>
   </div>
 
   <div class="sticky" style="transform:rotate(0.3deg)">
-    <div class="sticky-label">❓ Does Spring create new objects every injection?</div>
+    <div class="sticky-label">? Does Spring create new objects every injection?</div>
     <p><strong>NO — by default!</strong> Spring creates ONE object per bean and reuses it forever. This is <strong>Singleton scope</strong>.</p>
   </div>
 
@@ -375,7 +375,7 @@ ctor.<span class="wu-b">setAccessible</span>(<span class="kw">true</span>); <spa
   </div>
 
   <div class="insight">
-    <div class="insight-label">🧠 Singleton cache internally</div>
+    <div class="insight-label">★ Singleton cache internally</div>
     <p><code>ConcurrentHashMap&lt;String, Object&gt;</code> inside the container stores all singleton beans. Every injection returns the same reference from this map.</p>
   </div>
 
@@ -383,14 +383,14 @@ ctor.<span class="wu-b">setAccessible</span>(<span class="kw">true</span>); <spa
   <table class="note-table">
     <thead><tr><th>Scope</th><th>One instance per…</th></tr></thead>
     <tbody>
-      <tr><td><code>singleton</code> ⭐</td><td>Entire application (default)</td></tr>
+      <tr><td><code>singleton</code> ★</td><td>Entire application (default)</td></tr>
       <tr><td><code>prototype</code></td><td>Each injection / getBean() call</td></tr>
       <tr><td><code>request</code></td><td>Each HTTP request</td></tr>
       <tr><td><code>session</code></td><td>Each HTTP session</td></tr>
       <tr><td><code>application</code></td><td>ServletContext lifecycle</td></tr>
     </tbody>
   </table>
-  <div class="body-text"><p>⚠️ <code>@PreDestroy</code> is <span class="hl">NOT called</span> for prototype beans — Spring doesn't track them after creation!</p></div>
+  <div class="body-text"><p><code>@PreDestroy</code> is <span class="hl">NOT called</span> for prototype beans — Spring doesn't track them after creation!</p></div>
 </div>
 
 
@@ -398,7 +398,7 @@ ctor.<span class="wu-b">setAccessible</span>(<span class="kw">true</span>); <spa
 <div class="page purple-spine">
   <div class="page-num">pg 07</div>
   <div class="section-header">
-    <span class="section-icon">🏗️</span>
+    <span class="section-icon">↺</span>
     <span class="section-title">7. Complete Bean Lifecycle</span>
     <span class="section-num">07</span>
   </div>
@@ -406,43 +406,43 @@ ctor.<span class="wu-b">setAccessible</span>(<span class="kw">true</span>); <spa
   <div class="phase-flow">
     <div class="phase-box ph-gray">
       <div class="ph-num">Phase 1</div>
-      <div class="ph-title">📋 Definition</div>
+      <div class="ph-title">Definition</div>
       <div class="ph-sub">@Component / @Bean found → BeanDefinition registered</div>
     </div>
     <div class="phase-arrow">↓</div>
     <div class="phase-box ph-blue">
       <div class="ph-num">Phase 2</div>
-      <div class="ph-title">🔨 Instantiation</div>
+      <div class="ph-title">Instantiation</div>
       <div class="ph-sub">Constructor called via Reflection — raw object, no deps yet</div>
     </div>
     <div class="phase-arrow">↓</div>
     <div class="phase-box ph-green">
       <div class="ph-num">Phase 3</div>
-      <div class="ph-title">💉 Dependency Injection</div>
+      <div class="ph-title">Dependency Injection</div>
       <div class="ph-sub">@Autowired fields/setters resolved → BeanPostProcessor.before()</div>
     </div>
     <div class="phase-arrow">↓</div>
     <div class="phase-box ph-orange">
       <div class="ph-num">Phase 4</div>
-      <div class="ph-title">⚙️ Initialization</div>
+      <div class="ph-title">Initialization</div>
       <div class="ph-sub">@PostConstruct → afterPropertiesSet() → BeanPostProcessor.after()<br />← @Transactional / @Async proxies created HERE</div>
     </div>
     <div class="phase-arrow">↓</div>
     <div class="phase-box ph-purple">
       <div class="ph-num">Phase 5</div>
-      <div class="ph-title">✅ Ready — In Use</div>
+      <div class="ph-title">Ready — In Use ✓</div>
       <div class="ph-sub">Lives in singleton cache. Serves all requests.</div>
     </div>
     <div class="phase-arrow">↓</div>
     <div class="phase-box ph-red">
       <div class="ph-num">Phase 6</div>
-      <div class="ph-title">💀 Destruction</div>
+      <div class="ph-title">Destruction</div>
       <div class="ph-sub">@PreDestroy → DisposableBean.destroy()</div>
     </div>
   </div>
 
   <div class="insight orange-ins" style="margin-top:20px">
-    <div class="insight-label">🔥 BeanPostProcessor — The Magic Hook</div>
+    <div class="insight-label">⚡ BeanPostProcessor — The Magic Hook</div>
     <p>Called after EVERY bean initialization. Spring's AOP uses this to wrap beans with CGLIB/JDK proxies. This is exactly how <code>@Transactional</code>, <code>@Async</code>, and <code>@Cacheable</code> work — they replace your bean with a proxy at this phase!</p>
   </div>
 </div>
@@ -452,7 +452,7 @@ ctor.<span class="wu-b">setAccessible</span>(<span class="kw">true</span>); <spa
 <div class="page red-spine">
   <div class="page-num">pg 08</div>
   <div class="section-header">
-    <span class="section-icon">🔁</span>
+    <span class="section-icon">↺</span>
     <span class="section-title">8. Circular Dependencies</span>
     <span class="section-num">08</span>
   </div>
@@ -467,7 +467,7 @@ ctor.<span class="wu-b">setAccessible</span>(<span class="kw">true</span>); <spa
   <h2 class="sub">With Field/Setter Injection → Spring solves it using 3 caches</h2>
   <div class="diag-wrap">
     <div class="body-text" style="font-size:15px">
-      <p><span class="hl-orange">Level 1</span> — <code>singletonObjects</code> → fully initialized beans ✅</p>
+      <p><span class="hl-orange">Level 1</span> — <code>singletonObjects</code> → fully initialized beans ✓</p>
       <p><span class="hl-blue">Level 2</span> — <code>earlySingletonObjects</code> → half-init (no deps yet) 🔄</p>
       <p><span class="hl-green">Level 3</span> — <code>singletonFactories</code> → factory lambdas to create early refs 🏭</p>
     </div>
@@ -500,7 +500,7 @@ ctor.<span class="wu-b">setAccessible</span>(<span class="kw">true</span>); <spa
 <div class="page green-spine">
   <div class="page-num">pg 09</div>
   <div class="section-header">
-    <span class="section-icon">🎯</span>
+    <span class="section-icon">◎</span>
     <span class="section-title">9. @Autowired Resolution</span>
     <span class="section-num">09</span>
   </div>
@@ -516,18 +516,18 @@ ctor.<span class="wu-b">setAccessible</span>(<span class="kw">true</span>); <spa
       <div class="phase-arrow">↓</div>
       <div class="phase-box ph-green">
         <div class="ph-num">Exactly one found</div>
-        <div class="ph-title">✅ Inject it</div>
+        <div class="ph-title">Inject it ✓</div>
       </div>
       <div class="phase-arrow" style="opacity:0.3">— or —</div>
       <div class="phase-box ph-red">
         <div class="ph-num">Zero found</div>
-        <div class="ph-title">💥 NoSuchBeanDefinitionException</div>
+        <div class="ph-title">NoSuchBeanDefinitionException</div>
         <div class="ph-sub">Unless @Autowired(required=false)</div>
       </div>
       <div class="phase-arrow" style="opacity:0.3">— or —</div>
       <div class="phase-box ph-orange">
         <div class="ph-num">Multiple found</div>
-        <div class="ph-title">💥 NoUniqueBeanDefinitionException</div>
+        <div class="ph-title">NoUniqueBeanDefinitionException</div>
         <div class="ph-sub">→ Needs disambiguation (see below)</div>
       </div>
     </div>
@@ -548,7 +548,7 @@ ctor.<span class="wu-b">setAccessible</span>(<span class="kw">true</span>); <spa
 <span class="kw">private</span> <span class="cl">PaymentService</span> stripePaymentService; <span class="cm">// name = bean name</span></pre>
 
   <div class="insight">
-    <div class="insight-label">🔍 Resolution Order</div>
+    <div class="insight-label">★ Resolution Order</div>
     <p>Spring tries: <strong>1)</strong> by type → <strong>2)</strong> @Primary if multiple → <strong>3)</strong> @Qualifier → <strong>4)</strong> field/parameter name match. It only fails if none of these resolve to exactly one bean.</p>
   </div>
 </div>
@@ -558,14 +558,14 @@ ctor.<span class="wu-b">setAccessible</span>(<span class="kw">true</span>); <spa
 <div class="page orange-spine">
   <div class="page-num">pg 10</div>
   <div class="section-header">
-    <span class="section-icon">📝</span>
+    <span class="section-icon">✎</span>
     <span class="section-title">10. Quick Reference Cheatsheet</span>
     <span class="section-num">10</span>
   </div>
 
   <div class="cheat-grid">
     <div class="cheat-card" style="color:var(--green);border-top-color:var(--green)">
-      <div class="cheat-card-title">🫘 Declare Beans</div>
+      <div class="cheat-card-title">Declare Beans</div>
       <pre class="code-block" style="margin:0;font-size:12px;border-left-color:var(--green)"><span class="an">@Component</span>
 <span class="an">@Service</span>
 <span class="an">@Repository</span>
@@ -573,30 +573,30 @@ ctor.<span class="wu-b">setAccessible</span>(<span class="kw">true</span>); <spa
 <span class="an">@Bean</span> <span class="cm">// in @Configuration</span></pre>
     </div>
     <div class="cheat-card" style="color:var(--blue);border-top-color:var(--blue)">
-      <div class="cheat-card-title">💉 Inject Beans</div>
+      <div class="cheat-card-title">Inject Beans</div>
       <pre class="code-block" style="margin:0;font-size:12px;border-left-color:var(--blue)"><span class="an">@Autowired</span> <span class="cm">// field/ctor/setter</span>
 <span class="cm">// ctor: no @Autowired needed</span>
 <span class="cm">// if single constructor</span></pre>
     </div>
     <div class="cheat-card" style="color:var(--orange);border-top-color:var(--orange)">
-      <div class="cheat-card-title">🔄 Scopes</div>
+      <div class="cheat-card-title">Scopes</div>
       <pre class="code-block" style="margin:0;font-size:12px;border-left-color:var(--orange)"><span class="an">@Scope</span>(<span class="st">"singleton"</span>) <span class="cm">// default</span>
 <span class="an">@Scope</span>(<span class="st">"prototype"</span>) <span class="cm">// new each time</span>
 <span class="an">@Scope</span>(<span class="st">"request"</span>)
 <span class="an">@Scope</span>(<span class="st">"session"</span>)</pre>
     </div>
     <div class="cheat-card" style="color:var(--purple);border-top-color:var(--purple)">
-      <div class="cheat-card-title">⚙️ Lifecycle</div>
+      <div class="cheat-card-title">Lifecycle</div>
       <pre class="code-block" style="margin:0;font-size:12px;border-left-color:var(--purple)"><span class="an">@PostConstruct</span> <span class="cm">// after DI</span>
 <span class="an">@PreDestroy</span>    <span class="cm">// before destroy</span></pre>
     </div>
     <div class="cheat-card" style="color:var(--red);border-top-color:var(--red)">
-      <div class="cheat-card-title">🎯 Disambiguation</div>
+      <div class="cheat-card-title">Disambiguation</div>
       <pre class="code-block" style="margin:0;font-size:12px;border-left-color:var(--red)"><span class="an">@Primary</span>    <span class="cm">// default winner</span>
 <span class="an">@Qualifier</span>(<span class="st">"name"</span>) <span class="cm">// by name</span></pre>
     </div>
     <div class="cheat-card" style="color:var(--green);border-top-color:var(--green)">
-      <div class="cheat-card-title">🛡️ Conditional</div>
+      <div class="cheat-card-title">Conditional</div>
       <pre class="code-block" style="margin:0;font-size:12px;border-left-color:var(--green)"><span class="an">@ConditionalOnProperty</span>(
   name=<span class="st">"feat.enabled"</span>,
   havingValue=<span class="st">"true"</span>)
@@ -622,7 +622,7 @@ ctor.<span class="wu-b">setAccessible</span>(<span class="kw">true</span>); <spa
   </table>
 
   <div class="sticky" style="transform:rotate(-0.5deg);margin-top:24px">
-    <div class="sticky-label">🎓 Next to Study</div>
+    <div class="sticky-label">✎ Next to Study</div>
     <p>How <code>@Transactional</code> proxy works internally · Spring AOP (JDK vs CGLIB proxies) · Auto-configuration internals · <code>@SpringBootApplication</code> deep dive</p>
   </div>
 </div>
