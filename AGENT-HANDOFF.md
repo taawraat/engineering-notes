@@ -1,6 +1,6 @@
 # Hand Notes — Full Agent Handoff Context
 
-> Updated handoff after the **design polish session** (2026-05-17). Read this end-to-end before touching any file.
+> Updated handoff after the **emoji cleanup session** (2026-05-17). Read this end-to-end before touching any file.
 
 ---
 
@@ -50,7 +50,7 @@ npm run build    # → dist/
         ├── style-guide.astro            # design system showcase
         └── notes/
             ├── spring-boot-ioc.astro       # 10 pages
-            ├── database-acid.astro         # 10 pages — heavily polished this session
+            ├── database-acid.astro         # 10 pages
             └── spring-transactional.astro  # 12 pages
 ```
 
@@ -64,26 +64,79 @@ npm run build    # → dist/
 
 ---
 
-## 3. Recent Session Changes (commit `4c6bbb2 — feat: design fixed`)
+## 3. Session History (most recent first)
 
-This session focused on **enforcing Rule #6** (no ASCII art in code blocks) across `database-acid.astro` and on **upgrading the `.note-table` design system** to a self-contained paper card.
+### Session 2 — commit `5d00070 — replace emoji with sketch-like text symbols across all notes`
 
-### A. `src/pages/notes/database-acid.astro` content conversions
+Replaced all colorful/decorative emoji across all three note files with sketch-like Unicode text symbols. These characters inherit the CSS text color and render like hand-drawn pen marks — consistent across all three themes (warm/cool/dark).
+
+#### The sketch-like symbol palette (use this for any new content)
+
+| Symbol | Meaning / Used for |
+|---|---|
+| `★` | concept, definition, key insight, mental model, "Remember" |
+| `✎` | notes, cheat sheet, interview Q&A, "Next to Study" |
+| `⚡` | deep dive, internals, crash recovery, critical path |
+| `↺` | lifecycle, propagation, cycles, MVCC |
+| `◎` | isolation, focus/zoom, resolution, decision guide |
+| `✓` | correct, valid, success, "With X" comparison labels |
+| `✗` | error, bug, violation, "Without X" comparison labels |
+| `≡` | overview, all attributes, stack layers, summary |
+| `?` | question stickies (e.g. "? Does Spring create new objects?") |
+| `!` | warning, caution, common bug source |
+| `→` | dependency injection direction |
+| `◷` | timeout / time-bounded operations |
+| `◉` | database / record symbol (used as cover doodle in database-acid) |
+
+#### What was changed in each file
+
+**Cover tags** — emoji stripped entirely from all three files. The colored `.tag` chips already convey meaning through color; emoji was redundant clutter.
+
+**Cover doodles** (the large decorative display symbol):
+- `spring-boot-ioc.astro`: `☕` → `✍`
+- `database-acid.astro`: `🗄️` → `◉`
+- `spring-transactional.astro`: `🔁` → `↺`
+
+**Section icons** (`.section-icon` in every `.section-header`) — replaced with sketch palette above per semantic meaning of each page topic.
+
+**Sticky labels** (`.sticky-label`) — all emoji replaced with `★`, `✎`, `!`, `✗`, or `?`.
+
+**Insight labels** (`.insight-label`) — all emoji replaced with `★`, `⚡`, `✓`, `✗`, or `!`.
+
+**Phase box titles** (`.ph-title` text) — emoji removed entirely. The text already conveys meaning; emoji was redundant inside the boxes. e.g. `📋 Definition` → `Definition`, `📞 App calls commit()` → `App calls commit()`.
+
+**Cheat card titles** (`.cheat-card-title`) — emoji removed entirely. The cards are already color-coded by `.cheat-card` border color.
+
+**Inline content markers** — `✅` → `✓`, `⭐` → `★`, `❌` → `✗` throughout.
+
+**Preserved untouched** — all emoji/symbols inside `<pre class="code-block">` elements (code comments like `// ✅ Works`). Code content is never modified.
+
+#### Special exception — Page 2 of `database-acid.astro`
+
+The Atomicity bank-transfer code-compare on Page 2 contains `💥`, `🔥`, `✅` inside the protected ASCII prose-in-`<pre>` blocks. **These were NOT changed.** The user has explicitly reverted any modifications to that page twice — do not touch it.
+
+---
+
+### Session 1 — commit `4c6bbb2 — feat: design fixed`
+
+Focused on enforcing Rule #6 (no ASCII art in code blocks) across `database-acid.astro` and upgrading the `.note-table` design system to a self-contained paper card.
+
+#### `database-acid.astro` content conversions
 
 | Page | Section | Before | After |
 |------|---------|--------|-------|
-| 2 | Without/With Atomicity (bank transfer) | ASCII prose-in-`<pre>` | **KEPT AS-IS** — user explicitly reverted conversion attempts. Do **not** touch. |
-| 3 | What "Valid State" Means | ASCII tree (`├── └──`) of constraints inside `<pre>` | `.note-table` (Constraint → Rule it enforces) |
+| 2 | Without/With Atomicity (bank transfer) | ASCII prose-in-`<pre>` | **KEPT AS-IS** — do not touch. |
+| 3 | What "Valid State" Means | ASCII tree (`├── └──`) inside `<pre>` | `.note-table` (Constraint → Rule it enforces) |
 | 4 | Anomaly 1: Dirty Read | ASCII timeline `│ ─ ┼` inside `<pre>` | 3-column `.note-table` (Time × Tx A × Tx B) |
 | 4 | Anomaly 2: Non-Repeatable Read | same | same |
 | 4 | Anomaly 3: Phantom Read | same | same |
-| 5 | Anomaly 4: Lost Update | same + dangling `<span class="cm">Expected/Actual...</span>` lines | `.note-table` + `.insight orange-ins` for the "Expected vs Actual" punchline |
-| 6 | Hidden Row Metadata | ASCII box (`┌─┬┐`) showing one InnoDB row | `.note-table` (4 cols, 🔒 emoji on hidden columns) + `.two-col` `.col-card`s explaining `DB_TRX_ID` and `DB_ROLL_PTR` |
-| 6 | Read View — Snapshot Isolation | prose narrative inside `<pre>` + redundant `.phase-flow` repeating the same flow | body-text intro + `.sticky` ("📜 The Read View Rule") + enriched `.phase-flow` with concrete TXN numbers (`TXN_100`, `TXN_101`, `DB_TRX_ID < 100` rule) |
-| 7 | Without/With Durability | two `.code-compare` panels with prose-in-`<pre>` | single 3-column `.note-table` (Step × Without × With). Steps 1–3 are *identical*; only step 4 diverges with `.hl-orange` / `.hl-green` highlights. Subtitle below table makes the lesson explicit. |
-| 7 | Redo Log & WAL | ASCII box-flow inside `<pre>` | body-text intro + `.sticky` ("📜 The WAL Golden Rule") + `.phase-flow` 3-step sequence (📞 commit → 📝 Redo Log → 💾 fsync) with **"Step 3 · Durable! ✅"** marker on the final box + `.insight` callout explaining why data pages don't block COMMIT |
+| 5 | Anomaly 4: Lost Update | same + dangling spans | `.note-table` + `.insight orange-ins` for Expected vs Actual |
+| 6 | Hidden Row Metadata | ASCII box (`┌─┬┐`) | `.note-table` (4 cols) + `.two-col` `.col-card`s for `DB_TRX_ID` / `DB_ROLL_PTR` |
+| 6 | Read View — Snapshot Isolation | prose in `<pre>` + redundant `.phase-flow` | body-text intro + `.sticky` + enriched `.phase-flow` with TXN numbers |
+| 7 | Without/With Durability | two `.code-compare` panels with prose-in-`<pre>` | single 3-column `.note-table` (Step × Without × With) |
+| 7 | Redo Log & WAL | ASCII box-flow inside `<pre>` | body-text intro + `.sticky` + `.phase-flow` 3-step sequence + `.insight` |
 
-### Anomaly table convention (Pages 4–5) — copy this pattern
+#### Anomaly table convention (Pages 4–5) — copy this pattern
 
 ```html
 <table class="note-table">
@@ -99,14 +152,12 @@ This session focused on **enforcing Rule #6** (no ASCII art in code blocks) acro
 ```
 
 - Narrow `width:60px` Time column anchors each row.
-- Empty `<td>` cells read as "transaction is idle".
+- Empty `<td>` cells = transaction is idle.
 - `<code>` for SQL keywords (`BEGIN`, `UPDATE`, `SELECT`, `COMMIT`, `ROLLBACK`).
 - `.hl-green` for correct values, `.hl-orange` for anomalous values.
 - Italic `<em>` for side-notes like `(not yet committed)`.
 
-### B. `src/styles/components.css` — `.note-table` redesign
-
-**The big design upgrade of this session.** Tables are now a self-contained "paper card" so the page's lined-paper texture stops at the table boundary.
+#### `.note-table` CSS design (do not undo)
 
 ```css
 .note-table {
@@ -129,26 +180,20 @@ This session focused on **enforcing Rule #6** (no ASCII art in code blocks) acro
 .note-table td + td               { border-left: 1px solid var(--rule-line); }
 ```
 
-**Key design decisions (do not undo without reading this):**
+Key decisions:
+1. **Opaque cell backgrounds** — page's lined-paper texture bleeds through transparent cells, creating cross-hatched chaos.
+2. **`box-shadow` ring** instead of `border` — `border-collapse: collapse` fights with `border-radius`; shadow rings don't.
+3. **Token-based** (`--paper`/`--paper2`) — works in all three themes inherently.
+4. **Adjacent-sibling `border-left`** — internal column dividers without an outer frame.
 
-1. **Opaque cell backgrounds** (`--paper` odd, `--paper2` even). The body has a `repeating-linear-gradient` lined-paper texture. Without opaque cells, those horizontal lines bleed through and visually mix with the column dividers — looks like cross-hatched chaos.
-2. **`box-shadow: 0 0 0 1px ...` + `border-radius` + `overflow: hidden`** — uses a hairline shadow ring as the outer frame instead of a `border` property. Why? `border-collapse: collapse` fights with element borders + `border-radius`; box-shadow rings work cleanly.
-3. **Theme-safe via `--paper` / `--paper2` tokens** — both variables are defined in all three themes (warm/cool/dark) in `tokens.css` and `themes.css`. The old `[data-theme="dark"]` rgba override was removed because the token-based approach handles it inherently.
-4. **`th + th, td + td { border-left }`** — adjacent-sibling selector adds left borders only to cells *after* the first, giving internal column dividers without an outer frame.
-
-### C. Documentation updates
-
-| File | Change |
-|------|--------|
-| `CLAUDE.md` | **Added Rule #6 — "Use real components instead of ASCII art"** with full pattern→component lookup table (flow-row, phase-flow, two-col, code-compare, note-table for timelines/lookups). Renumbered the existing mobile rule from `Rule 6` to `Rule 7`. Updated cheat sheet table line. |
-| `README.md` | Added `.note-table` (paper card; for reference data + timelines) and `.note-list` rows to the "Consistent styling rules" table. |
-| `src/pages/style-guide.astro` | Added body-text describing the new paper-card design, a second `.note-table` example showing the concurrency timeline pattern, and an `.insight orange-ins` warning callout that explicitly forbids ASCII tables. |
-
-### D. Tooling
+#### Documentation updates (Session 1)
 
 | File | Change |
 |------|--------|
-| `.gitignore` | Added `.agents/` and `skills-lock.json` (AI agent tooling artifacts). `.astro/` was already ignored. |
+| `CLAUDE.md` | Added Rule #6 — "Use real components instead of ASCII art". Renumbered mobile rule from 6 → 7. |
+| `README.md` | Added `.note-table` and `.note-list` to the styling rules table. |
+| `src/pages/style-guide.astro` | Added `.note-table` paper-card demo, timeline pattern example, and `.insight orange-ins` warning against ASCII tables. |
+| `.gitignore` | Added `.agents/` and `skills-lock.json`. |
 
 ---
 
@@ -159,7 +204,7 @@ This session focused on **enforcing Rule #6** (no ASCII art in code blocks) acro
 3. **Escape `{` → `&#123;` and `}` → `&#125;`** in `.astro` template sections (after second `---`). Frontmatter JS is unaffected.
 4. **Check the style guide first** at `/style-guide` — every component is demonstrated there. Don't invent one-off styles.
 5. **CSS Grid children need `min-width: 0`** — direct `<div>` grid children must have it set.
-6. **🆕 Use real components instead of ASCII art** — never draw with `│ ─ ┼ ┌ └ ▶` inside `<pre class="code-block">`. The page's lined-paper texture turns ASCII grids into visual noise.
+6. **Use real components instead of ASCII art** — never draw with `│ ─ ┼ ┌ └ ▶` inside `<pre class="code-block">`. The page's lined-paper texture turns ASCII grids into visual noise.
 
    | Pattern | Use |
    |---|---|
@@ -176,6 +221,8 @@ This session focused on **enforcing Rule #6** (no ASCII art in code blocks) acro
    - `≤ 480px` small phones — hide pagination title, compact nav
 
 8. **Cover `h1` is one sentence, no `<br />`** — 34px font wraps naturally.
+
+9. **Emoji rule (new)** — use sketch-like Unicode text symbols (see Section 3 palette) for all new decorative markers. Never add colorful multi-color emoji to section icons, sticky labels, insight labels, phase box titles, or cheat card titles. Emoji inside `<pre class="code-block">` (code comments) are untouched.
 
 ---
 
@@ -219,7 +266,7 @@ global.css
 - **Fonts:** `klee` (default) · `caveat` · `patrick` · `kalam` — via `data-font` on `<html>`
 - Persisted in `localStorage` (`hn-theme`, `hn-font`).
 - FOUC prevented by inline `<script>` in `<head>` of `BaseLayout.astro` — do not remove.
-- Theme panel: floating 🎨 button bottom-right → `ThemeFontPanel.astro`.
+- Theme panel: floating button bottom-right → `ThemeFontPanel.astro`.
 
 ---
 
@@ -230,11 +277,12 @@ Cover card        .cover
                     .cover-subject  ← series label, small caps
                     h1              ← single sentence, NO <br />
                     .cover-sub      ← one subtitle line
-                    .cover-tags     ← .tag.tag-g/b/o/p chips
-                    .cover-doodle   ← decorative emoji
+                    .cover-tags     ← .tag.tag-g/b/o/p chips (NO emoji inside tags)
+                    .cover-doodle   ← single sketch-like Unicode symbol
 
 Page card         .page [.green|blue|orange|purple|red-spine]
 Page section hdr  .section-header > .section-icon + .section-title + .section-num
+                    .section-icon uses sketch symbols (★ ✎ ⚡ ↺ ◎ ✓ ✗ ≡ → ◷)
 Page number       .page-num (hidden ≤ 640px)
 Subsection hdgs   h2.sub · h3.sub
 
@@ -243,24 +291,28 @@ Inline code       <code>
 Code block        <pre class="code-block [color]-left">     ← ONLY for actual code
                     Syntax: .kw .an .cl .st .cm .ar
 Code comparison   .code-compare > .code-compare-panel
-                    .code-compare-label [.g|.r|.b]
+                    .code-compare-label [.g|.r|.b]  ← use ✓ / ✗ prefix, not ✅ / ❌
                     .code-compare-sep
                     .code-compare-note
 
 Two-col text      .two-col > .col-card
                     .col-card-title [.g|.r|.b|.o]
 Cheat grid        .cheat-grid > .cheat-card
+                    .cheat-card-title ← NO emoji; text only
 Flow diagram      .flow-row > .flow-box.fb-[gray|blue|green|purple|orange] + .flow-arr
 Lifecycle flow    .phase-flow > .phase-box.ph-[gray|blue|green|orange|purple|red] + .phase-arrow
+                    .ph-title ← NO emoji; text only
 Diagram wrap      .diag-wrap (graph paper bg, overflow-x: auto)
 
 Sticky callout    .sticky (.sticky-label + <p>)
+                    .sticky-label uses sketch symbols only (★ ✎ ⚡ ! ? ✗)
 Insight box       .insight [.green-ins|.orange-ins]
+                    .insight-label uses sketch symbols only (★ ⚡ ✓ ✗ !)
 
 Bullet list       .note-list > li [.sq|.ck|.cr|.st]
 Table             <table class="note-table">  ← paper card; reference data + timelines
                     (auto: opaque cells, outer ring, soft shadow, mobile auto-scroll)
-Tags              .tag [.tag-g|.tag-b|.tag-o|.tag-p]
+Tags              .tag [.tag-g|.tag-b|.tag-o|.tag-p]  ← text only inside, no emoji
 
 Inline highlight  .hl .hl-green .hl-blue .hl-orange .hl-purple
 Wavy underline    .wu (green) .wu-o (orange) .wu-b (blue)
@@ -301,9 +353,10 @@ These classes do **not** style outside a code block — for tables/cards use `<c
 2. Replace **all** `{` → `&#123;` and `}` → `&#125;` in the HTML section (after second `---`).
 3. Use `<pre class="code-block">` for every actual code block (never `<div>`).
 4. **For tables, timelines, comparisons** — use the proper component (Rule #6). Never draw with ASCII characters.
-5. Cover `h1` = single sentence, no `<br />`.
-6. Add `<PaginationController />` before `</BaseLayout>`.
-7. Register the note in the `notes` array in `src/pages/index.astro`.
+5. **For icons and labels** — use the sketch symbol palette from Section 3. No colorful emoji.
+6. Cover `h1` = single sentence, no `<br />`. Cover tags = text only, no emoji.
+7. Add `<PaginationController />` before `</BaseLayout>`.
+8. Register the note in the `notes` array in `src/pages/index.astro`.
 
 ---
 
@@ -312,7 +365,7 @@ These classes do **not** style outside a code block — for tables/cards use `<c
 ```javascript
 const notes = [
   { href: '/notes/spring-transactional/',  pages: 12, ... },  // @Transactional deep dive
-  { href: '/notes/database-acid/',         pages: 10, ... },  // ACID — heavily polished this session
+  { href: '/notes/database-acid/',         pages: 10, ... },  // ACID properties + MySQL internals
   { href: '/notes/spring-boot-ioc/',       pages: 10, ... },  // IoC, beans, DI
 ];
 ```
@@ -323,41 +376,44 @@ const notes = [
 
 - **Compact, read-friendly** trumps decorative — when phase-flow felt "too big" for the bank transfer, user preferred the original ASCII prose. The decision turns on content density per pixel.
 - **Industrial-standard solutions with minimal changes** — explicit user rule. Don't refactor adjacent code unprompted.
-- **Commit messages:** short, lowercase, imperative. Examples: `feat: design fixed`, `add spring-aop note`, `fix code block overflow`.
-- **Tables must have visible internal grid lines** — column dividers are non-negotiable for readability. The current `.note-table` paper-card design satisfies this.
-- **One job per component** — user pushed back when the same flow was repeated in both prose and `.phase-flow`. Each visual element should do exactly one thing the others don't.
+- **Commit messages:** short, lowercase, imperative. Examples: `feat: design fixed`, `add spring-aop note`, `fix code block overflow`, `replace emoji with sketch-like text symbols across all notes`.
+- **Tables must have visible internal grid lines** — column dividers are non-negotiable for readability.
+- **One job per component** — user pushed back when the same flow was repeated in both prose and `.phase-flow`. Each visual element should do exactly one thing.
 - **The Atomicity bank transfer (Page 2 of database-acid)** must remain in its original ASCII prose-in-code form. User reverted conversion attempts twice. **Do not touch.**
+- **Sketch-like symbols over colorful emoji** — user explicitly requested replacing emoji with hand-drawn-looking Unicode symbols for better theme compatibility. The symbols inherit CSS text color and look like pen marks on paper. This is now the standard for all new content.
 
 ---
 
 ## 11. Possible Next Steps
 
-- Apply Rule #6 audit to `spring-boot-ioc.astro` and `spring-transactional.astro` — there may be more ASCII timelines/diagrams that predate Rule #6.
+- Add a new note (e.g. Spring AOP internals, JVM memory model, database indexing / B+ Tree).
 - Move the `notes` array in `index.astro` to an Astro content collection as the count grows.
 - Add `@astrojs/sitemap` + RSS feed (`@astrojs/rss`).
 - Add search functionality as notes grow.
-- Audit existing `<pre class="code-block">` blocks across all notes for any remaining ASCII art (`│ ─ ┼ ┌ └ ▶`).
+- Audit any remaining ASCII art (`│ ─ ┼ ┌ └ ▶`) inside `<pre class="code-block">` across all notes (Rule #6).
 
 ---
 
 ## 12. Files to Read First (in order)
 
-1. **`CLAUDE.md`** — non-negotiable rules, including the new Rule #6.
-2. **`/style-guide` route** (`src/pages/style-guide.astro`) — visual demo of every component, including the new `.note-table` paper card and the warning against ASCII tables.
-3. **`README.md`** — developer guide + the styling rules table that includes `.note-table` for timelines/lookups.
-4. **`src/styles/components.css`** — single source of truth for all component CSS. The `.note-table` block (around line 580) is the model for future "paper card" components.
-5. **`src/pages/notes/database-acid.astro`** — reference for the new patterns: `.note-table` timelines (Pages 4–5), `.note-table` row metadata (Page 6), `.sticky` + `.phase-flow` rhythm (Pages 6–7).
+1. **`CLAUDE.md`** — non-negotiable rules (Rules 1–9 including emoji rule).
+2. **`/style-guide` route** (`src/pages/style-guide.astro`) — visual demo of every component including `.note-table` paper card.
+3. **`README.md`** — developer guide + styling rules table.
+4. **`src/styles/components.css`** — single source of truth for all component CSS. `.note-table` block is the model for future paper-card components.
+5. **`src/pages/notes/database-acid.astro`** — reference for `.note-table` timelines (Pages 4–5), `.note-table` row metadata (Page 6), `.sticky` + `.phase-flow` rhythm (Pages 6–7), and the sketch symbol palette in action.
 
 ---
 
 ## 13. Quick "Don't Break These" List
 
-- ❌ Don't draw tables with `│ ─ ┼ ┌ └ ▶` inside `<pre>` — use `<table class="note-table">` (Rule #6).
-- ❌ Don't use `.kw / .cm / .st` syntax classes outside `.code-block` — they're scoped to that selector.
-- ❌ Don't add `border` (instead of `box-shadow`) to `.note-table` — it fights with `border-collapse: collapse` + `border-radius`.
-- ❌ Don't make table cells transparent — page lines bleed through.
-- ❌ Don't touch the Atomicity bank-transfer comparison on Page 2 of `database-acid.astro` — user wants the ASCII version.
-- ❌ Don't remove the `isInsideHScrollable` guard in `PaginationController.astro`.
-- ❌ Don't use bare `<div>` as a CSS Grid child without `min-width: 0`.
-- ❌ Don't put `<br />` tags in cover `h1`.
-- ❌ Don't forget to escape `{` and `}` in `.astro` templates.
+- ✗ Don't draw tables with `│ ─ ┼ ┌ └ ▶` inside `<pre>` — use `<table class="note-table">` (Rule #6).
+- ✗ Don't use `.kw / .cm / .st` syntax classes outside `.code-block` — they're scoped to that selector.
+- ✗ Don't add `border` (instead of `box-shadow`) to `.note-table` — it fights with `border-collapse: collapse` + `border-radius`.
+- ✗ Don't make table cells transparent — page lines bleed through.
+- ✗ Don't touch the Atomicity bank-transfer comparison on Page 2 of `database-acid.astro` — user wants the ASCII version.
+- ✗ Don't remove the `isInsideHScrollable` guard in `PaginationController.astro`.
+- ✗ Don't use bare `<div>` as a CSS Grid child without `min-width: 0`.
+- ✗ Don't put `<br />` tags in cover `h1`.
+- ✗ Don't forget to escape `{` and `}` in `.astro` templates.
+- ✗ Don't add colorful emoji to section icons, sticky labels, insight labels, phase box titles, cheat card titles, or cover tags — use the sketch symbol palette (★ ✎ ⚡ ↺ ◎ ✓ ✗ ≡ ? ! → ◷ ◉) instead.
+- ✗ Don't modify emoji/symbols inside `<pre class="code-block">` content — code is untouched.
