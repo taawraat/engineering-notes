@@ -1,0 +1,1149 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PaginationController from '../../components/PaginationController.astro';
+---
+
+<BaseLayout
+  title="Java Multithreading &amp; Concurrency · Hand Notes"
+  description="Deep dive from OS fundamentals to Spring Boot: threads, memory model, synchronization, executors, CompletableFuture, @Async, virtual threads, and production patterns."
+>
+
+<!-- ═══ COVER ═══ -->
+<div class="cover">
+  <div class="cover-subject">Java &amp; Spring Boot · Deep Dive Series</div>
+  <h1>Multithreading and Concurrency from OS fundamentals to production patterns</h1>
+  <div class="cover-sub">What the JVM, OS, and CPU actually do — and what can go wrong</div>
+  <div class="cover-tags">
+    <span class="tag tag-g">Threads</span>
+    <span class="tag tag-b">Memory Model</span>
+    <span class="tag tag-o">Executors</span>
+    <span class="tag tag-p">@Async</span>
+    <span class="tag tag-g">Virtual Threads</span>
+    <span class="tag tag-b">Spring Boot</span>
+  </div>
+  <div class="cover-doodle">⚡</div>
+</div>
+
+<!-- ═══ PAGE 1 ═══ -->
+<div class="page green-spine">
+  <div class="page-num">pg 01</div>
+  <div class="section-header">
+    <span class="section-icon">★</span>
+    <span class="section-title">1. The Mental Model: What Is a Thread?</span>
+    <span class="section-num">01</span>
+  </div>
+
+  <div class="body-text">
+    <p>Before writing concurrent code, build this picture: your computer is a <span class="hl">restaurant kitchen</span>.</p>
+    <ul class="note-list">
+      <li class="sq"><span class="hl-green">CPU core</span> = one chef — one task at a time per core</li>
+      <li class="sq"><span class="hl-blue">Process</span> = one complete recipe (your Java app) with its own pantry (heap), countertop (stack), recipe book (code)</li>
+      <li class="sq"><span class="hl-orange">Thread</span> = a worker executing that recipe — multiple workers share the same pantry</li>
+    </ul>
+    <p>The danger: two workers grab the same ingredient (<span class="wu">shared data</span>) without coordination.</p>
+  </div>
+
+  <h2 class="sub">Inside a JVM Process</h2>
+  <div class="diag-wrap">
+    <div class="phase-flow">
+      <div class="phase-box ph-green">
+        <div class="ph-num">Shared</div>
+        <div class="ph-title">Heap</div>
+        <div class="ph-sub">Objects, static fields, arrays — <code>new User()</code>, <code>List&lt;Order&gt;</code>, counters</div>
+      </div>
+      <div class="phase-arrow">↓ all threads share heap</div>
+      <div class="flow-row" style="flex-wrap:wrap;justify-content:center;gap:8px">
+        <div class="flow-box fb-blue">Thread-1<br /><span style="font-size:11px;opacity:0.7">own stack + PC</span></div>
+        <div class="flow-box fb-orange">Thread-2<br /><span style="font-size:11px;opacity:0.7">own stack + PC</span></div>
+        <div class="flow-box fb-purple">Thread-3<br /><span style="font-size:11px;opacity:0.7">own stack + PC</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sticky">
+    <div class="sticky-label">★ Key Insight</div>
+    <p>Each thread has its own <strong>stack</strong> (local variables, call frames) and <strong>program counter</strong>. All threads <strong>share the heap</strong>. That shared heap is where concurrency bugs are born.</p>
+  </div>
+</div>
+
+<!-- ═══ PAGE 2 ═══ -->
+<div class="page orange-spine">
+  <div class="page-num">pg 02</div>
+  <div class="section-header">
+    <span class="section-icon">◎</span>
+    <span class="section-title">2. Processes vs Threads vs Coroutines</span>
+    <span class="section-num">02</span>
+  </div>
+
+  <div class="two-col">
+    <div class="col-card">
+      <div class="col-card-title g">Process</div>
+      <ul class="note-list" style="font-size:14px;margin:0">
+        <li class="sq">Independent program, own memory space</li>
+        <li class="sq">OS isolation — one crash doesn't kill another</li>
+        <li class="sq">IPC is expensive (pipes, sockets)</li>
+        <li class="sq">Example: Spring Boot app vs PostgreSQL server</li>
+      </ul>
+    </div>
+    <div class="col-card">
+      <div class="col-card-title o">OS Thread (Platform)</div>
+      <ul class="note-list" style="font-size:14px;margin:0">
+        <li class="sq">Lives inside a process, shares heap</li>
+        <li class="sq">OS schedules on CPU cores</li>
+        <li class="sq">~1MB stack per thread (JVM default)</li>
+        <li class="sq">Context switching has real cost</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="insight green-ins" style="margin-top:16px">
+    <div class="insight-label">Virtual Threads (Java 21+)</div>
+    <p>Lightweight, runtime-managed — millions possible. Project Loom. Covered in depth on page 19.</p>
+  </div>
+
+  <h2 class="sub">Comparison</h2>
+  <table class="note-table">
+    <thead><tr><th></th><th>Process</th><th>Platform Thread</th><th>Virtual Thread</th></tr></thead>
+    <tbody>
+      <tr><td>Memory</td><td>Isolated</td><td>Shared heap</td><td>Shared heap</td></tr>
+      <tr><td>Creation cost</td><td>High</td><td>Medium (~1MB)</td><td>Very low</td></tr>
+      <tr><td>Scheduling</td><td>OS</td><td>OS</td><td>JVM</td></tr>
+      <tr><td>Max practical</td><td>Hundreds</td><td>Thousands</td><td>Millions</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ═══ PAGE 3 ═══ -->
+<div class="page blue-spine">
+  <div class="page-num">pg 03</div>
+  <div class="section-header">
+    <span class="section-icon">◎</span>
+    <span class="section-title">3. How the JVM Creates Threads</span>
+    <span class="section-num">03</span>
+  </div>
+
+  <div class="body-text">
+    <p>Calling <code>start()</code> is how you ask the JVM to schedule a new thread of execution. The JVM talks to the host OS thread implementation (often pthreads on Linux).</p>
+  </div>
+
+  <h2 class="sub">From <code>start()</code> to the OS</h2>
+  <div class="diag-wrap">
+    <div class="phase-flow">
+      <div class="phase-box ph-blue">
+        <div class="ph-num">1</div>
+        <div class="ph-title"><code>thread.start()</code> on caller thread</div>
+        <div class="ph-sub">Registers Runnable / run target; schedules native thread creation</div>
+      </div>
+      <div class="phase-arrow">↓</div>
+      <div class="phase-box ph-orange">
+        <div class="ph-num">2</div>
+        <div class="ph-title">JVM allocates thread structures</div>
+        <div class="ph-sub">Java Thread object ↔ OS thread bookkeeping</div>
+      </div>
+      <div class="phase-arrow">↓</div>
+      <div class="phase-box ph-green">
+        <div class="ph-num">3</div>
+        <div class="ph-title">New thread enters <span class="hl-green">RUNNABLE</span></div>
+        <div class="ph-sub">Dispatcher may run <code>run()</code> immediately or later</div>
+      </div>
+      <div class="phase-arrow">↓</div>
+      <div class="phase-box ph-purple">
+        <div class="ph-num">4</div>
+        <div class="ph-title"><code>run()</code> executes on the new thread</div>
+        <div class="ph-sub">When <code>run()</code> returns, thread terminates</div>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="sub"><code>run()</code> vs <code>start()</code></h2>
+  <div class="two-col">
+    <div class="col-card">
+      <div class="col-card-title r">Calling <code>run()</code> directly</div>
+      <div class="body-text"><p>Runs on the <span class="wu-o">current thread</span>. No new OS thread. Same stack, same scheduler quantum.</p></div>
+      <pre class="code-block orange-left"><span class="cl">Worker</span> w = <span class="kw">new</span> <span class="cl">Worker</span>();
+w.run(); <span class="cm">// ordinary method call — NOT concurrent</span></pre>
+    </div>
+    <div class="col-card">
+      <div class="col-card-title g">Calling <code>start()</code></div>
+      <div class="body-text"><p>Asks the JVM to launch a <span class="hl-green">new thread</span> that will invoke <code>run()</code> on its own stack.</p></div>
+      <pre class="code-block green-left"><span class="cl">Worker</span> w = <span class="kw">new</span> <span class="cl">Worker</span>();
+w.start(); <span class="cm">// concurrent execution path</span></pre>
+    </div>
+  </div>
+
+  <div class="sticky">
+    <div class="sticky-label">★ Rule of thumb</div>
+    <p><span class="hl-orange">Never</span> call <code>start()</code> twice on the same <code>Thread</code> instance — it throws <code>IllegalThreadStateException</code>. Create a new <code>Thread</code> object if you need another run.</p>
+  </div>
+</div>
+
+
+<!-- ═══ PAGE 4 ═══ -->
+<div class="page purple-spine">
+  <div class="page-num">pg 04</div>
+  <div class="section-header">
+    <span class="section-icon">◎</span>
+    <span class="section-title">4. Thread Lifecycle &amp; States</span>
+    <span class="section-num">04</span>
+  </div>
+
+  <div class="body-text">
+    <p><code>java.lang.Thread.State</code> exposes what the thread scheduler thinks your thread is doing. Blocked vs waiting vs timed waiting matters when you diagnose stalls.</p>
+  </div>
+
+  <h2 class="sub">State progression</h2>
+  <div class="diag-wrap">
+    <div class="phase-flow">
+      <div class="phase-box ph-gray">
+        <div class="ph-num">NEW</div>
+        <div class="ph-title">Constructed, not started</div>
+        <div class="ph-sub"><code>start()</code> not yet called</div>
+      </div>
+      <div class="phase-arrow">↓</div>
+      <div class="phase-box ph-green">
+        <div class="ph-num">RUNNABLE</div>
+        <div class="ph-title">Eligible to run</div>
+        <div class="ph-sub">Running or waiting for CPU time</div>
+      </div>
+      <div class="phase-arrow">↓</div>
+      <div class="phase-box ph-orange">
+        <div class="ph-num">BLOCKED / WAITING / TIMED_WAITING</div>
+        <div class="ph-title">Not runnable</div>
+        <div class="ph-sub">Lock, <code>park</code>, or timed wait</div>
+      </div>
+      <div class="phase-arrow">↓</div>
+      <div class="phase-box ph-blue">
+        <div class="ph-num">TERMINATED</div>
+        <div class="ph-title"><code>run()</code> finished</div>
+        <div class="ph-sub">Uncaught exceptions also end here</div>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="sub">What each state usually means</h2>
+  <table class="note-table">
+    <thead>
+      <tr><th>State</th><th>Typical cause</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><span class="hl-green">NEW</span></td><td>Object exists; call <code>start()</code> once when ready</td></tr>
+      <tr><td><span class="hl-blue">RUNNABLE</span></td><td>Ready slice from OS scheduler (includes running)</td></tr>
+      <tr><td><span class="hl-orange">BLOCKED</span></td><td>Waiting to enter a <code>synchronized</code> monitor</td></tr>
+      <tr><td><span class="hl-purple">WAITING</span></td><td><code>Object.wait()</code>, <code>LockSupport.park()</code>, joining without timeout…</td></tr>
+      <tr><td><span class="wu">TIMED_WAITING</span></td><td><code>Thread.sleep</code>, timed <code>wait</code>, <code>join(ms)</code>, <code>parkNanos</code>…</td></tr>
+      <tr><td><span class="hl">TERMINATED</span></td><td>Normal completion or crash inside <code>run()</code></td></tr>
+    </tbody>
+  </table>
+
+  <div class="insight green-ins">
+    <div class="insight-label">★ Reading stacks</div>
+    <p>JFR, <code>jstack</code>, or async profiler threads often show WAITING on a lock vs BLOCKED trying to acquire — both explain latency, but the fix differs (signal vs reduce contention).</p>
+  </div>
+</div>
+
+
+<!-- ═══ PAGE 5 ═══ -->
+<div class="page orange-spine">
+  <div class="page-num">pg 05</div>
+  <div class="section-header">
+    <span class="section-icon">◎</span>
+    <span class="section-title">5. Concurrency vs Parallelism</span>
+    <span class="section-num">05</span>
+  </div>
+
+  <div class="two-col">
+    <div class="col-card">
+      <div class="col-card-title b">Concurrency</div>
+      <div class="body-text"><p>Many tasks <span class="hl-blue">make progress</span> over the same interval by interleaving. One core can run concurrent work via scheduling.</p></div>
+      <ul class="note-list">
+        <li class="sq">Overlapping I/O and computation</li>
+        <li class="sq">Many connections multiplexed on few threads</li>
+      </ul>
+    </div>
+    <div class="col-card">
+      <div class="col-card-title g">Parallelism</div>
+      <div class="body-text"><p>Tasks execute <span class="hl-green">at the same instant</span> on separate hardware execution units — multiple cores or SIMD lanes.</p></div>
+      <ul class="note-list">
+        <li class="sq">Parallel streams splitting CPU-bound chunks</li>
+        <li class="sq">SIMD-friendly numeric kernels</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="diag-wrap">
+    <div class="flow-row">
+      <div class="flow-box fb-blue">Concurrent — interleaved progress</div>
+      <div class="flow-arr">+</div>
+      <div class="flow-box fb-green">Parallel — simultaneous cores</div>
+      <div class="flow-arr">→</div>
+      <div class="flow-box fb-purple">Throughput — both together</div>
+    </div>
+  </div>
+
+  <div class="insight orange-ins">
+    <div class="insight-label">Spring Boot &amp; Tomcat</div>
+    <p>A servlet container runs <span class="hl-blue">many concurrent requests</span> with a bounded worker pool. Throughput comes from overlapping socket I/O — parallelism helps when work is CPU-heavy; concurrency carries the load when threads wait on backends.</p>
+  </div>
+
+  <div class="body-text">
+    <p>Pick thread counts and pool types based on whether tasks <span class="wu">block</span> (wait on I/O) or <span class="wu">burn CPU</span>.</p>
+  </div>
+</div>
+
+
+<!-- ═══ PAGE 6 ═══ -->
+<div class="page green-spine">
+  <div class="page-num">pg 06</div>
+  <div class="section-header">
+    <span class="section-icon">◎</span>
+    <span class="section-title">6. Memory Model &amp; CPU Caches</span>
+    <span class="section-num">06</span>
+  </div>
+
+  <div class="body-text">
+    <p>Each core reads and writes through fast private caches. Without synchronization, two threads can disagree on the latest value of a plain field — <span class="hl-orange">visibility</span> is separate from atomicity.</p>
+  </div>
+
+  <h2 class="sub">Cache hierarchy (conceptual)</h2>
+  <div class="diag-wrap">
+    <div class="phase-flow">
+      <div class="phase-box ph-purple">
+        <div class="ph-num">L3</div>
+        <div class="ph-title">Shared last-level cache</div>
+        <div class="ph-sub">Often shared across cores on a socket</div>
+      </div>
+      <div class="phase-arrow">↓</div>
+      <div class="phase-box ph-blue">
+        <div class="ph-num">L2</div>
+        <div class="ph-title">Per-core mid cache</div>
+        <div class="ph-sub">Holds working sets closer than RAM</div>
+      </div>
+      <div class="phase-arrow">↓</div>
+      <div class="phase-box ph-orange">
+        <div class="ph-num">L1</div>
+        <div class="ph-title">Smallest, fastest</div>
+        <div class="ph-sub">Split I/D caches per core</div>
+      </div>
+      <div class="phase-arrow">↓</div>
+      <div class="phase-box ph-green">
+        <div class="ph-num">Core</div>
+        <div class="ph-title">Load / store execution</div>
+        <div class="ph-sub">Needs coherence protocol + barriers for sharing</div>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="sub">Visibility bug pattern</h2>
+  <pre class="code-block red-left"><span class="kw">class</span> <span class="cl">VisibilityBug</span> &#123;
+  <span class="kw">private boolean</span> ready = <span class="kw">false</span>;
+  <span class="kw">private int</span> value = 0;
+
+  <span class="kw">void</span> writer() &#123;
+    value = 42;
+    ready = <span class="kw">true</span>; <span class="cm">// another core may never observe true without hb edge</span>
+  &#125;
+
+  <span class="kw">void</span> reader() &#123;
+    <span class="kw">while</span> (!ready) &#123; <span class="cm">/* busy spin — may loop forever */</span> &#125;
+    System.out.println(value);
+  &#125;
+&#125;</pre>
+
+  <div class="sticky">
+    <div class="sticky-label">★ Fix direction</div>
+    <p>Use <code>volatile</code> on flags that communicate readiness, or guard both sides with <code>synchronized</code> / locks — you need a <span class="hl-green">happens-before</span> relationship, not just “it worked on my laptop.”</p>
+  </div>
+</div>
+
+
+<!-- ═══ PAGE 7 ═══ -->
+<div class="page blue-spine">
+  <div class="page-num">pg 07</div>
+  <div class="section-header">
+    <span class="section-icon">◎</span>
+    <span class="section-title">7. Race Conditions</span>
+    <span class="section-num">07</span>
+  </div>
+
+  <div class="body-text">
+    <p>A data race: two threads touch the same mutable state without ordering guarantees, and at least one writes. Even “simple” increments compile to non-atomic sequences.</p>
+  </div>
+
+  <h2 class="sub"><code>BankAccount</code> — lost updates</h2>
+  <pre class="code-block orange-left"><span class="kw">class</span> <span class="cl">BankAccount</span> &#123;
+  <span class="kw">private int</span> balance = 0;
+
+  <span class="kw">public void</span> deposit(<span class="kw">int</span> amount) &#123;
+    balance += amount; <span class="cm">// read-modify-write race</span>
+  &#125;
+
+  <span class="kw">public int</span> getBalance() &#123; <span class="kw">return</span> balance; &#125;
+&#125;</pre>
+
+  <h2 class="sub">Why <code>i++</code> is not atomic</h2>
+  <pre class="code-block purple-left"><span class="cm">// Conceptual bytecode shape for i++ on a field:</span>
+<span class="cl">ALOAD</span> ...      <span class="cm">// load current</span>
+<span class="cl">ICONST_1</span>
+<span class="cl">IADD</span>
+<span class="cl">PUTFIELD</span> ...   <span class="cm">// store — another thread may interleave here</span></pre>
+
+  <h2 class="sub"><code>MetricsController</code> fix with <code>AtomicInteger</code></h2>
+  <pre class="code-block green-left"><span class="kw">class</span> <span class="cl">MetricsController</span> &#123;
+  <span class="kw">private final</span> <span class="cl">AtomicInteger</span> hits = <span class="kw">new</span> <span class="cl">AtomicInteger</span>();
+
+  <span class="kw">public void</span> recordHit() &#123;
+    hits.incrementAndGet(); <span class="cm">// CAS loop — atomic under contention</span>
+  &#125;
+
+  <span class="kw">public int</span> getHits() &#123; <span class="kw">return</span> hits.get(); &#125;
+&#125;</pre>
+
+  <div class="insight green-ins">
+    <div class="insight-label">When atomic classes win</div>
+    <p>For single counters or gauges, atomics beat synchronized blocks — fewer serial sections. For invariants spanning multiple fields, use locks or confine mutations to one thread.</p>
+  </div>
+</div>
+
+
+<!-- ═══ PAGE 8 ═══ -->
+<div class="page red-spine">
+  <div class="page-num">pg 08</div>
+  <div class="section-header">
+    <span class="section-icon">◎</span>
+    <span class="section-title">8. Deadlock, Livelock, Starvation</span>
+    <span class="section-num">08</span>
+  </div>
+
+  <h2 class="sub">Transfer deadlock</h2>
+  <pre class="code-block red-left"><span class="cm">// Bad: lock ordering differs per call → cyclic wait</span>
+<span class="kw">void</span> transfer(<span class="cl">Account</span> a, <span class="cl">Account</span> b, <span class="kw">long</span> amt) &#123;
+  <span class="kw">synchronized</span> (a) &#123;
+    <span class="kw">synchronized</span> (b) &#123;
+      a.debit(amt); b.credit(amt);
+    &#125;
+  &#125;
+&#125;</pre>
+
+  <pre class="code-block green-left"><span class="cm">// Fix: global lock order (e.g., by id)</span>
+<span class="kw">void</span> transfer(<span class="cl">Account</span> a, <span class="cl">Account</span> b, <span class="kw">long</span> amt) &#123;
+  <span class="cl">Account</span> first = a.id &lt; b.id ? a : b;
+  <span class="cl">Account</span> second = a.id &lt; b.id ? b : a;
+  <span class="kw">synchronized</span> (first) &#123;
+    <span class="kw">synchronized</span> (second) &#123;
+      first.debit(amt); second.credit(amt);
+    &#125;
+  &#125;
+&#125;</pre>
+
+  <h2 class="sub">Coffman conditions (all needed for deadlock)</h2>
+  <table class="note-table">
+    <thead>
+      <tr><th>#</th><th>Condition</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td>Mutual exclusion on resources</td></tr>
+      <tr><td>2</td><td>Hold and wait while requesting more</td></tr>
+      <tr><td>3</td><td>No preemption of locks</td></tr>
+      <tr><td>4</td><td>Circular wait chain</td></tr>
+    </tbody>
+  </table>
+
+  <h2 class="sub">Livelock &amp; starvation mitigations</h2>
+  <div class="two-col">
+    <div class="col-card">
+      <div class="col-card-title b">Livelock — backoff</div>
+      <pre class="code-block blue-left"><span class="kw">long</span> backoff = 1;
+<span class="kw">while</span> (!tryAct()) &#123;
+  LockSupport.parkNanos(backoff);
+  backoff = Math.min(backoff * 2, max);
+&#125;</pre>
+    </div>
+    <div class="col-card">
+      <div class="col-card-title g">Starvation — fairness</div>
+      <pre class="code-block green-left"><span class="kw">private final</span> <span class="cl">Lock</span> lock =
+  <span class="kw">new</span> <span class="cl">ReentrantLock</span>(<span class="kw">true</span>);
+<span class="cm">// fair=true queues acquirers — lower throughput</span></pre>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ PAGE 9 ═══ -->
+<div class="page purple-spine">
+  <div class="page-num">pg 09</div>
+  <div class="section-header">
+    <span class="section-icon">◎</span>
+    <span class="section-title">9. synchronized, volatile, Locks</span>
+    <span class="section-num">09</span>
+  </div>
+
+  <div class="cheat-grid">
+    <div class="cheat-card">
+      <div class="cheat-card-title">Counter with synchronized</div>
+      <pre class="code-block green-left"><span class="kw">class</span> <span class="cl">Counter</span> &#123;
+  <span class="kw">private int</span> n = 0;
+  <span class="kw">public synchronized void</span> inc() &#123; n++; &#125;
+  <span class="kw">public synchronized int</span> get() &#123; <span class="kw">return</span> n; &#125;
+&#125;</pre>
+    </div>
+    <div class="cheat-card">
+      <div class="cheat-card-title">volatile shutdown flag</div>
+      <pre class="code-block orange-left"><span class="kw">private volatile boolean</span> running = <span class="kw">true</span>;
+
+<span class="kw">public void</span> stop() &#123; running = <span class="kw">false</span>; &#125;
+
+<span class="kw">public void</span> loop() &#123;
+  <span class="kw">while</span> (running) &#123; work(); &#125;
+&#125;</pre>
+    </div>
+  </div>
+
+  <h2 class="sub"><code>ReentrantLock</code> — timed &amp; interruptible</h2>
+  <pre class="code-block purple-left"><span class="kw">private final</span> <span class="cl">Lock</span> lock = <span class="kw">new</span> <span class="cl">ReentrantLock</span>();
+
+<span class="kw">public void</span> doWork() <span class="kw">throws</span> <span class="cl">InterruptedException</span> &#123;
+  <span class="kw">if</span> (lock.tryLock(200, TimeUnit.MILLISECONDS)) &#123;
+    <span class="kw">try</span> &#123; <span class="cm">/* critical section */</span> &#125;
+    <span class="kw">finally</span> &#123; lock.unlock(); &#125;
+  &#125;
+&#125;</pre>
+
+  <h2 class="sub"><code>ReadWriteLock</code> cache sketch</h2>
+  <pre class="code-block blue-left"><span class="kw">private final</span> <span class="cl">ReadWriteLock</span> rw = <span class="kw">new</span> <span class="cl">ReentrantReadWriteLock</span>();
+
+<span class="kw">public</span> <span class="cl">V</span> get(<span class="cl">K</span> k) &#123;
+  rw.readLock().lock();
+  <span class="kw">try</span> &#123; <span class="kw">return</span> cache.get(k); &#125;
+  <span class="kw">finally</span> &#123; rw.readLock().unlock(); &#125;
+&#125;
+
+<span class="kw">public void</span> put(<span class="cl">K</span> k, <span class="cl">V</span> v) &#123;
+  rw.writeLock().lock();
+  <span class="kw">try</span> &#123; cache.put(k, v); &#125;
+  <span class="kw">finally</span> &#123; rw.writeLock().unlock(); &#125;
+&#125;</pre>
+
+  <table class="note-table">
+    <thead>
+      <tr><th>Tool</th><th>Best for</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>synchronized</code></td><td>Simple monitors; JVM optimized fast path</td></tr>
+      <tr><td><code>volatile</code></td><td>Single-field signaling / publication</td></tr>
+      <tr><td><code>ReentrantLock</code></td><td>Try/time/interrupt; explicit fairness</td></tr>
+      <tr><td><code>ReadWriteLock</code></td><td>Many readers, rare writers</td></tr>
+    </tbody>
+  </table>
+</div>
+
+
+<!-- ═══ PAGE 10 ═══ -->
+<div class="page orange-spine">
+  <div class="page-num">pg 10</div>
+  <div class="section-header">
+    <span class="section-icon">◎</span>
+    <span class="section-title">10. Java Memory Model Essentials</span>
+    <span class="section-num">10</span>
+  </div>
+
+  <div class="body-text">
+    <p>The JMM defines which writes other threads are allowed to observe. If action A <span class="hl-green">happens-before</span> B, B sees A’s effects on governed fields.</p>
+  </div>
+
+  <h2 class="sub">Happens-before rules (high signal)</h2>
+  <ul class="note-list">
+    <li class="sq">Program order inside a single thread between accesses</li>
+    <li class="sq">Unlock on monitor m happens-before any subsequent lock on m</li>
+    <li class="sq"><code>volatile</code> write happens-before later volatile read of same var</li>
+    <li class="sq"><code>Thread.start</code> happens-before code in the started thread</li>
+    <li class="ck">Termination of a thread happens-before <code>join</code> returns</li>
+    <li class="cr">Submitting to <code>Executor</code> happens-before task starts (spec guarantees)</li>
+  </ul>
+
+  <h2 class="sub">Double-checked locking — broken</h2>
+  <pre class="code-block red-left"><span class="kw">class</span> <span class="cl">BrokenSingleton</span> &#123;
+  <span class="kw">private static</span> <span class="cl">Helper</span> helper;
+  <span class="kw">public static</span> <span class="cl">Helper</span> get() &#123;
+    <span class="kw">if</span> (helper == <span class="kw">null</span>) &#123;
+      <span class="kw">synchronized</span> (<span class="cl">BrokenSingleton</span>.<span class="kw">class</span>) &#123;
+        <span class="kw">if</span> (helper == <span class="kw">null</span>)
+          helper = <span class="kw">new</span> <span class="cl">Helper</span>(); <span class="cm">// unsafe publication without volatile</span>
+      &#125;
+    &#125;
+    <span class="kw">return</span> helper;
+  &#125;
+&#125;</pre>
+
+  <h2 class="sub">Fixed — <code>volatile</code> holder</h2>
+  <pre class="code-block green-left"><span class="kw">private static volatile</span> <span class="cl">Helper</span> helper;
+
+<span class="kw">public static</span> <span class="cl">Helper</span> get() &#123;
+  <span class="cl">Helper</span> local = helper;
+  <span class="kw">if</span> (local == <span class="kw">null</span>) &#123;
+    <span class="kw">synchronized</span> (<span class="cl">SafeSingleton</span>.<span class="kw">class</span>) &#123;
+      local = helper;
+      <span class="kw">if</span> (local == <span class="kw">null</span>) &#123;
+        helper = local = <span class="kw">new</span> <span class="cl">Helper</span>();
+      &#125;
+    &#125;
+  &#125;
+  <span class="kw">return</span> local;
+&#125;</pre>
+
+  <div class="insight orange-ins">
+    <div class="insight-label">Modern alternative</div>
+    <p>Prefer enum singletons or lazy holder idiom — fewer moving parts than hand-rolled DCL.</p>
+  </div>
+</div>
+
+
+<!-- ═══ PAGE 11 ═══ -->
+<div class="page green-spine">
+  <div class="page-num">pg 11</div>
+  <div class="section-header">
+    <span class="section-icon">◎</span>
+    <span class="section-title">11. Thread-Safe Structures</span>
+    <span class="section-num">11</span>
+  </div>
+
+  <div class="body-text">
+    <p>Collections from <code>java.util</code> are not magically concurrent unless documented. Wrapping with <code>Collections.synchronizedMap</code> still leaves compound actions unsafe.</p>
+  </div>
+
+  <h2 class="sub">What not to share blindly</h2>
+  <ul class="note-list">
+    <li class="cr"><code>HashMap</code>, <code>ArrayList</code>, <code>TreeMap</code> — structural corruption under concurrent write</li>
+    <li class="cr"><code>StringBuilder</code> — mutable and not synchronized</li>
+    <li class="sq"><code>Collections.synchronizedX</code> — still need external lock for check-then-act</li>
+  </ul>
+
+  <h2 class="sub"><code>ConcurrentHashMap</code></h2>
+  <pre class="code-block green-left"><span class="cl">ConcurrentHashMap</span>&lt;<span class="cl">String</span>, <span class="cl">Integer</span>&gt; map =
+    <span class="kw">new</span> <span class="cl">ConcurrentHashMap</span>&lt;&gt;();
+
+map.merge(<span class="st">"hits"</span>, 1, Integer::sum); <span class="cm">// atomic merge per key</span></pre>
+
+  <h2 class="sub"><code>BlockingQueue</code> producer-consumer</h2>
+  <pre class="code-block blue-left"><span class="kw">private final</span> <span class="cl">BlockingQueue</span>&lt;<span class="cl">Task</span>&gt; q =
+    <span class="kw">new</span> <span class="cl">LinkedBlockingQueue</span>&lt;&gt;(1024);
+
+<span class="kw">public void</span> submit(<span class="cl">Task</span> t) <span class="kw">throws</span> <span class="cl">InterruptedException</span> &#123;
+  q.put(t); <span class="cm">// back-pressure when full</span>
+&#125;
+
+<span class="kw">public</span> <span class="cl">Task</span> take() <span class="kw">throws</span> <span class="cl">InterruptedException</span> &#123;
+  <span class="kw">return</span> q.take();
+&#125;</pre>
+
+  <h2 class="sub"><code>AtomicInteger</code> telemetry</h2>
+  <pre class="code-block purple-left"><span class="kw">private final</span> <span class="cl">AtomicInteger</span> failures =
+    <span class="kw">new</span> <span class="cl">AtomicInteger</span>();
+
+<span class="kw">public void</span> recordFailure() &#123;
+  failures.incrementAndGet();
+&#125;</pre>
+</div>
+
+
+<!-- ═══ PAGE 12 ═══ -->
+<div class="page orange-spine">
+  <div class="page-num">pg 12</div>
+  <div class="section-header">
+    <span class="section-icon">◎</span>
+    <span class="section-title">12. Executor Framework</span>
+    <span class="section-num">12</span>
+  </div>
+
+  <div class="diag-wrap">
+    <div class="phase-flow">
+      <div class="phase-box ph-blue">
+        <div class="ph-num">1</div>
+        <div class="ph-title">Submit <code>Runnable</code> / <code>Callable</code></div>
+        <div class="ph-sub">Caller thread returns immediately</div>
+      </div>
+      <div class="phase-arrow">↓</div>
+      <div class="phase-box ph-orange">
+        <div class="ph-num">2</div>
+        <div class="ph-title">Work enters queue</div>
+        <div class="ph-sub">Bounded queue applies back-pressure</div>
+      </div>
+      <div class="phase-arrow">↓</div>
+      <div class="phase-box ph-green">
+        <div class="ph-num">3</div>
+        <div class="ph-title">Pool threads dequeue</div>
+        <div class="ph-sub">Reuse avoids thread churn</div>
+      </div>
+      <div class="phase-arrow">↓</div>
+      <div class="phase-box ph-purple">
+        <div class="ph-num">4</div>
+        <div class="ph-title">Task completes / exception captured</div>
+        <div class="ph-sub"><code>Future</code> resolves or reports failure</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="insight orange-ins">
+    <div class="insight-label">Factory methods caveat</div>
+    <p><code>Executors.newCachedThreadPool()</code> can grow without bound under overload — fine for demos, risky in production. Prefer explicit <code>ThreadPoolExecutor</code> with named threads and bounded queues.</p>
+  </div>
+
+  <h2 class="sub">Graceful shutdown</h2>
+  <pre class="code-block green-left"><span class="cl">ExecutorService</span> exec = Executors.newFixedThreadPool(8);
+<span class="kw">try</span> &#123;
+  exec.invokeAll(tasks, 30, TimeUnit.SECONDS);
+&#125; <span class="kw">finally</span> &#123;
+  exec.shutdown();
+  <span class="kw">if</span> (!exec.awaitTermination(60, TimeUnit.SECONDS))
+    exec.shutdownNow(); <span class="cm">// interrupt workers</span>
+&#125;</pre>
+</div>
+
+
+<!-- ═══ PAGE 13 ═══ -->
+<div class="page purple-spine">
+  <div class="page-num">pg 13</div>
+  <div class="section-header">
+    <span class="section-icon">◎</span>
+    <span class="section-title">13. ThreadPoolExecutor</span>
+    <span class="section-num">13</span>
+  </div>
+
+  <h2 class="sub">Constructor knobs</h2>
+  <pre class="code-block blue-left"><span class="kw">new</span> <span class="cl">ThreadPoolExecutor</span>(
+  corePoolSize,      <span class="cm">// threads kept alive even idle (until allowCoreTimeout)</span>
+  maximumPoolSize,   <span class="cm">// ceiling under burst</span>
+  keepAliveTime,     <span class="cm">// idle excess threads die after this</span>
+  unit,
+  workQueue,         <span class="cm">// bounded vs unbounded defines overload behavior</span>
+  threadFactory,
+  handler            <span class="cm">// rejection policy when saturated</span>
+);</pre>
+
+  <h2 class="sub">Task admission flow</h2>
+  <div class="diag-wrap">
+    <div class="phase-flow">
+      <div class="phase-box ph-green">
+        <div class="ph-num">A</div>
+        <div class="ph-title">Running &lt; core?</div>
+        <div class="ph-sub">Spawn worker, run task</div>
+      </div>
+      <div class="phase-arrow">↓ else</div>
+      <div class="phase-box ph-blue">
+        <div class="ph-num">B</div>
+        <div class="ph-title">Offer to queue</div>
+        <div class="ph-sub">If accepted, existing workers drain</div>
+      </div>
+      <div class="phase-arrow">↓ else</div>
+      <div class="phase-box ph-orange">
+        <div class="ph-num">C</div>
+        <div class="ph-title">Running &lt; max?</div>
+        <div class="ph-sub">Spawn extra worker</div>
+      </div>
+      <div class="phase-arrow">↓ else</div>
+      <div class="phase-box ph-red">
+        <div class="ph-num">D</div>
+        <div class="ph-title">RejectedExecutionHandler</div>
+        <div class="ph-sub">Abort, discard, caller-runs…</div>
+      </div>
+    </div>
+  </div>
+
+  <table class="note-table">
+    <thead>
+      <tr><th>Policy</th><th>Behavior</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>AbortPolicy</code></td><td>Throws <code>RejectedExecutionException</code></td></tr>
+      <tr><td><code>CallerRunsPolicy</code></td><td>Runs task on submitting thread — slows producers</td></tr>
+      <tr><td><code>DiscardPolicy</code></td><td>Drops task silently</td></tr>
+      <tr><td><code>DiscardOldestPolicy</code></td><td>Drops oldest queued task, retries offer</td></tr>
+    </tbody>
+  </table>
+
+  <div class="sticky">
+    <div class="sticky-label">Sizing heuristic</div>
+    <p>For tasks that mostly wait on I/O: <span class="hl-green">N_threads ≈ N_cores × (1 + W/C)</span> where W is wait time and C is compute time per task (Little-style guideline — tune with metrics).</p>
+  </div>
+</div>
+
+
+<!-- ═══ PAGE 14 ═══ -->
+<div class="page blue-spine">
+  <div class="page-num">pg 14</div>
+  <div class="section-header">
+    <span class="section-icon">◎</span>
+    <span class="section-title">14. CompletableFuture</span>
+    <span class="section-num">14</span>
+  </div>
+
+  <div class="two-col">
+    <div class="col-card">
+      <div class="col-card-title b"><code>Future&lt;T&gt;</code></div>
+      <div class="body-text"><p>Represents a deferred result. Composition is awkward — blocking <code>get</code> ties up threads.</p></div>
+    </div>
+    <div class="col-card">
+      <div class="col-card-title g"><code>CompletableFuture&lt;T&gt;</code></div>
+      <div class="body-text"><p>Explicit completion, chaining with <code>thenApply</code>, <code>thenCompose</code>, async stages — keeps callbacks structured.</p></div>
+    </div>
+  </div>
+
+  <h2 class="sub">Pipeline example</h2>
+  <pre class="code-block purple-left"><span class="cl">CompletableFuture</span>&lt;<span class="cl">Order</span>&gt; pipeline =
+  <span class="cl">CompletableFuture</span>.supplyAsync(() -&gt; fetchRemote(id), ioPool)
+    .thenApply(<span class="cl">Order</span>::enrich)
+    .thenCompose(o -&gt;
+      <span class="cl">CompletableFuture</span>.supplyAsync(() -&gt; persist(o), dbPool));
+
+<span class="cl">Order</span> done = pipeline.join();</pre>
+
+  <h2 class="sub"><code>allOf</code> / <code>anyOf</code></h2>
+  <pre class="code-block green-left"><span class="cl">CompletableFuture</span>&lt;<span class="cl">Void</span>&gt; all =
+  <span class="cl">CompletableFuture</span>.allOf(f1, f2, f3);
+
+<span class="cl">CompletableFuture</span>&lt;<span class="cl">Object</span>&gt; any =
+  <span class="cl">CompletableFuture</span>.anyOf(f1, f2, f3);</pre>
+
+  <div class="insight orange-ins">
+    <div class="insight-label">ForkJoinPool.commonPool()</div>
+    <p>Default async executor shares the common pool — fine for CPU-light chaining, dangerous if stages block (I/O, locks). Always pass a dedicated <code>Executor</code> for blocking work.</p>
+  </div>
+</div>
+
+
+<!-- ═══ PAGE 15 ═══ -->
+<div class="page green-spine">
+  <div class="page-num">pg 15</div>
+  <div class="section-header">
+    <span class="section-icon">◎</span>
+    <span class="section-title">15. Spring <code>@Async</code></span>
+    <span class="section-num">15</span>
+  </div>
+
+  <pre class="code-block green-left"><span class="an">@Service</span>
+<span class="kw">public class</span> <span class="cl">Notifier</span> &#123;
+
+  <span class="an">@Async</span>
+  <span class="kw">public</span> <span class="cl">CompletableFuture</span>&lt;<span class="cl">String</span>&gt; send(<span class="cl">String</span> userId) &#123;
+    <span class="cm">// runs on TaskExecutor thread</span>
+    <span class="kw">return</span> <span class="cl">CompletableFuture</span>.completedFuture(<span class="st">"queued"</span>);
+  &#125;
+&#125;</pre>
+
+  <h2 class="sub">How Spring reaches your bean</h2>
+  <div class="diag-wrap">
+    <div class="phase-flow">
+      <div class="phase-box ph-blue">
+        <div class="ph-num">1</div>
+        <div class="ph-title">Caller holds Spring proxy</div>
+        <div class="ph-sub">Autowired interface or concrete type</div>
+      </div>
+      <div class="phase-arrow">↓</div>
+      <div class="phase-box ph-orange">
+        <div class="ph-num">2</div>
+        <div class="ph-title">CGLIB / JDK proxy intercepts</div>
+        <div class="ph-sub"><code>@Async</code> advisor triggers async path</div>
+      </div>
+      <div class="phase-arrow">↓</div>
+      <div class="phase-box ph-green">
+        <div class="ph-num">3</div>
+        <div class="ph-title"><code>TaskExecutor</code> submits work</div>
+        <div class="ph-sub">New stack — no caller thread context</div>
+      </div>
+      <div class="phase-arrow">↓</div>
+      <div class="phase-box ph-purple">
+        <div class="ph-num">4</div>
+        <div class="ph-title">Real target bean invoked</div>
+        <div class="ph-sub"><code>AsyncUncaughtExceptionHandler</code> if void method blows up</div>
+      </div>
+    </div>
+  </div>
+
+  <pre class="code-block blue-left"><span class="an">@Configuration</span>
+<span class="an">@EnableAsync</span>
+<span class="kw">public class</span> <span class="cl">AsyncConfig</span> &#123;
+  <span class="an">@Bean</span>
+  <span class="kw">public</span> <span class="cl">Executor</span> taskExecutor() &#123;
+    <span class="cl">ThreadPoolTaskExecutor</span> ex = <span class="kw">new</span> <span class="cl">ThreadPoolTaskExecutor</span>();
+    ex.setCorePoolSize(4);
+    ex.setMaxPoolSize(16);
+    ex.setQueueCapacity(500);
+    ex.setThreadNamePrefix(<span class="st">"app-async-"</span>);
+    ex.initialize();
+    <span class="kw">return</span> ex;
+  &#125;
+&#125;</pre>
+
+  <div class="body-text">
+    <p><span class="hl-orange">Self-invocation</span> bypasses the proxy — internal <code>this.send()</code> is not async. <span class="hl-purple">Exceptions</span> from <code>void</code> async methods do not propagate to the caller; configure a handler.</p>
+  </div>
+</div>
+
+
+<!-- ═══ PAGE 16 ═══ -->
+<div class="page orange-spine">
+  <div class="page-num">pg 16</div>
+  <div class="section-header">
+    <span class="section-icon">◎</span>
+    <span class="section-title">16. <code>@Transactional</code> Thread Binding</span>
+    <span class="section-num">16</span>
+  </div>
+
+  <div class="body-text">
+    <p>Spring’s declarative transactions tie the JDBC <code>Connection</code> (and thus Hibernate session) to the <span class="hl-blue">current thread</span> via <code>ThreadLocal</code> machinery inside <code>TransactionSynchronizationManager</code>.</p>
+  </div>
+
+  <div class="diag-wrap">
+    <div class="phase-flow">
+      <div class="phase-box ph-green">
+        <div class="ph-num">1</div>
+        <div class="ph-title">Enter @Transactional method</div>
+        <div class="ph-sub">AOP opens tx, binds resources</div>
+      </div>
+      <div class="phase-arrow">↓</div>
+      <div class="phase-box ph-blue">
+        <div class="ph-num">2</div>
+        <div class="ph-title"><code>ThreadLocal</code> map updated</div>
+        <div class="ph-sub">Same thread sees active connection</div>
+      </div>
+      <div class="phase-arrow">↓</div>
+      <div class="phase-box ph-orange">
+        <div class="ph-num">3</div>
+        <div class="ph-title">Repositories participate</div>
+        <div class="ph-sub">SqlSession / Session joins bound resources</div>
+      </div>
+      <div class="phase-arrow">↓</div>
+      <div class="phase-box ph-purple">
+        <div class="ph-num">4</div>
+        <div class="ph-title">Method returns — cleanup</div>
+        <div class="ph-sub">Unbind after commit/rollback</div>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="sub">Mixing <code>@Async</code> breaks the binding</h2>
+  <pre class="code-block red-left"><span class="an">@Transactional</span>
+<span class="kw">public void</span> pipeline() &#123;
+  repo.save(entity);          <span class="cm">// OK — tx thread</span>
+  asyncSideEffect();          <span class="cm">// runs elsewhere — NO transaction here</span>
+&#125;
+
+<span class="an">@Async</span>
+<span class="kw">public void</span> asyncSideEffect() &#123;
+  repo.saveAuditLog();       <span class="cm">// fails or auto-commit separate tx</span>
+&#125;</pre>
+
+  <pre class="code-block green-left"><span class="cm">// Fix patterns: lift txn boundary, pass IDs, or use</span>
+<span class="cm">// TransactionTemplate / REQUIRES_NEW on the async leg.</span></pre>
+
+  <div class="sticky">
+    <div class="sticky-label">★ Mental model</div>
+    <p>Transactions follow thread affinity — jumping threads without an explicit propagation strategy drops the transactional context.</p>
+  </div>
+</div>
+
+
+<!-- ═══ PAGE 17 ═══ -->
+<div class="page red-spine">
+  <div class="page-num">pg 17</div>
+  <div class="section-header">
+    <span class="section-icon">◎</span>
+    <span class="section-title">17. Five Common Concurrency Bugs</span>
+    <span class="section-num">17</span>
+  </div>
+
+  <h2 class="sub">1 — Mutable singleton state</h2>
+  <pre class="code-block orange-left"><span class="cm">// Bug: cache mutated without synchronization</span>
+<span class="kw">private final</span> <span class="cl">Map</span>&lt;<span class="cl">String</span>,<span class="cl">String</span>&gt; cache = <span class="kw">new</span> <span class="cl">HashMap</span>&lt;&gt;();</pre>
+  <pre class="code-block green-left"><span class="kw">private final</span> <span class="cl">ConcurrentHashMap</span>&lt;<span class="cl">String</span>,<span class="cl">String</span>&gt; cache =
+  <span class="kw">new</span> <span class="cl">ConcurrentHashMap</span>&lt;&gt;();</pre>
+
+  <h2 class="sub">2 — Unsafe lazy init</h2>
+  <pre class="code-block orange-left"><span class="kw">private static</span> <span class="cl">Heavy</span> heavy;
+<span class="kw">public static</span> <span class="cl">Heavy</span> get() &#123;
+  <span class="kw">if</span> (heavy == <span class="kw">null</span>) heavy = <span class="kw">new</span> <span class="cl">Heavy</span>(); <span class="cm">// races</span>
+  <span class="kw">return</span> heavy;
+&#125;</pre>
+  <pre class="code-block green-left"><span class="kw">private static final class</span> <span class="cl">Holder</span> &#123;
+  <span class="kw">static final</span> <span class="cl">Heavy</span> INSTANCE = <span class="kw">new</span> <span class="cl">Heavy</span>();
+&#125;
+<span class="kw">public static</span> <span class="cl">Heavy</span> get() &#123; <span class="kw">return</span> <span class="cl">Holder</span>.INSTANCE; &#125;</pre>
+
+  <h2 class="sub">3 — <code>ThreadLocal</code> leak in pools</h2>
+  <pre class="code-block green-left"><span class="kw">try</span> &#123;
+  requestContext.set(ctx);
+  handle();
+&#125; <span class="kw">finally</span> &#123;
+  requestContext.remove(); <span class="cm">// mandatory when threads are reused</span>
+&#125;</pre>
+
+  <h2 class="sub">4 — <code>this</code> escape from constructor</h2>
+  <pre class="code-block orange-left"><span class="kw">public</span> <span class="cl">Leaky</span>() &#123;
+  registry.register(<span class="kw">this</span>); <span class="cm">// other thread sees partially built object</span>
+&#125;</pre>
+  <pre class="code-block green-left"><span class="kw">public static</span> <span class="cl">Safe</span> create() &#123;
+  <span class="cl">Safe</span> s = <span class="kw">new</span> <span class="cl">Safe</span>(); <span class="cm">// finish fields first</span>
+  registry.register(s);
+  <span class="kw">return</span> s;
+&#125;</pre>
+
+  <h2 class="sub">5 — Shared <code>HashMap</code> under parallel requests</h2>
+  <pre class="code-block green-left"><span class="cm">// Replace with ConcurrentHashMap or confine to one thread</span></pre>
+</div>
+
+
+<!-- ═══ PAGE 18 ═══ -->
+<div class="page purple-spine">
+  <div class="page-num">pg 18</div>
+  <div class="section-header">
+    <span class="section-icon">◎</span>
+    <span class="section-title">18. Amdahl's Law</span>
+    <span class="section-num">18</span>
+  </div>
+
+  <div class="sticky">
+    <div class="sticky-label">Formula</div>
+    <p><span class="hl-green">Speedup ≤ 1 / (S + (1 − S) / N)</span> — where <span class="wu">S</span> is the strictly serial fraction of work and <span class="wu">N</span> is parallel hardware width.</p>
+  </div>
+
+  <div class="body-text">
+    <p>Even tiny serial sections cap throughput. Doubling cores stops helping once coordination dominates.</p>
+  </div>
+
+  <h2 class="sub">Numeric sketch</h2>
+  <div class="body-text">
+    <p>If 10% must run sequentially (<code>S = 0.10</code>) and <code>N = 8</code> cores: denominator ≈ <code>0.10 + 0.90 / 8 = 0.2125</code> → max speedup ≈ <span class="hl-green">4.7×</span>, not 8×.</p>
+  </div>
+
+  <table class="note-table">
+    <thead>
+      <tr><th>S (serial %)</th><th>Limit as N → ∞</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>5%</td><td>20× ceiling</td></tr>
+      <tr><td>10%</td><td>10× ceiling</td></tr>
+      <tr><td>25%</td><td>4× ceiling</td></tr>
+    </tbody>
+  </table>
+
+  <div class="insight green-ins">
+    <div class="insight-label">Context switches cost serial budget</div>
+    <p>Fighting over locks or bouncing cache lines raises effective <span class="wu">S</span>. Profile before buying hardware — sometimes removing one lock beats adding cores.</p>
+  </div>
+</div>
+
+
+<!-- ═══ PAGE 19 ═══ -->
+<div class="page blue-spine">
+  <div class="page-num">pg 19</div>
+  <div class="section-header">
+    <span class="section-icon">◎</span>
+    <span class="section-title">19. Virtual Threads (Project Loom)</span>
+    <span class="section-num">19</span>
+  </div>
+
+  <div class="diag-wrap">
+    <div class="phase-flow">
+      <div class="phase-box ph-blue">
+        <div class="ph-num">1</div>
+        <div class="ph-title"><code>Thread.ofVirtual().start(...)</code></div>
+        <div class="ph-sub">Thousands of lightweight threads</div>
+      </div>
+      <div class="phase-arrow">↓</div>
+      <div class="phase-box ph-green">
+        <div class="ph-num">2</div>
+        <div class="ph-title">Carrier pool schedules mounts</div>
+        <div class="ph-sub">ForkJoinPool common carrier threads</div>
+      </div>
+      <div class="phase-arrow">↓</div>
+      <div class="phase-box ph-orange">
+        <div class="ph-num">3</div>
+        <div class="ph-title">Blocking park frees carrier</div>
+        <div class="ph-sub">Socket read, LockSupport.park…</div>
+      </div>
+      <div class="phase-arrow">↓</div>
+      <div class="phase-box ph-purple">
+        <div class="ph-num">4</div>
+        <div class="ph-title">Unpark resumes continuation</div>
+        <div class="ph-sub">May migrate to another carrier transparently</div>
+      </div>
+    </div>
+  </div>
+
+  <pre class="code-block green-left"><span class="kw">try</span> (<span class="kw">var</span> scope = <span class="kw">new</span> <span class="cl">StructuredTaskScope</span>.ShutdownOnFailure()) &#123;
+  <span class="cl">Supplier</span>&lt;<span class="cl">String</span>&gt; a =
+    scope.fork(() -&gt; download(<span class="st">"https://a"</span>));
+  <span class="cl">Supplier</span>&lt;<span class="cl">String</span>&gt; b =
+    scope.fork(() -&gt; download(<span class="st">"https://b"</span>));
+  scope.join().throwIfFailed();
+  <span class="kw">return</span> combine(a.get(), b.get());
+&#125;</pre>
+
+  <table class="note-table">
+    <thead>
+      <tr><th>Scenario</th><th>Virtual threads shine</th><th>Consider reactive instead</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>I/O heavy servlet-style code</td><td>✓ plain blocking style scales</td><td>If pipelines already fully async end-to-end</td></tr>
+      <tr><td>CPU-bound math kernels</td><td>✗ carriers still limited</td><td>Use parallel streams / worker pools sized to cores</td></tr>
+      <tr><td>Pinning hazards (<code>synchronized</code> + native)</td><td>Tune or refactor</td><td>May still need platform threads</td></tr>
+    </tbody>
+  </table>
+</div>
+
+
+<!-- ═══ PAGE 20 ═══ -->
+<div class="page green-spine">
+  <div class="page-num">pg 20</div>
+  <div class="section-header">
+    <span class="section-icon">◎</span>
+    <span class="section-title">20. Production Checklist</span>
+    <span class="section-num">20</span>
+  </div>
+
+  <ul class="note-list">
+    <li class="ck">Name threads via custom <code>ThreadFactory</code> — deadlocks become searchable in logs.</li>
+    <li class="ck">Bound queues + explicit rejection policy — fail loudly instead of exhausting memory.</li>
+    <li class="ck">Time out blocking waits — avoid indefinite <code>take()</code> without shutdown story.</li>
+    <li class="ck">Clear <code>ThreadLocal</code> in <code>finally</code> for pooled threads.</li>
+    <li class="ck">Avoid nested locks without global ordering — graph dependencies occasionally.</li>
+    <li class="ck">Expose pool metrics (queue depth, active count) to your observability stack.</li>
+    <li class="ck">Stress-test under GC pauses + CPU throttle — races hide until production latency spikes.</li>
+  </ul>
+
+  <h2 class="sub">Pick your primitive</h2>
+  <div class="diag-wrap">
+    <div class="phase-flow">
+      <div class="phase-box ph-blue">
+        <div class="ph-num">?</div>
+        <div class="ph-title">Mutable shared state?</div>
+        <div class="ph-sub">Yes → continue</div>
+      </div>
+      <div class="phase-arrow">↓</div>
+      <div class="phase-box ph-orange">
+        <div class="ph-num">?</div>
+        <div class="ph-title">Single field atomics?</div>
+        <div class="ph-sub">Atomics / volatile</div>
+      </div>
+      <div class="phase-arrow">↓</div>
+      <div class="phase-box ph-green">
+        <div class="ph-num">?</div>
+        <div class="ph-title">Multi-field invariant?</div>
+        <div class="ph-sub">Locks / confinement / actors</div>
+      </div>
+      <div class="phase-arrow">↓</div>
+      <div class="phase-box ph-purple">
+        <div class="ph-num">?</div>
+        <div class="ph-title">mostly I/O?</div>
+        <div class="ph-sub">Executors / virtual threads</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sticky">
+    <div class="sticky-label">Closing thought</div>
+    <p><span class="hl-purple">Prefer boring primitives</span> that your team can reason about under midnight pages: clear ownership of mutable state, bounded queues, and measurable pools beat clever lock-free recipes until profiling proves otherwise.</p>
+  </div>
+</div>
+
+<PaginationController />
+</BaseLayout>
