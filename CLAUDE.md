@@ -64,10 +64,13 @@ Never draw diagrams or tables with ASCII characters (`│ ─ ┼ ┌ └ ▶ �
 | File | Purpose |
 |------|---------|
 | `src/styles/tokens.css` | All CSS custom properties — edit here first |
-| `src/styles/themes.css` | Theme (`warm`/`cool`/`dark`) and font overrides |
+| `src/styles/themes.css` | Theme and font overrides (`data-theme`, `data-font`, `data-ui`) |
+| `src/styles/appearance.css` | Background modes, contrast mix, slider-driven tokens |
 | `src/styles/components.css` | Every component class — source of truth for UI |
 | `src/styles/global.css` | Resets + `@import` chain |
-| `src/layouts/BaseLayout.astro` | HTML shell, fonts, FOUC script |
+| `src/layouts/BaseLayout.astro` | HTML shell, fonts, `/hn-appearance.js` FOUC script |
+| `public/hn-appearance.js` | Shared appearance prefs (load/save/apply) |
+| `src/components/AppearancePanel.astro` | Theme/font/background/reading settings UI |
 | `src/components/PaginationController.astro` | Drop-in paginator for any note |
 
 ---
@@ -136,6 +139,16 @@ The site is read heavily on phones. Follow these rules for every new component o
 ### Cover writing rule
 
 The `h1` inside `.cover` must be a single flowing sentence — **no `<br />` tags**. The font is 34 px and will wrap naturally. Forced line breaks produce an oversized, theatrical heading that pushes reading content far down the page.
+
+### Appearance system
+
+- **Themes** (`data-theme`): `warm` · `cool` · `sepia` · `sage` · `cream` · `contrast` · `lavender` · `ocean` · `rose` · `mint` · `dark` · `dusk` · `midnight` · `oled`
+- **Fonts** (`data-font`): `klee` · `caveat` · `patrick` · `kalam` · `legible` · `clear`
+- **Background** (`data-bg`): `lined` · `plain` · `dots` · `minimal`
+- **UI feel** (`data-ui`): `soft` · `default` · `crisp`
+- **Reading focus** (`hn-custom`): `hideCover`, `autoHideCover` (hides cover after page 1 on paginated notes), `hideDecor`, `focusReading`, `warmth`, `letterSpacing`, `contentWidth` (`narrow`/`default`/`wide`)
+- **Presets** in panel: Eye ease, Comfort, Night, Default — use CSS tokens, never hardcode colors in note pages.
+- Do not remove `/hn-appearance.js` or the FOUC script in `BaseLayout.astro`.
 
 ---
 

@@ -18,7 +18,6 @@
   --yellow-hl:     #dff0ff;
   --yellow-sticky: #cfe8ff;
 
-  /* Accent tweaks for cool tone */
   --green:       #2e7057;
   --green-bg:    #e4f4ee;
   --green-light: #b8dece;
@@ -47,7 +46,6 @@
   --yellow-hl:     rgba(255, 243, 163, 0.15);
   --yellow-sticky: #3a3000;
 
-  /* Accent adjustments for dark bg */
   --green:       #5ab87a;
   --green-bg:    rgba(90, 184, 122, 0.12);
   --green-light: rgba(90, 184, 122, 0.25);
@@ -67,30 +65,437 @@
   --purple-bg: rgba(168, 120, 232, 0.12);
 }
 
+/* ── Sepia — low glare, strong ink/paper separation ── */
+[data-theme="sepia"] {
+  --paper:    #f4ecd8;
+  --paper2:   #f8f0e0;
+  --ink:      #1f1408;
+  --ink2:     #3d2e18;
+  --ink3:     #5c4830;
+  --body-bg:  #ddd0b8;
+  --rule-line: #d0c4a8;
+  --grid:      #e4d8c0;
+  --body-rule: #c8b898;
+  --shadow:   rgba(60, 40, 10, 0.12);
+  --shadow2:  rgba(60, 40, 10, 0.20);
+  --yellow-hl:     #f5e6a8;
+  --yellow-sticky: #eed878;
+
+  --green:       #2d6b42;
+  --green-bg:    #dceee2;
+  --green-light: #b8dcc4;
+
+  --blue:       #1e4a8a;
+  --blue-bg:    #dce8f8;
+  --blue-light: #a8c8e8;
+
+  --orange:       #a84e18;
+  --orange-bg:    #f8ece0;
+  --orange-light: #e8c098;
+}
+
+/* ── Sage — calm green tint ── */
+[data-theme="sage"] {
+  --paper:    #f2f6f0;
+  --paper2:   #f6faf4;
+  --ink:      #1a2818;
+  --ink2:     #2e4230;
+  --ink3:     #4a6050;
+  --body-bg:  #d4e0d0;
+  --rule-line: #c4d4c0;
+  --grid:      #d8e4d4;
+  --body-rule: #b8c8b4;
+  --shadow:   rgba(30, 60, 30, 0.10);
+  --shadow2:  rgba(30, 60, 30, 0.18);
+  --yellow-hl:     #e8f4c8;
+  --yellow-sticky: #d8ecc0;
+
+  --green:       #2a6848;
+  --green-bg:    #dceee4;
+  --green-light: #b0d8c0;
+
+  --blue:       #2858a0;
+  --blue-bg:    #e0eaf4;
+  --blue-light: #b0cce8;
+
+  --orange:       #a05828;
+  --orange-bg:    #f4ece4;
+  --orange-light: #e0c4a0;
+
+  --purple:    #5848a0;
+  --purple-bg: #ece8f4;
+}
+
+/* ── Contrast — high-contrast light (accessibility) ── */
+[data-theme="contrast"] {
+  --paper:    #ffffff;
+  --paper2:   #f8f8f8;
+  --ink:      #0a0a0a;
+  --ink2:     #1a1a1a;
+  --ink3:     #333333;
+  --body-bg:  #e8e8e8;
+  --rule-line: #cccccc;
+  --grid:      #e0e0e0;
+  --body-rule: #bbbbbb;
+  --shadow:   rgba(0, 0, 0, 0.14);
+  --shadow2:  rgba(0, 0, 0, 0.22);
+  --yellow-hl:     #fff59d;
+  --yellow-sticky: #ffee58;
+
+  --green:       #0d5c2e;
+  --green-bg:    #e0f5e8;
+  --green-light: #a8e0c0;
+
+  --blue:       #0a3d8a;
+  --blue-bg:    #e0ecf8;
+  --blue-light: #90c0f0;
+
+  --orange:       #a04000;
+  --orange-bg:    #fff0e0;
+  --orange-light: #f0c090;
+
+  --red:    #a01010;
+  --red-bg: #ffe8e8;
+
+  --purple:    #4a2080;
+  --purple-bg: #f0e8f8;
+}
+
+/* ── OLED — true black for OLED screens ── */
+[data-theme="oled"] {
+  --paper:    #121212;
+  --paper2:   #1a1a1a;
+  --ink:      #f5f5f5;
+  --ink2:     #d0d0d0;
+  --ink3:     #a0a0a0;
+  --body-bg:  #000000;
+  --rule-line: #2a2a2a;
+  --grid:      #222222;
+  --body-rule: #1a1a1a;
+  --shadow:   rgba(0, 0, 0, 0.50);
+  --shadow2:  rgba(0, 0, 0, 0.70);
+  --yellow-hl:     rgba(255, 243, 163, 0.18);
+  --yellow-sticky: #3a3500;
+
+  --green:       #6ed49a;
+  --green-bg:    rgba(110, 212, 154, 0.14);
+  --green-light: rgba(110, 212, 154, 0.28);
+
+  --blue:       #82b8ff;
+  --blue-bg:    rgba(130, 184, 255, 0.14);
+  --blue-light: rgba(130, 184, 255, 0.28);
+
+  --orange:       #ffa060;
+  --orange-bg:    rgba(255, 160, 96, 0.14);
+  --orange-light: rgba(255, 160, 96, 0.28);
+
+  --red:    #ff7070;
+  --red-bg: rgba(255, 112, 112, 0.14);
+
+  --purple:    #c0a0ff;
+  --purple-bg: rgba(192, 160, 255, 0.14);
+}
+
+/* ── Lavender — soft purple, calming ── */
+[data-theme="lavender"] {
+  --paper:    #f8f6fc;
+  --paper2:   #faf8fe;
+  --ink:      #2a2438;
+  --ink2:     #443858;
+  --ink3:     #605878;
+  --body-bg:  #e8e4f0;
+  --rule-line: #dcd4e8;
+  --grid:      #e8e0f0;
+  --body-rule: #d0c8dc;
+  --shadow:   rgba(60, 40, 90, 0.10);
+  --shadow2:  rgba(60, 40, 90, 0.16);
+  --yellow-hl:     #f0e8ff;
+  --yellow-sticky: #e4d8f8;
+
+  --green:       #3a6858;
+  --green-bg:    #e4f2ec;
+  --green-light: #b8dcc8;
+
+  --blue:       #4a5898;
+  --blue-bg:    #e8ecfa;
+  --blue-light: #c0c8e8;
+
+  --orange:       #a05848;
+  --orange-bg:    #f8ece8;
+  --orange-light: #e8c0b0;
+
+  --purple:    #6a4898;
+  --purple-bg: #f0eaf8;
+}
+
+/* ── Ocean — cool aqua, refreshing ── */
+[data-theme="ocean"] {
+  --paper:    #f2fafa;
+  --paper2:   #f6fcfc;
+  --ink:      #142830;
+  --ink2:     #2a4450;
+  --ink3:     #486068;
+  --body-bg:  #d0e8ec;
+  --rule-line: #b8d8e0;
+  --grid:      #cce4ea;
+  --body-rule: #a8ccd4;
+  --shadow:   rgba(20, 60, 80, 0.10);
+  --shadow2:  rgba(20, 60, 80, 0.16);
+  --yellow-hl:     #e0f8f8;
+  --yellow-sticky: #c8f0f0;
+
+  --green:       #2a7868;
+  --green-bg:    #e0f4f0;
+  --green-light: #a8e0d4;
+
+  --blue:       #1a6898;
+  --blue-bg:    #e0f0fa;
+  --blue-light: #a8d4f0;
+
+  --orange:       #986838;
+  --orange-bg:    #f4f0e8;
+  --orange-light: #e0d0b0;
+
+  --purple:    #4868a0;
+  --purple-bg: #eaeef8;
+}
+
+/* ── Rose — warm blush, gentle ── */
+[data-theme="rose"] {
+  --paper:    #faf6f6;
+  --paper2:   #fcf8f8;
+  --ink:      #301820;
+  --ink2:     #503038;
+  --ink3:     #704858;
+  --body-bg:  #ecd8dc;
+  --rule-line: #e0c8d0;
+  --grid:      #ecd8dc;
+  --body-rule: #d4b8c0;
+  --shadow:   rgba(80, 30, 50, 0.10);
+  --shadow2:  rgba(80, 30, 50, 0.16);
+  --yellow-hl:     #ffe8f0;
+  --yellow-sticky: #f8d0dc;
+
+  --green:       #3a6850;
+  --green-bg:    #e4f2ea;
+  --green-light: #b8dcc8;
+
+  --blue:       #4858a0;
+  --blue-bg:    #eaeef8;
+  --blue-light: #c0c8e8;
+
+  --orange:       #b04838;
+  --orange-bg:    #faece8;
+  --orange-light: #e8c0b0;
+
+  --purple:    #8858a0;
+  --purple-bg: #f4eef8;
+}
+
+/* ── Mint — fresh green, easy on eyes ── */
+[data-theme="mint"] {
+  --paper:    #f4faf6;
+  --paper2:   #f8fcfa;
+  --ink:      #182820;
+  --ink2:     #304838;
+  --ink3:     #506050;
+  --body-bg:  #d4ece0;
+  --rule-line: #c0dcc8;
+  --grid:      #d0e8d8;
+  --body-rule: #b0d0bc;
+  --shadow:   rgba(30, 70, 50, 0.10);
+  --shadow2:  rgba(30, 70, 50, 0.16);
+  --yellow-hl:     #e8f8d8;
+  --yellow-sticky: #d8f0c8;
+
+  --green:       #288050;
+  --green-bg:    #dcf0e4;
+  --green-light: #a8dcc0;
+
+  --blue:       #2870a0;
+  --blue-bg:    #dceef8;
+  --blue-light: #a8d0ec;
+
+  --orange:       #a07030;
+  --orange-bg:    #f8f0e4;
+  --orange-light: #e8d0a8;
+
+  --purple:    #5070a0;
+  --purple-bg: #eaeef8;
+}
+
+/* ── Cream — soft ivory, minimal strain ── */
+[data-theme="cream"] {
+  --paper:    #fffef8;
+  --paper2:   #fffffa;
+  --ink:      #28241c;
+  --ink2:     #444038;
+  --ink3:     #645c50;
+  --body-bg:  #f0ece0;
+  --rule-line: #e4dcc8;
+  --grid:      #ece8dc;
+  --body-rule: #d8d0c0;
+  --shadow:   rgba(50, 40, 20, 0.08);
+  --shadow2:  rgba(50, 40, 20, 0.14);
+  --yellow-hl:     #fff8d8;
+  --yellow-sticky: #f8f0b0;
+
+  --green:       #3a6848;
+  --green-bg:    #e8f4ec;
+  --green-light: #c0e0c8;
+
+  --blue:       #3858a0;
+  --blue-bg:    #e8eef8;
+  --blue-light: #b8cce8;
+
+  --orange:       #a06828;
+  --orange-bg:    #faf0e4;
+  --orange-light: #ecd8b0;
+
+  --purple:    #6858a0;
+  --purple-bg: #f0ecf8;
+}
+
+/* ── Dusk — soft twilight dark ── */
+[data-theme="dusk"] {
+  --paper:    #2a2838;
+  --paper2:   #302e40;
+  --ink:      #ece8f8;
+  --ink2:     #d0c8e0;
+  --ink3:     #a89cb8;
+  --body-bg:  #1a1824;
+  --rule-line: #3a3848;
+  --grid:      #323040;
+  --body-rule: #2a2834;
+  --shadow:   rgba(0, 0, 0, 0.35);
+  --shadow2:  rgba(0, 0, 0, 0.55);
+  --yellow-hl:     rgba(255, 240, 200, 0.14);
+  --yellow-sticky: #3a3428;
+
+  --green:       #68c898;
+  --green-bg:    rgba(104, 200, 152, 0.12);
+  --green-light: rgba(104, 200, 152, 0.25);
+
+  --blue:       #88b0f0;
+  --blue-bg:    rgba(136, 176, 240, 0.12);
+  --blue-light: rgba(136, 176, 240, 0.25);
+
+  --orange:       #f0a070;
+  --orange-bg:    rgba(240, 160, 112, 0.12);
+  --orange-light: rgba(240, 160, 112, 0.25);
+
+  --red:    #f08080;
+  --red-bg: rgba(240, 128, 128, 0.12);
+
+  --purple:    #c0a0f0;
+  --purple-bg: rgba(192, 160, 240, 0.12);
+}
+
+/* ── Midnight — deep navy, restful dark ── */
+[data-theme="midnight"] {
+  --paper:    #1a2438;
+  --paper2:   #1e2840;
+  --ink:      #e8f0fa;
+  --ink2:     #c8d4e8;
+  --ink3:     #98a8c0;
+  --body-bg:  #0e1420;
+  --rule-line: #283448;
+  --grid:      #222c3c;
+  --body-rule: #1c2434;
+  --shadow:   rgba(0, 0, 0, 0.40);
+  --shadow2:  rgba(0, 0, 0, 0.58);
+  --yellow-hl:     rgba(255, 243, 180, 0.14);
+  --yellow-sticky: #2a3018;
+
+  --green:       #60d0a0;
+  --green-bg:    rgba(96, 208, 160, 0.12);
+  --green-light: rgba(96, 208, 160, 0.25);
+
+  --blue:       #70b0f8;
+  --blue-bg:    rgba(112, 176, 248, 0.12);
+  --blue-light: rgba(112, 176, 248, 0.25);
+
+  --orange:       #f0a060;
+  --orange-bg:    rgba(240, 160, 96, 0.12);
+  --orange-light: rgba(240, 160, 96, 0.25);
+
+  --red:    #f07878;
+  --red-bg: rgba(240, 120, 120, 0.12);
+
+  --purple:    #b0a0f0;
+  --purple-bg: rgba(176, 160, 240, 0.12);
+}
+
+/* ─────────────────────────────────────────
+   UI feel — data-ui
+   ───────────────────────────────────────── */
+
+[data-ui="soft"] {
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --shadow:  rgba(80, 50, 20, 0.08);
+  --shadow2: rgba(80, 50, 20, 0.14);
+  --card-shadow: 4px 6px 20px var(--shadow);
+}
+
+[data-ui="crisp"] {
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --shadow:  rgba(80, 50, 20, 0.06);
+  --shadow2: rgba(80, 50, 20, 0.12);
+  --card-shadow: 1px 2px 8px var(--shadow);
+}
+
+[data-theme="dark"][data-ui="soft"],
+[data-theme="oled"][data-ui="soft"],
+[data-theme="dusk"][data-ui="soft"],
+[data-theme="midnight"][data-ui="soft"] {
+  --shadow:  rgba(0, 0, 0, 0.35);
+  --shadow2: rgba(0, 0, 0, 0.50);
+}
+
+[data-theme="dark"][data-ui="crisp"],
+[data-theme="oled"][data-ui="crisp"],
+[data-theme="dusk"][data-ui="crisp"],
+[data-theme="midnight"][data-ui="crisp"] {
+  --shadow:  rgba(0, 0, 0, 0.45);
+  --shadow2: rgba(0, 0, 0, 0.65);
+}
+
 /* ─────────────────────────────────────────
    Font Overrides
    ───────────────────────────────────────── */
 
-/* Caveat — casual, friendly scrawl */
 [data-font="caveat"] {
   --font-body: 'Caveat', cursive;
   --font-hand: 'Caveat', cursive;
 }
 
-/* Patrick Hand — neat, clean classroom */
 [data-font="patrick"] {
   --font-body: 'Patrick Hand', cursive;
   --font-hand: 'Patrick Hand', cursive;
 }
 
-/* Kalam — warm, rounded notebook */
 [data-font="kalam"] {
   --font-body: 'Kalam', cursive;
   --font-hand: 'Kalam', cursive;
 }
 
-/* Klee One — default, no override needed */
 [data-font="klee"] {
   --font-body: 'Klee One', cursive;
   --font-hand: 'Gochi Hand', cursive;
+}
+
+/* Atkinson Hyperlegible — max legibility */
+[data-font="legible"] {
+  --font-body: 'Atkinson Hyperlegible', sans-serif;
+  --font-hand: 'Atkinson Hyperlegible', sans-serif;
+}
+
+/* Nunito Sans — clean sans for dense reading */
+[data-font="clear"] {
+  --font-body: 'Nunito Sans', sans-serif;
+  --font-hand: 'Nunito Sans', sans-serif;
 }

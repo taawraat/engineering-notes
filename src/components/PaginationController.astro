@@ -89,6 +89,10 @@
 
       // Update URL hash without pushing to history
       try { history.replaceState(null, '', '#page-' + (current + 1)); } catch (_) {}
+
+      document.documentElement.dispatchEvent(
+        new CustomEvent('hn-page-change', { detail: { index: current, total: total } })
+      );
     }
 
     // ── Animation ────────────────────────────────────────────────────

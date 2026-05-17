@@ -23,14 +23,15 @@ npm run preview   # preview the production build locally
 src/
   styles/
     tokens.css        # all CSS custom properties (--content-width, colors, spacing)
-    themes.css        # [data-theme="cool/dark"] and [data-font="*"] overrides
+    themes.css        # [data-theme] and [data-font] overrides
+    appearance.css    # backgrounds, contrast mix, slider hooks
     components.css    # every component class
-    global.css        # resets + @imports for the three files above
+    global.css        # resets + @imports
   layouts/
-    BaseLayout.astro  # HTML shell, Google Fonts, FOUC-prevention script
+    BaseLayout.astro  # HTML shell, Google Fonts, appearance FOUC script
   components/
     SiteNav.astro
-    ThemeFontPanel.astro
+    AppearancePanel.astro
     PaginationController.astro
   pages/
     index.astro
@@ -116,11 +117,19 @@ The site uses three CSS breakpoints, all in the `Responsive` section at the bott
 
 Every direct child of a CSS Grid container must have `min-width: 0` or it can burst outside its column. `.col-card`, `.cheat-card`, and `.scope-side` already include this. If you add a bare `<div>` as a grid child, add `style="min-width:0"` or give it a class that sets it.
 
-### Themes and fonts
+### Themes and appearance
 
-- **Themes:** `warm` (default) · `cool` · `dark`
-- **Fonts:** `klee` (default) · `caveat` · `patrick` · `kalam`
-- Stored in `localStorage` under `hn-theme` / `hn-font`. FOUC is prevented by an inline script in `BaseLayout.astro` — do not remove it.
+Open the **🎨** button (bottom-right) to change look and feel. Settings persist in `localStorage` and apply before first paint via `/hn-appearance.js` — do not remove that script from `BaseLayout.astro`.
+
+| Key | Values |
+|-----|--------|
+| `hn-theme` | `warm` · `cool` · `sepia` · `sage` · `cream` · `contrast` · `lavender` · `ocean` · `rose` · `mint` · `dark` · `dusk` · `midnight` · `oled` |
+| `hn-font` | `klee` (default) · `caveat` · `patrick` · `kalam` · `legible` · `clear` |
+| `hn-bg` | `lined` (default) · `plain` · `dots` · `minimal` |
+| `hn-ui` | `default` · `soft` · `crisp` |
+| `hn-custom` | JSON: sliders + `hideCover`, `autoHideCover`, `hideDecor`, `focusReading`, `warmth`, `letterSpacing`, `contentWidth` |
+
+**Legibility fonts:** `legible` = Atkinson Hyperlegible · `clear` = Nunito Sans. Body text never goes below 15px; code never below 13.5px.
 
 ---
 

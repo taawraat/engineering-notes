@@ -138,6 +138,14 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <div class="sg-font-label">data-font="kalam"</div>
       </div>
       <div class="col-card">
+        <div class="sg-font-sample" style="font-family:'Atkinson Hyperlegible',sans-serif">Atkinson Hyperlegible<br />High legibility</div>
+        <div class="sg-font-label">data-font="legible"</div>
+      </div>
+      <div class="col-card">
+        <div class="sg-font-sample" style="font-family:'Nunito Sans',sans-serif">Nunito Sans Aa Bb<br />Dense technical reading</div>
+        <div class="sg-font-label">data-font="clear"</div>
+      </div>
+      <div class="col-card">
         <div class="sg-font-sample" style="font-family:'JetBrains Mono',monospace;font-size:18px">JetBrains Mono<br />const foo = 42;</div>
         <div class="sg-font-label">--font-mono · code only</div>
       </div>
@@ -166,6 +174,47 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     <h3 class="sub">h3.sub — Sub-section heading</h3>
   </div>
 </div>
+
+
+<!-- ── Appearance ── -->
+<div class="sg-section">
+  <div class="page purple-spine">
+    <div class="section-header">
+      <span class="section-icon">◎</span>
+      <span class="section-title">Appearance Settings</span>
+    </div>
+
+    <div class="body-text">
+      <p>Use the <strong>🎨</strong> button (bottom-right) to open the appearance panel. Choices persist in <code>localStorage</code> and apply before first paint via <code>/hn-appearance.js</code>.</div>
+    </div>
+
+    <h2 class="sub">Themes (<code>data-theme</code>)</h2>
+    <div class="body-text" style="font-size:15px">
+      <p><code>warm</code> · <code>cool</code> · <code>dark</code> · <code>sepia</code> · <code>sage</code> · <code>contrast</code> · <code>oled</code></div>
+    </div>
+
+    <h2 class="sub">Fonts (<code>data-font</code>)</h2>
+    <div class="body-text" style="font-size:15px">
+      <p><code>klee</code> · <code>caveat</code> · <code>patrick</code> · <code>kalam</code> · <code>legible</code> · <code>clear</code></div>
+    </div>
+
+    <h2 class="sub">Backgrounds (<code>data-bg</code>)</h2>
+    <div class="body-text" style="font-size:15px">
+      <p><code>lined</code> (default) · <code>plain</code> · <code>dots</code> · <code>minimal</code> — plus a line-intensity slider.</div>
+    </div>
+
+    <h2 class="sub">Reading &amp; advanced</h2>
+    <div class="body-text" style="font-size:15px">
+      <p>Text size and line-height sliders (body min 15px, code min 13.5px). Contrast slider, UI feel (<code>soft</code>/<code>default</code>/<code>crisp</code>), toggles for page rules and code grid.</div>
+    </div>
+
+    <div class="insight green-ins">
+      <div class="insight-label">★ Tip</div>
+      <p>Try <strong>Sepia</strong> or <strong>Contrast</strong> for long reading sessions; <strong>Legible</strong> font for maximum clarity.</div>
+    </div>
+  </div>
+</div>
+
 
 <!-- ── Callouts ── -->
 <div class="sg-section">

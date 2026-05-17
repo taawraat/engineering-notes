@@ -1,0 +1,440 @@
+---
+const themeGroups = [
+  {
+    label: 'Classic',
+    themes: [
+      { id: 'warm', label: 'Warm', icon: '☀️' },
+      { id: 'cool', label: 'Cool', icon: '❄️' },
+      { id: 'sepia', label: 'Sepia', icon: '📜' },
+      { id: 'sage', label: 'Sage', icon: '🌿' },
+      { id: 'cream', label: 'Cream', icon: '🤍' },
+      { id: 'contrast', label: 'Contrast', icon: '🔲' },
+    ],
+  },
+  {
+    label: 'Calm & refreshing',
+    themes: [
+      { id: 'lavender', label: 'Lavender', icon: '💜' },
+      { id: 'ocean', label: 'Ocean', icon: '🌊' },
+      { id: 'rose', label: 'Rose', icon: '🌸' },
+      { id: 'mint', label: 'Mint', icon: '🍃' },
+    ],
+  },
+  {
+    label: 'Soft dark',
+    themes: [
+      { id: 'dark', label: 'Dark', icon: '🌙' },
+      { id: 'dusk', label: 'Dusk', icon: '🌆' },
+      { id: 'midnight', label: 'Midnight', icon: '🌃' },
+      { id: 'oled', label: 'OLED', icon: '⬛' },
+    ],
+  },
+];
+
+const fonts = [
+  { id: 'klee', label: 'Klee', family: "'Klee One', cursive" },
+  { id: 'caveat', label: 'Caveat', family: "'Caveat', cursive" },
+  { id: 'patrick', label: 'Patrick', family: "'Patrick Hand', cursive" },
+  { id: 'kalam', label: 'Kalam', family: "'Kalam', cursive" },
+  { id: 'legible', label: 'Legible', family: "'Atkinson Hyperlegible', sans-serif" },
+  { id: 'clear', label: 'Clear', family: "'Nunito Sans', sans-serif" },
+];
+
+const backgrounds = [
+  { id: 'lined', label: 'Lined' },
+  { id: 'plain', label: 'Plain' },
+  { id: 'dots', label: 'Dots' },
+  { id: 'minimal', label: 'Minimal' },
+];
+
+const uiFeels = [
+  { id: 'soft', label: 'Soft' },
+  { id: 'default', label: 'Default' },
+  { id: 'crisp', label: 'Crisp' },
+];
+
+const widths = [
+  { id: 'narrow', label: 'Narrow' },
+  { id: 'default', label: 'Default' },
+  { id: 'wide', label: 'Wide' },
+];
+---
+
+<button
+  class="hn-panel-toggle"
+  id="hn-toggle"
+  type="button"
+  aria-label="Open appearance settings"
+  aria-expanded="false"
+  aria-controls="hn-panel"
+>🎨</button>
+
+<div class="hn-panel" id="hn-panel" role="dialog" aria-modal="true" aria-label="Appearance settings" hidden>
+  <div class="hn-panel-header">
+    <span class="hn-panel-title">Appearance</span>
+    <button type="button" class="hn-panel-close" id="hn-close" aria-label="Close">✕</button>
+  </div>
+
+  <div class="hn-panel-body" id="hn-panel-body">
+    <section class="hn-panel-section">
+      <div class="hn-panel-section-label">Theme</div>
+      {themeGroups.map((group) => (
+        <div class="hn-theme-group">
+          <div class="hn-panel-sub-label">{group.label}</div>
+          <div class="hn-panel-row hn-panel-row-themes" role="group" aria-label={group.label}>
+            {group.themes.map((t) => (
+              <button
+                type="button"
+                class="hn-btn"
+                data-hn-theme={t.id}
+                aria-label={`${t.label} theme`}
+              >{t.icon} {t.label}</button>
+            ))}
+          </div>
+        </div>
+      ))}
+    </section>
+
+    <section class="hn-panel-section">
+      <div class="hn-panel-section-label">Handwriting</div>
+      <div class="hn-panel-row" role="group" aria-label="Font">
+        {fonts.map((f) => (
+          <button
+            type="button"
+            class="hn-btn hn-btn-font"
+            data-hn-font={f.id}
+            aria-label={`${f.label} font`}
+            style={`font-family:${f.family}`}
+          >{f.label}</button>
+        ))}
+      </div>
+    </section>
+
+    <section class="hn-panel-section">
+      <div class="hn-panel-section-label">Background</div>
+      <div class="hn-panel-row" role="group" aria-label="Background style">
+        {backgrounds.map((b) => (
+          <button type="button" class="hn-btn" data-hn-bg={b.id} aria-label={`${b.label} background`}>
+            {b.label}
+          </button>
+        ))}
+      </div>
+      <div class="hn-range-row">
+        <label class="hn-range-label" for="hn-bg-opacity">
+          Line intensity <strong id="hn-bg-opacity-val">100%</strong>
+        </label>
+        <input type="range" class="hn-range" id="hn-bg-opacity" min="0" max="100" value="100" />
+      </div>
+    </section>
+
+    <section class="hn-panel-section hn-panel-section-highlight">
+      <div class="hn-panel-section-label">Reading focus</div>
+      <p class="hn-panel-hint">Reduce clutter and keep eyes comfortable while you read.</p>
+      <div class="hn-panel-row" role="group" aria-label="Reading preset">
+        <button type="button" class="hn-btn" data-hn-read="eyeease">Eye ease</button>
+        <button type="button" class="hn-btn" data-hn-read="comfort">Comfort</button>
+        <button type="button" class="hn-btn" data-hn-read="night">Night</button>
+        <button type="button" class="hn-btn" data-hn-read="default">Default</button>
+      </div>
+      <label class="hn-toggle-row">
+        Hide cover card
+        <input type="checkbox" id="hn-hide-cover" />
+      </label>
+      <label class="hn-toggle-row">
+        Auto-hide cover after page 1
+        <input type="checkbox" id="hn-auto-hide-cover" />
+      </label>
+      <label class="hn-toggle-row">
+        <span class="hn-toggle-text">Hide decorations <span class="hn-toggle-hint">doodles, tags, badges</span></span>
+        <input type="checkbox" id="hn-hide-decor" />
+      </label>
+      <label class="hn-toggle-row">
+        <span class="hn-toggle-text">Focus reading mode <span class="hn-toggle-hint">narrow width, calm cards</span></span>
+        <input type="checkbox" id="hn-focus-reading" />
+      </label>
+      <div class="hn-range-row">
+        <label class="hn-range-label" for="hn-text-scale">
+          Text size <strong id="hn-text-scale-val">100%</strong>
+        </label>
+        <input type="range" class="hn-range" id="hn-text-scale" min="90" max="115" value="100" />
+      </div>
+      <div class="hn-range-row">
+        <label class="hn-range-label" for="hn-line-height">
+          Line height <strong id="hn-line-height-val">100%</strong>
+        </label>
+        <input type="range" class="hn-range" id="hn-line-height" min="90" max="110" value="100" />
+      </div>
+      <div class="hn-panel-sub-label">Column width</div>
+      <div class="hn-panel-row" role="group" aria-label="Content width">
+        {widths.map((w) => (
+          <button type="button" class="hn-btn" data-hn-width={w.id} aria-label={`${w.label} width`}>
+            {w.label}
+          </button>
+        ))}
+      </div>
+    </section>
+
+    <section class="hn-panel-section">
+      <div class="hn-panel-section-label">Eye comfort</div>
+      <div class="hn-range-row">
+        <label class="hn-range-label" for="hn-warmth">
+          Warmth / blue-light ease <strong id="hn-warmth-val">0%</strong>
+        </label>
+        <input type="range" class="hn-range" id="hn-warmth" min="0" max="100" value="0" />
+      </div>
+      <div class="hn-range-row">
+        <label class="hn-range-label" for="hn-letter-spacing">
+          Letter spacing <strong id="hn-letter-spacing-val">0%</strong>
+        </label>
+        <input type="range" class="hn-range" id="hn-letter-spacing" min="0" max="100" value="0" />
+      </div>
+    </section>
+
+    <section class="hn-panel-section">
+      <div class="hn-panel-section-label">Advanced</div>
+      <div class="hn-range-row">
+        <label class="hn-range-label" for="hn-contrast">
+          Contrast <strong id="hn-contrast-val">0%</strong>
+        </label>
+        <input type="range" class="hn-range" id="hn-contrast" min="0" max="100" value="0" />
+      </div>
+      <div class="hn-panel-sub-label">UI feel</div>
+      <div class="hn-panel-row" role="group" aria-label="UI feel">
+        {uiFeels.map((u) => (
+          <button type="button" class="hn-btn" data-hn-ui={u.id} aria-label={`${u.label} UI`}>
+            {u.label}
+          </button>
+        ))}
+      </div>
+      <label class="hn-toggle-row">
+        Page ruled lines
+        <input type="checkbox" id="hn-page-rules" checked />
+      </label>
+      <label class="hn-toggle-row">
+        Code graph grid
+        <input type="checkbox" id="hn-code-grid" checked />
+      </label>
+    </section>
+  </div>
+
+  <div class="hn-panel-footer">
+    <button type="button" class="hn-reset-btn" id="hn-reset">Reset to defaults</button>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var HN = window.HNAppearance;
+    if (!HN) return;
+
+    var toggle = document.getElementById('hn-toggle');
+    var panel = document.getElementById('hn-panel');
+    var closeBtn = document.getElementById('hn-close');
+
+    var state = {
+      theme: 'warm',
+      font: 'klee',
+      bg: 'lined',
+      ui: 'default',
+      custom: Object.assign({}, HN.DEFAULTS.custom),
+    };
+
+    function getCustomFromUI() {
+      return {
+        contrast: parseInt(document.getElementById('hn-contrast').value, 10),
+        bgOpacity: parseInt(document.getElementById('hn-bg-opacity').value, 10),
+        textScale: parseInt(document.getElementById('hn-text-scale').value, 10),
+        lineHeight: parseInt(document.getElementById('hn-line-height').value, 10),
+        warmth: parseInt(document.getElementById('hn-warmth').value, 10),
+        letterSpacing: parseInt(document.getElementById('hn-letter-spacing').value, 10),
+        pageRules: document.getElementById('hn-page-rules').checked,
+        codeGrid: document.getElementById('hn-code-grid').checked,
+        hideCover: document.getElementById('hn-hide-cover').checked,
+        autoHideCover: document.getElementById('hn-auto-hide-cover').checked,
+        hideDecor: document.getElementById('hn-hide-decor').checked,
+        focusReading: document.getElementById('hn-focus-reading').checked,
+        contentWidth: (function () {
+          var active = document.querySelector('[data-hn-width].active');
+          return active ? active.dataset.hnWidth : state.custom.contentWidth || 'default';
+        })(),
+      };
+    }
+
+    function setRangeLabels() {
+      document.getElementById('hn-bg-opacity-val').textContent =
+        document.getElementById('hn-bg-opacity').value + '%';
+      document.getElementById('hn-text-scale-val').textContent =
+        document.getElementById('hn-text-scale').value + '%';
+      document.getElementById('hn-line-height-val').textContent =
+        document.getElementById('hn-line-height').value + '%';
+      document.getElementById('hn-contrast-val').textContent =
+        document.getElementById('hn-contrast').value + '%';
+      document.getElementById('hn-warmth-val').textContent =
+        document.getElementById('hn-warmth').value + '%';
+      document.getElementById('hn-letter-spacing-val').textContent =
+        document.getElementById('hn-letter-spacing').value + '%';
+    }
+
+    function syncUIFromState() {
+      var c = state.custom;
+      document.getElementById('hn-contrast').value = c.contrast;
+      document.getElementById('hn-bg-opacity').value = c.bgOpacity;
+      document.getElementById('hn-text-scale').value = c.textScale;
+      document.getElementById('hn-line-height').value = c.lineHeight;
+      document.getElementById('hn-warmth').value = c.warmth;
+      document.getElementById('hn-letter-spacing').value = c.letterSpacing;
+      document.getElementById('hn-page-rules').checked = c.pageRules;
+      document.getElementById('hn-code-grid').checked = c.codeGrid;
+      document.getElementById('hn-hide-cover').checked = c.hideCover;
+      document.getElementById('hn-auto-hide-cover').checked = c.autoHideCover;
+      document.getElementById('hn-hide-decor').checked = c.hideDecor;
+      document.getElementById('hn-focus-reading').checked = c.focusReading;
+      setRangeLabels();
+
+      document.querySelectorAll('[data-hn-theme]').forEach(function (btn) {
+        btn.classList.toggle('active', btn.dataset.hnTheme === state.theme);
+      });
+      document.querySelectorAll('[data-hn-font]').forEach(function (btn) {
+        btn.classList.toggle('active', btn.dataset.hnFont === state.font);
+      });
+      document.querySelectorAll('[data-hn-bg]').forEach(function (btn) {
+        btn.classList.toggle('active', btn.dataset.hnBg === state.bg);
+      });
+      document.querySelectorAll('[data-hn-ui]').forEach(function (btn) {
+        btn.classList.toggle('active', btn.dataset.hnUi === state.ui);
+      });
+      document.querySelectorAll('[data-hn-width]').forEach(function (btn) {
+        btn.classList.toggle('active', btn.dataset.hnWidth === c.contentWidth);
+      });
+    }
+
+    function applyAndSave() {
+      state.custom = getCustomFromUI();
+      HN.applyAppearancePrefs(state);
+      HN.savePrefs(state);
+    }
+
+    function loadState() {
+      state.theme = document.documentElement.dataset.theme || HN.DEFAULTS.theme;
+      state.font = document.documentElement.dataset.font || HN.DEFAULTS.font;
+      state.bg = document.documentElement.dataset.bg || HN.DEFAULTS.bg;
+      state.ui = document.documentElement.dataset.ui || HN.DEFAULTS.ui;
+      state.custom = HN.parseCustom(localStorage.getItem('hn-custom'));
+      syncUIFromState();
+    }
+
+    function openPanel() {
+      panel.hidden = false;
+      panel.classList.add('open');
+      toggle.setAttribute('aria-expanded', 'true');
+      toggle.textContent = '✕';
+      loadState();
+      closeBtn.focus();
+    }
+
+    function closePanel() {
+      panel.classList.remove('open');
+      panel.hidden = true;
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.textContent = '🎨';
+      toggle.focus();
+    }
+
+    toggle.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (panel.classList.contains('open')) closePanel();
+      else openPanel();
+    });
+
+    closeBtn.addEventListener('click', closePanel);
+
+    document.addEventListener('click', function (e) {
+      if (panel.classList.contains('open') && !panel.contains(e.target) && e.target !== toggle) {
+        closePanel();
+      }
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && panel.classList.contains('open')) closePanel();
+    });
+
+    document.querySelectorAll('[data-hn-theme]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        state.theme = btn.dataset.hnTheme;
+        applyAndSave();
+        syncUIFromState();
+      });
+    });
+
+    document.querySelectorAll('[data-hn-font]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        state.font = btn.dataset.hnFont;
+        applyAndSave();
+        syncUIFromState();
+      });
+    });
+
+    document.querySelectorAll('[data-hn-bg]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        state.bg = btn.dataset.hnBg;
+        applyAndSave();
+        syncUIFromState();
+      });
+    });
+
+    document.querySelectorAll('[data-hn-ui]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        state.ui = btn.dataset.hnUi;
+        applyAndSave();
+        syncUIFromState();
+      });
+    });
+
+    document.querySelectorAll('[data-hn-width]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        state.custom.contentWidth = btn.dataset.hnWidth;
+        applyAndSave();
+        syncUIFromState();
+      });
+    });
+
+    document.querySelectorAll('[data-hn-read]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var preset = HN.applyReadingPreset(btn.dataset.hnRead);
+        if (!preset) return;
+        state.theme = preset.theme;
+        state.font = preset.font;
+        state.bg = preset.bg;
+        state.ui = preset.ui;
+        state.custom = preset.custom;
+        HN.applyAppearancePrefs(state);
+        HN.savePrefs(state);
+        syncUIFromState();
+      });
+    });
+
+    [
+      'hn-contrast', 'hn-bg-opacity', 'hn-text-scale', 'hn-line-height',
+      'hn-warmth', 'hn-letter-spacing',
+    ].forEach(function (id) {
+      document.getElementById(id).addEventListener('input', function () {
+        setRangeLabels();
+        applyAndSave();
+      });
+    });
+
+    [
+      'hn-page-rules', 'hn-code-grid', 'hn-hide-cover', 'hn-auto-hide-cover',
+      'hn-hide-decor', 'hn-focus-reading',
+    ].forEach(function (id) {
+      document.getElementById(id).addEventListener('change', applyAndSave);
+    });
+
+    document.getElementById('hn-reset').addEventListener('click', function () {
+      state = HN.resetPrefs();
+      syncUIFromState();
+    });
+
+    loadState();
+  })();
+</script>

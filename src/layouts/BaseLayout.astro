@@ -1,6 +1,6 @@
 ---
 import SiteNav from '../components/SiteNav.astro';
-import ThemeFontPanel from '../components/ThemeFontPanel.astro';
+import AppearancePanel from '../components/AppearancePanel.astro';
 import '../styles/global.css';
 
 interface Props {
@@ -39,20 +39,16 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Gochi+Hand&family=JetBrains+Mono:wght@400;500&family=Kalam:wght@300;400;700&family=Klee+One:wght@400;600&family=Patrick+Hand&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Caveat:wght@400;600&family=Gochi+Hand&family=JetBrains+Mono:wght@400;500&family=Kalam:wght@300;400;700&family=Klee+One:wght@400;600&family=Nunito+Sans:wght@400;600;700&family=Patrick+Hand&display=swap"
       rel="stylesheet"
     />
 
     <title>{title}</title>
 
-    <!-- FOUC prevention: apply saved theme/font before first paint -->
+    <!-- Appearance prefs — must load before paint -->
+    <script is:inline src="/hn-appearance.js"></script>
     <script is:inline>
-      (function () {
-        var t = localStorage.getItem('hn-theme') || 'warm';
-        var f = localStorage.getItem('hn-font') || 'klee';
-        document.documentElement.dataset.theme = t;
-        document.documentElement.dataset.font = f;
-      })();
+      if (window.HNAppearance) window.HNAppearance.loadFromStorage();
     </script>
   </head>
   <body>
@@ -60,6 +56,6 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <div class="content-wrap">
       <slot />
     </div>
-    <ThemeFontPanel />
+    <AppearancePanel />
   </body>
 </html>

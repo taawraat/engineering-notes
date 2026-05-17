@@ -3,6 +3,7 @@
    ───────────────────────────────────────── */
 @import './tokens.css';
 @import './themes.css';
+@import './appearance.css';
 @import './components.css';
 
 /* ─────────────────────────────────────────
@@ -23,11 +24,11 @@ body {
     0deg,
     transparent,
     transparent 39px,
-    var(--body-rule) 39px,
-    var(--body-rule) 40px
+    color-mix(in srgb, var(--body-rule) calc(var(--hn-bg-opacity, 1) * 100%), transparent) 39px,
+    color-mix(in srgb, var(--body-rule) calc(var(--hn-bg-opacity, 1) * 100%), transparent) 40px
   );
   font-family: var(--font-body);
-  color: var(--ink);
+  color: var(--ink-display, var(--ink));
   min-height: 100vh;
 }
 

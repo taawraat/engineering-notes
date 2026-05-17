@@ -7,7 +7,7 @@
   --font-hand: 'Gochi Hand', cursive;
   --font-mono: 'JetBrains Mono', monospace;
 
-  /* ── Paper & Ink ── */
+  /* ── Paper & Ink (base — contrast slider mixes via appearance.css) ── */
   --paper:    #fdf8f0;
   --paper2:   #fef9f2;
   --ink:      #2d2318;
@@ -23,6 +23,7 @@
   /* ── Shadows ── */
   --shadow:  rgba(80, 50, 20, 0.10);
   --shadow2: rgba(80, 50, 20, 0.18);
+  --card-shadow: 3px 3px 16px var(--shadow);
 
   /* ── Accent: Green ── */
   --green:       #3a7d4a;
@@ -58,6 +59,26 @@
   --spine-purple: var(--purple);
   --spine-red:    var(--red);
 
+  /* ── User-adjustable appearance (set by hn-appearance.js) ── */
+  --hn-text-scale:   1;
+  --hn-line-scale:   1;
+  --hn-bg-opacity:   1;
+  --hn-page-rules:   1;
+  --hn-code-grid:    1;
+  --hn-contrast:     0;
+  --hn-ink-mix:      0%;
+  --hn-paper-mix:    0%;
+
+  /* ── Readability scale (floors enforced in JS: body ≥15px, code ≥13.5px) ── */
+  --text-body:         calc(18px * var(--hn-text-scale));
+  --text-body-leading: calc(2.0 * var(--hn-line-scale));
+  --text-code:         calc(13.5px * var(--hn-text-scale));
+  --text-code-leading: calc(1.9 * var(--hn-line-scale));
+
+  /* ── Pattern opacity (background intensity slider) ── */
+  --page-rule-opacity: calc(0.5 * var(--hn-bg-opacity) * var(--hn-page-rules));
+  --code-grid-opacity: calc(1 * var(--hn-bg-opacity) * var(--hn-code-grid));
+
   /* ── Spacing rhythm ── */
   --space-1: 0.25rem;
   --space-2: 0.5rem;
@@ -66,7 +87,7 @@
   --space-6: 1.5rem;
   --space-8: 2rem;
 
-  /* ── Border radius ── */
+  /* ── Border radius (overridden by data-ui) ── */
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 12px;
